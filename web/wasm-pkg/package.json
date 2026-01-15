@@ -1,0 +1,16 @@
+{
+  "name": "wc-wasm",
+  "type": "module",
+  "description": "WebAssembly bindings for World Cup simulation",
+  "version": "0.1.0",
+  "files": [
+    "wc_wasm_bg.wasm",
+    "wc_wasm.js",
+    "wc_wasm.d.ts"
+  ],
+  "main": "wc_wasm.js",
+  "types": "wc_wasm.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
