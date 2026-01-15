@@ -1,0 +1,13 @@
+[package]
+name = "wc-simulation"
+version.workspace = true
+edition.workspace = true
+description = "Monte Carlo simulation engine for World Cup prediction"
+
+[dependencies]
+wc-core = { path = "../wc-core" }
+wc-strategies = { path = "../wc-strategies" }
+serde = { workspace = true }
+rand = { workspace = true }
+rand_chacha = { workspace = true }
+rayon = { workspace = true }

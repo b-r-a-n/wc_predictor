@@ -1,0 +1,13 @@
+[package]
+name = "wc-strategies"
+version.workspace = true
+edition.workspace = true
+description = "Prediction strategies for World Cup simulation"
+
+[dependencies]
+wc-core = { path = "../wc-core" }
+serde = { workspace = true }
+rand = { workspace = true }
+
+[dev-dependencies]
+rand_chacha = { workspace = true }

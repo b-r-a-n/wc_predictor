@@ -1,0 +1,22 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/wc-core",
+    "crates/wc-strategies",
+    "crates/wc-simulation",
+    "crates/wc-wasm",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/user/wc_predictor"
+
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+rand = "0.8"
+rand_chacha = "0.3"
+rayon = "1.10"
+thiserror = "1.0"

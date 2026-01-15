@@ -1,0 +1,9 @@
+[package]
+name = "wc-core"
+version.workspace = true
+edition.workspace = true
+description = "Core domain types for World Cup simulation"
+
+[dependencies]
+serde = { workspace = true }
+thiserror = { workspace = true }
