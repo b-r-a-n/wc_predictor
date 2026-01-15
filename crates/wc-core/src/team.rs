@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 /// Unique identifier for a team (0-47 for 48 teams).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, PartialOrd, Ord)]
+#[serde(transparent)]
 pub struct TeamId(pub u8);
 
 impl Default for TeamId {
