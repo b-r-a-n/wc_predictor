@@ -36,7 +36,7 @@ export function useWasm(): { status: WasmStatus; api: WasmApi | null; error: str
         console.log('WASM initialized');
 
         // Load tournament data
-        const response = await fetch('/data/teams.json');
+        const response = await fetch(`${import.meta.env.BASE_URL}data/teams.json`);
         if (!response.ok) {
           throw new Error(`Failed to load teams.json: ${response.status}`);
         }
