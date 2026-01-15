@@ -1,0 +1,735 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "last_updated": "2026-01-15",
+    "note": "World Cup 2026 team mapping - 48 teams in 12 groups. 42 confirmed qualifiers, 6 TBD playoff spots (March 2026).",
+    "sources": [
+      "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/final-draw-results",
+      "https://www.transfermarkt.us"
+    ]
+  },
+  "teams": [
+    {
+      "id": 0,
+      "canonical_name": "Argentina",
+      "fifa_code": "ARG",
+      "confederation": "CONMEBOL",
+      "world_cup_wins": 3,
+      "aliases": {
+        "elo": "Argentina",
+        "transfermarkt": "argentinien",
+        "transfermarkt_id": 3437,
+        "fifa": "Argentina"
+      }
+    },
+    {
+      "id": 1,
+      "canonical_name": "Australia",
+      "fifa_code": "AUS",
+      "confederation": "AFC",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Australia",
+        "transfermarkt": "australien",
+        "transfermarkt_id": 3433,
+        "fifa": "Australia"
+      }
+    },
+    {
+      "id": 2,
+      "canonical_name": "Austria",
+      "fifa_code": "AUT",
+      "confederation": "UEFA",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Austria",
+        "transfermarkt": "osterreich",
+        "transfermarkt_id": 3383,
+        "fifa": "Austria"
+      }
+    },
+    {
+      "id": 3,
+      "canonical_name": "Algeria",
+      "fifa_code": "ALG",
+      "confederation": "CAF",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Algeria",
+        "transfermarkt": "algerien",
+        "transfermarkt_id": 3614,
+        "fifa": "Algeria"
+      }
+    },
+    {
+      "id": 4,
+      "canonical_name": "Belgium",
+      "fifa_code": "BEL",
+      "confederation": "UEFA",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Belgium",
+        "transfermarkt": "belgien",
+        "transfermarkt_id": 3382,
+        "fifa": "Belgium"
+      }
+    },
+    {
+      "id": 5,
+      "canonical_name": "Brazil",
+      "fifa_code": "BRA",
+      "confederation": "CONMEBOL",
+      "world_cup_wins": 5,
+      "aliases": {
+        "elo": "Brazil",
+        "transfermarkt": "brasilien",
+        "transfermarkt_id": 3439,
+        "fifa": "Brazil"
+      }
+    },
+    {
+      "id": 6,
+      "canonical_name": "Canada",
+      "fifa_code": "CAN",
+      "confederation": "CONCACAF",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Canada",
+        "transfermarkt": "kanada",
+        "transfermarkt_id": 3510,
+        "fifa": "Canada"
+      }
+    },
+    {
+      "id": 7,
+      "canonical_name": "Cape Verde",
+      "fifa_code": "CPV",
+      "confederation": "CAF",
+      "world_cup_wins": 0,
+      "first_world_cup": true,
+      "aliases": {
+        "elo": "Cape Verde",
+        "transfermarkt": "kap-verde",
+        "transfermarkt_id": 4311,
+        "fifa": "Cape Verde"
+      }
+    },
+    {
+      "id": 8,
+      "canonical_name": "Colombia",
+      "fifa_code": "COL",
+      "confederation": "CONMEBOL",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Colombia",
+        "transfermarkt": "kolumbien",
+        "transfermarkt_id": 3816,
+        "fifa": "Colombia"
+      }
+    },
+    {
+      "id": 9,
+      "canonical_name": "Croatia",
+      "fifa_code": "CRO",
+      "confederation": "UEFA",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Croatia",
+        "transfermarkt": "kroatien",
+        "transfermarkt_id": 3556,
+        "fifa": "Croatia"
+      }
+    },
+    {
+      "id": 10,
+      "canonical_name": "Curacao",
+      "fifa_code": "CUW",
+      "confederation": "CONCACAF",
+      "world_cup_wins": 0,
+      "first_world_cup": true,
+      "aliases": {
+        "elo": "Curacao",
+        "transfermarkt": "curacao",
+        "transfermarkt_id": 32364,
+        "fifa": "Curacao"
+      }
+    },
+    {
+      "id": 11,
+      "canonical_name": "Ecuador",
+      "fifa_code": "ECU",
+      "confederation": "CONMEBOL",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Ecuador",
+        "transfermarkt": "ecuador",
+        "transfermarkt_id": 5750,
+        "fifa": "Ecuador"
+      }
+    },
+    {
+      "id": 12,
+      "canonical_name": "Egypt",
+      "fifa_code": "EGY",
+      "confederation": "CAF",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Egypt",
+        "transfermarkt": "agypten",
+        "transfermarkt_id": 3672,
+        "fifa": "Egypt"
+      }
+    },
+    {
+      "id": 13,
+      "canonical_name": "England",
+      "fifa_code": "ENG",
+      "confederation": "UEFA",
+      "world_cup_wins": 1,
+      "aliases": {
+        "elo": "England",
+        "transfermarkt": "england",
+        "transfermarkt_id": 3299,
+        "fifa": "England"
+      }
+    },
+    {
+      "id": 14,
+      "canonical_name": "France",
+      "fifa_code": "FRA",
+      "confederation": "UEFA",
+      "world_cup_wins": 2,
+      "aliases": {
+        "elo": "France",
+        "transfermarkt": "frankreich",
+        "transfermarkt_id": 3377,
+        "fifa": "France"
+      }
+    },
+    {
+      "id": 15,
+      "canonical_name": "Germany",
+      "fifa_code": "GER",
+      "confederation": "UEFA",
+      "world_cup_wins": 4,
+      "aliases": {
+        "elo": "Germany",
+        "transfermarkt": "deutschland",
+        "transfermarkt_id": 3262,
+        "fifa": "Germany"
+      }
+    },
+    {
+      "id": 16,
+      "canonical_name": "Ghana",
+      "fifa_code": "GHA",
+      "confederation": "CAF",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Ghana",
+        "transfermarkt": "ghana",
+        "transfermarkt_id": 3441,
+        "fifa": "Ghana"
+      }
+    },
+    {
+      "id": 17,
+      "canonical_name": "Haiti",
+      "fifa_code": "HAI",
+      "confederation": "CONCACAF",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Haiti",
+        "transfermarkt": "haiti",
+        "transfermarkt_id": 14161,
+        "fifa": "Haiti"
+      }
+    },
+    {
+      "id": 18,
+      "canonical_name": "Iran",
+      "fifa_code": "IRN",
+      "confederation": "AFC",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Iran",
+        "transfermarkt": "iran",
+        "transfermarkt_id": 3582,
+        "fifa": "IR Iran"
+      }
+    },
+    {
+      "id": 19,
+      "canonical_name": "Ivory Coast",
+      "fifa_code": "CIV",
+      "confederation": "CAF",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Ivory Coast",
+        "transfermarkt": "elfenbeinkuste",
+        "transfermarkt_id": 3591,
+        "fifa": "Cote d'Ivoire"
+      }
+    },
+    {
+      "id": 20,
+      "canonical_name": "Japan",
+      "fifa_code": "JPN",
+      "confederation": "AFC",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Japan",
+        "transfermarkt": "japan",
+        "transfermarkt_id": 3435,
+        "fifa": "Japan"
+      }
+    },
+    {
+      "id": 21,
+      "canonical_name": "Jordan",
+      "fifa_code": "JOR",
+      "confederation": "AFC",
+      "world_cup_wins": 0,
+      "first_world_cup": true,
+      "aliases": {
+        "elo": "Jordan",
+        "transfermarkt": "jordanien",
+        "transfermarkt_id": 15737,
+        "fifa": "Jordan"
+      }
+    },
+    {
+      "id": 22,
+      "canonical_name": "Mexico",
+      "fifa_code": "MEX",
+      "confederation": "CONCACAF",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Mexico",
+        "transfermarkt": "mexiko",
+        "transfermarkt_id": 6303,
+        "fifa": "Mexico"
+      }
+    },
+    {
+      "id": 23,
+      "canonical_name": "Morocco",
+      "fifa_code": "MAR",
+      "confederation": "CAF",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Morocco",
+        "transfermarkt": "marokko",
+        "transfermarkt_id": 3575,
+        "fifa": "Morocco"
+      }
+    },
+    {
+      "id": 24,
+      "canonical_name": "Netherlands",
+      "fifa_code": "NED",
+      "confederation": "UEFA",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Netherlands",
+        "transfermarkt": "niederlande",
+        "transfermarkt_id": 3379,
+        "fifa": "Netherlands"
+      }
+    },
+    {
+      "id": 25,
+      "canonical_name": "New Zealand",
+      "fifa_code": "NZL",
+      "confederation": "OFC",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "New Zealand",
+        "transfermarkt": "neuseeland",
+        "transfermarkt_id": 9171,
+        "fifa": "New Zealand"
+      }
+    },
+    {
+      "id": 26,
+      "canonical_name": "Norway",
+      "fifa_code": "NOR",
+      "confederation": "UEFA",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Norway",
+        "transfermarkt": "norwegen",
+        "transfermarkt_id": 3440,
+        "fifa": "Norway"
+      }
+    },
+    {
+      "id": 27,
+      "canonical_name": "Panama",
+      "fifa_code": "PAN",
+      "confederation": "CONCACAF",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Panama",
+        "transfermarkt": "panama",
+        "transfermarkt_id": 3580,
+        "fifa": "Panama"
+      }
+    },
+    {
+      "id": 28,
+      "canonical_name": "Paraguay",
+      "fifa_code": "PAR",
+      "confederation": "CONMEBOL",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Paraguay",
+        "transfermarkt": "paraguay",
+        "transfermarkt_id": 3581,
+        "fifa": "Paraguay"
+      }
+    },
+    {
+      "id": 29,
+      "canonical_name": "Portugal",
+      "fifa_code": "POR",
+      "confederation": "UEFA",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Portugal",
+        "transfermarkt": "portugal",
+        "transfermarkt_id": 3300,
+        "fifa": "Portugal"
+      }
+    },
+    {
+      "id": 30,
+      "canonical_name": "Qatar",
+      "fifa_code": "QAT",
+      "confederation": "AFC",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Qatar",
+        "transfermarkt": "katar",
+        "transfermarkt_id": 14162,
+        "fifa": "Qatar"
+      }
+    },
+    {
+      "id": 31,
+      "canonical_name": "Saudi Arabia",
+      "fifa_code": "KSA",
+      "confederation": "AFC",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Saudi Arabia",
+        "transfermarkt": "saudi-arabien",
+        "transfermarkt_id": 3807,
+        "fifa": "Saudi Arabia"
+      }
+    },
+    {
+      "id": 32,
+      "canonical_name": "Scotland",
+      "fifa_code": "SCO",
+      "confederation": "UEFA",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Scotland",
+        "transfermarkt": "schottland",
+        "transfermarkt_id": 3380,
+        "fifa": "Scotland"
+      }
+    },
+    {
+      "id": 33,
+      "canonical_name": "Senegal",
+      "fifa_code": "SEN",
+      "confederation": "CAF",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Senegal",
+        "transfermarkt": "senegal",
+        "transfermarkt_id": 3499,
+        "fifa": "Senegal"
+      }
+    },
+    {
+      "id": 34,
+      "canonical_name": "South Africa",
+      "fifa_code": "RSA",
+      "confederation": "CAF",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "South Africa",
+        "transfermarkt": "sudafrika",
+        "transfermarkt_id": 3806,
+        "fifa": "South Africa"
+      }
+    },
+    {
+      "id": 35,
+      "canonical_name": "South Korea",
+      "fifa_code": "KOR",
+      "confederation": "AFC",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "South Korea",
+        "transfermarkt": "sudkorea",
+        "transfermarkt_id": 3589,
+        "fifa": "Korea Republic"
+      }
+    },
+    {
+      "id": 36,
+      "canonical_name": "Spain",
+      "fifa_code": "ESP",
+      "confederation": "UEFA",
+      "world_cup_wins": 1,
+      "aliases": {
+        "elo": "Spain",
+        "transfermarkt": "spanien",
+        "transfermarkt_id": 3375,
+        "fifa": "Spain"
+      }
+    },
+    {
+      "id": 37,
+      "canonical_name": "Switzerland",
+      "fifa_code": "SUI",
+      "confederation": "UEFA",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Switzerland",
+        "transfermarkt": "schweiz",
+        "transfermarkt_id": 3384,
+        "fifa": "Switzerland"
+      }
+    },
+    {
+      "id": 38,
+      "canonical_name": "Tunisia",
+      "fifa_code": "TUN",
+      "confederation": "CAF",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "Tunisia",
+        "transfermarkt": "tunesien",
+        "transfermarkt_id": 3670,
+        "fifa": "Tunisia"
+      }
+    },
+    {
+      "id": 39,
+      "canonical_name": "United States",
+      "fifa_code": "USA",
+      "confederation": "CONCACAF",
+      "world_cup_wins": 0,
+      "aliases": {
+        "elo": "United States",
+        "transfermarkt": "usa",
+        "transfermarkt_id": 3505,
+        "fifa": "USA"
+      }
+    },
+    {
+      "id": 40,
+      "canonical_name": "Uruguay",
+      "fifa_code": "URU",
+      "confederation": "CONMEBOL",
+      "world_cup_wins": 2,
+      "aliases": {
+        "elo": "Uruguay",
+        "transfermarkt": "uruguay",
+        "transfermarkt_id": 3449,
+        "fifa": "Uruguay"
+      }
+    },
+    {
+      "id": 41,
+      "canonical_name": "Uzbekistan",
+      "fifa_code": "UZB",
+      "confederation": "AFC",
+      "world_cup_wins": 0,
+      "first_world_cup": true,
+      "aliases": {
+        "elo": "Uzbekistan",
+        "transfermarkt": "usbekistan",
+        "transfermarkt_id": 3563,
+        "fifa": "Uzbekistan"
+      }
+    },
+    {
+      "id": 42,
+      "canonical_name": "TBD - UEFA Playoff A",
+      "fifa_code": "TBD",
+      "confederation": "UEFA",
+      "world_cup_wins": 0,
+      "playoff": true,
+      "playoff_teams": ["Italy", "Wales", "Bosnia and Herzegovina", "Northern Ireland"],
+      "aliases": {
+        "elo": "TBD",
+        "transfermarkt": "TBD",
+        "transfermarkt_id": null,
+        "fifa": "TBD"
+      }
+    },
+    {
+      "id": 43,
+      "canonical_name": "TBD - UEFA Playoff B",
+      "fifa_code": "TBD",
+      "confederation": "UEFA",
+      "world_cup_wins": 0,
+      "playoff": true,
+      "playoff_teams": ["Ukraine", "Sweden", "Poland", "Albania"],
+      "aliases": {
+        "elo": "TBD",
+        "transfermarkt": "TBD",
+        "transfermarkt_id": null,
+        "fifa": "TBD"
+      }
+    },
+    {
+      "id": 44,
+      "canonical_name": "TBD - UEFA Playoff C",
+      "fifa_code": "TBD",
+      "confederation": "UEFA",
+      "world_cup_wins": 0,
+      "playoff": true,
+      "playoff_teams": ["Turkey", "Romania", "Slovakia", "Kosovo"],
+      "aliases": {
+        "elo": "TBD",
+        "transfermarkt": "TBD",
+        "transfermarkt_id": null,
+        "fifa": "TBD"
+      }
+    },
+    {
+      "id": 45,
+      "canonical_name": "TBD - UEFA Playoff D",
+      "fifa_code": "TBD",
+      "confederation": "UEFA",
+      "world_cup_wins": 0,
+      "playoff": true,
+      "playoff_teams": ["Denmark", "Czechia", "Republic of Ireland", "North Macedonia"],
+      "aliases": {
+        "elo": "TBD",
+        "transfermarkt": "TBD",
+        "transfermarkt_id": null,
+        "fifa": "TBD"
+      }
+    },
+    {
+      "id": 46,
+      "canonical_name": "TBD - Intercontinental Playoff 1",
+      "fifa_code": "TBD",
+      "confederation": "TBD",
+      "world_cup_wins": 0,
+      "playoff": true,
+      "playoff_teams": ["Jamaica", "New Caledonia", "DR Congo"],
+      "aliases": {
+        "elo": "TBD",
+        "transfermarkt": "TBD",
+        "transfermarkt_id": null,
+        "fifa": "TBD"
+      }
+    },
+    {
+      "id": 47,
+      "canonical_name": "TBD - Intercontinental Playoff 2",
+      "fifa_code": "TBD",
+      "confederation": "TBD",
+      "world_cup_wins": 0,
+      "playoff": true,
+      "playoff_teams": ["Bolivia", "Suriname", "Iraq"],
+      "aliases": {
+        "elo": "TBD",
+        "transfermarkt": "TBD",
+        "transfermarkt_id": null,
+        "fifa": "TBD"
+      }
+    }
+  ],
+  "groups": {
+    "A": ["Mexico", "South Africa", "South Korea", "TBD - UEFA Playoff D"],
+    "B": ["Canada", "TBD - UEFA Playoff A", "Qatar", "Switzerland"],
+    "C": ["Brazil", "Morocco", "Haiti", "Scotland"],
+    "D": ["United States", "Paraguay", "Australia", "TBD - UEFA Playoff C"],
+    "E": ["Germany", "Curacao", "Ivory Coast", "Ecuador"],
+    "F": ["Netherlands", "Japan", "TBD - UEFA Playoff B", "Tunisia"],
+    "G": ["Belgium", "Egypt", "Iran", "New Zealand"],
+    "H": ["Spain", "Cape Verde", "Saudi Arabia", "Uruguay"],
+    "I": ["France", "Senegal", "TBD - Intercontinental Playoff 2", "Norway"],
+    "J": ["Argentina", "Algeria", "Austria", "Jordan"],
+    "K": ["Portugal", "TBD - Intercontinental Playoff 1", "Uzbekistan", "Colombia"],
+    "L": ["England", "Croatia", "Ghana", "Panama"]
+  },
+  "confederations": {
+    "AFC": {
+      "name": "Asian Football Confederation",
+      "slots": 8,
+      "teams": ["Australia", "Iran", "Japan", "Jordan", "Qatar", "Saudi Arabia", "South Korea", "Uzbekistan"]
+    },
+    "CAF": {
+      "name": "Confederation of African Football",
+      "slots": 9,
+      "teams": ["Algeria", "Cape Verde", "Egypt", "Ghana", "Ivory Coast", "Morocco", "Senegal", "South Africa", "Tunisia"]
+    },
+    "CONCACAF": {
+      "name": "Confederation of North, Central America and Caribbean Association Football",
+      "slots": 6,
+      "teams": ["Canada", "Curacao", "Haiti", "Mexico", "Panama", "United States"]
+    },
+    "CONMEBOL": {
+      "name": "South American Football Confederation",
+      "slots": 6,
+      "teams": ["Argentina", "Brazil", "Colombia", "Ecuador", "Paraguay", "Uruguay"]
+    },
+    "OFC": {
+      "name": "Oceania Football Confederation",
+      "slots": 1,
+      "teams": ["New Zealand"]
+    },
+    "UEFA": {
+      "name": "Union of European Football Associations",
+      "slots": 16,
+      "confirmed_teams": ["Austria", "Belgium", "Croatia", "England", "France", "Germany", "Netherlands", "Norway", "Portugal", "Scotland", "Spain", "Switzerland"],
+      "playoff_teams": ["Albania", "Bosnia and Herzegovina", "Czechia", "Denmark", "Italy", "Kosovo", "North Macedonia", "Northern Ireland", "Poland", "Republic of Ireland", "Romania", "Slovakia", "Sweden", "Turkey", "Ukraine", "Wales"]
+    }
+  },
+  "playoff_schedule": {
+    "uefa_playoffs": {
+      "semifinals": "2026-03-26",
+      "finals": "2026-03-31"
+    },
+    "intercontinental_playoffs": {
+      "semifinals": "2026-03-26",
+      "finals": "2026-03-31",
+      "venues": {
+        "semifinal_1": "Guadalajara, Mexico",
+        "semifinal_2": "Monterrey, Mexico"
+      }
+    }
+  },
+  "tournament_info": {
+    "name": "FIFA World Cup 2026",
+    "hosts": ["United States", "Canada", "Mexico"],
+    "dates": {
+      "start": "2026-06-11",
+      "end": "2026-07-19"
+    },
+    "total_teams": 48,
+    "total_groups": 12,
+    "teams_per_group": 4,
+    "total_matches": 104,
+    "group_stage_matches": 72,
+    "stadiums": 16,
+    "opening_match": {
+      "teams": ["Mexico", "South Africa"],
+      "venue": "Estadio Azteca, Mexico City",
+      "date": "2026-06-11"
+    },
+    "first_time_qualifiers": ["Cape Verde", "Curacao", "Jordan", "Uzbekistan"],
+    "notable_absences": ["Chile", "Nigeria", "Cameroon", "Costa Rica", "Serbia", "Greece"]
+  }
+}
