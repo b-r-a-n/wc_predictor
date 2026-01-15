@@ -69,9 +69,11 @@ export function GroupTable({ group, teams, teamStats, totalSimulations }: GroupT
                 className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
               >
                 <td className="px-3 py-2 whitespace-nowrap">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base">{getFlagEmoji(team.code)}</span>
-                    <span className="text-sm font-medium text-gray-900">{team.name}</span>
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    <span className="text-base flex-shrink-0">{getFlagEmoji(team.code)}</span>
+                    <span className="text-sm font-medium text-gray-900 truncate max-w-[100px]" title={team.name}>
+                      {team.name}
+                    </span>
                   </div>
                 </td>
                 <td className="px-2 py-2 text-center">
