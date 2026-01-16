@@ -113,12 +113,25 @@ export function useWasm(): { status: WasmStatus; api: WasmApi | null; error: str
               pathStats = rawPathStats as Record<string, unknown>;
             }
 
+            // Get bracket_slot_stats if available (may be a Map that needs conversion)
+            let bracketSlotStats: Record<string, unknown> | undefined;
+            const rawBracketSlotStats = (rawResult as any).bracket_slot_stats;
+            if (rawBracketSlotStats instanceof Map) {
+              bracketSlotStats = {};
+              rawBracketSlotStats.forEach((value: unknown, key: number) => {
+                bracketSlotStats![String(key)] = value;
+              });
+            } else if (rawBracketSlotStats) {
+              bracketSlotStats = rawBracketSlotStats as Record<string, unknown>;
+            }
+
             return {
               total_simulations: result.total_simulations,
               team_stats: teamStats,
               most_likely_winner: result.most_likely_winner,
               most_likely_final: result.most_likely_final,
               path_stats: pathStats,
+              bracket_slot_stats: bracketSlotStats,
             } as AggregatedResults;
           },
           calculateMatchProbability: (teamAElo, teamBElo, isKnockout) => {
