@@ -1,0 +1,24 @@
+[package]
+name = "wc-cli"
+version.workspace = true
+edition.workspace = true
+description = "Command-line interface for World Cup 2026 simulation"
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "wc"
+path = "src/main.rs"
+
+[dependencies]
+wc-core = { path = "../wc-core" }
+wc-strategies = { path = "../wc-strategies" }
+wc-simulation = { path = "../wc-simulation" }
+
+clap = { version = "4.4", features = ["derive"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+comfy-table = "7.1"
+thiserror = { workspace = true }
+rand = { workspace = true }
+rand_chacha = { workspace = true }

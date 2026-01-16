@@ -5,6 +5,7 @@ members = [
     "crates/wc-strategies",
     "crates/wc-simulation",
     "crates/wc-wasm",
+    "crates/wc-cli",
 ]
 
 [workspace.package]
