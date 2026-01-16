@@ -302,424 +302,24 @@ fn resolve_slot(
 use std::sync::LazyLock;
 
 pub static THIRD_PLACE_TABLE: LazyLock<HashMap<&'static str, [char; 8]>> = LazyLock::new(|| {
-    let mut m = HashMap::with_capacity(495);
-
-    // Row format: (qualifying_groups, [1E_opponent, 1I_opponent, 1A_opponent, 1L_opponent, 1D_opponent, 1G_opponent, 1B_opponent, 1K_opponent])
-    // Based on FIFA World Cup 2026 Regulations, Annex C
-
-    // Example entries (full table to be populated):
-    m.insert("EFGHIJKL", ['F', 'G', 'E', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("DFGHIJKL", ['D', 'F', 'H', 'K', 'I', 'J', 'G', 'L']);
-    m.insert("DEGHIJKL", ['D', 'G', 'E', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("DEFHIJKL", ['D', 'F', 'E', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("DEFGIJKL", ['D', 'F', 'E', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("DEFGHJKL", ['D', 'F', 'E', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("DEFGHIKL", ['D', 'F', 'E', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("DEFGHIJK", ['D', 'F', 'E', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("CFGHIJKL", ['F', 'G', 'C', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("CEGHIJKL", ['E', 'G', 'C', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("CEFHIJKL", ['E', 'F', 'C', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("CEFGIJKL", ['E', 'F', 'C', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("CEFGHJKL", ['E', 'F', 'C', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("CEFGHIKL", ['E', 'F', 'C', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("CEFGHIJK", ['E', 'F', 'C', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("CDGHIJKL", ['D', 'G', 'C', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("CDFHIJKL", ['D', 'F', 'C', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("CDFGIJKL", ['D', 'F', 'C', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("CDFGHJKL", ['D', 'F', 'C', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("CDFGHIKL", ['D', 'F', 'C', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("CDFGHIJK", ['D', 'F', 'C', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("CDEHIJKL", ['D', 'E', 'C', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("CDEGIJKL", ['D', 'E', 'C', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("CDEGHJKL", ['D', 'E', 'C', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("CDEGHIKL", ['D', 'E', 'C', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("CDEGHIJK", ['D', 'E', 'C', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("CDEFIJKL", ['D', 'E', 'C', 'K', 'I', 'F', 'J', 'L']);
-    m.insert("CDEFHJKL", ['D', 'E', 'C', 'K', 'J', 'F', 'H', 'L']);
-    m.insert("CDEFHIKL", ['D', 'E', 'C', 'K', 'I', 'F', 'H', 'L']);
-    m.insert("CDEFHIJK", ['D', 'E', 'C', 'J', 'I', 'F', 'H', 'K']);
-    m.insert("CDEFGJKL", ['D', 'E', 'C', 'K', 'J', 'F', 'G', 'L']);
-    m.insert("CDEFGIKL", ['D', 'E', 'C', 'K', 'I', 'F', 'G', 'L']);
-    m.insert("CDEFGIJK", ['D', 'E', 'C', 'J', 'I', 'F', 'G', 'K']);
-    m.insert("CDEFGHKL", ['D', 'E', 'C', 'K', 'F', 'G', 'H', 'L']);
-    m.insert("CDEFGHJK", ['D', 'E', 'C', 'J', 'F', 'G', 'H', 'K']);
-    m.insert("CDEFGHIL", ['D', 'E', 'C', 'L', 'I', 'F', 'G', 'H']);
-    m.insert("CDEFGHIJ", ['D', 'E', 'C', 'J', 'I', 'F', 'G', 'H']);
-
-    // Groups starting with B
-    m.insert("BFGHIJKL", ['F', 'G', 'B', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("BEGHIJKL", ['E', 'G', 'B', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("BEFHIJKL", ['E', 'F', 'B', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("BEFGIJKL", ['E', 'F', 'B', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("BEFGHJKL", ['E', 'F', 'B', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("BEFGHIKL", ['E', 'F', 'B', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("BEFGHIJK", ['E', 'F', 'B', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("BDGHIJKL", ['D', 'G', 'B', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("BDFHIJKL", ['D', 'F', 'B', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("BDFGIJKL", ['D', 'F', 'B', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("BDFGHJKL", ['D', 'F', 'B', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("BDFGHIKL", ['D', 'F', 'B', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("BDFGHIJK", ['D', 'F', 'B', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("BDEHIJKL", ['D', 'E', 'B', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("BDEGIJKL", ['D', 'E', 'B', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("BDEGHJKL", ['D', 'E', 'B', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("BDEGHIKL", ['D', 'E', 'B', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("BDEGHIJK", ['D', 'E', 'B', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("BDEFIJKL", ['D', 'E', 'B', 'K', 'I', 'F', 'J', 'L']);
-    m.insert("BDEFHJKL", ['D', 'E', 'B', 'K', 'J', 'F', 'H', 'L']);
-    m.insert("BDEFHIKL", ['D', 'E', 'B', 'K', 'I', 'F', 'H', 'L']);
-    m.insert("BDEFHIJK", ['D', 'E', 'B', 'J', 'I', 'F', 'H', 'K']);
-    m.insert("BDEFGJKL", ['D', 'E', 'B', 'K', 'J', 'F', 'G', 'L']);
-    m.insert("BDEFGIKL", ['D', 'E', 'B', 'K', 'I', 'F', 'G', 'L']);
-    m.insert("BDEFGIJK", ['D', 'E', 'B', 'J', 'I', 'F', 'G', 'K']);
-    m.insert("BDEFGHKL", ['D', 'E', 'B', 'K', 'F', 'G', 'H', 'L']);
-    m.insert("BDEFGHJK", ['D', 'E', 'B', 'J', 'F', 'G', 'H', 'K']);
-    m.insert("BDEFGHIL", ['D', 'E', 'B', 'L', 'I', 'F', 'G', 'H']);
-    m.insert("BDEFGHIJ", ['D', 'E', 'B', 'J', 'I', 'F', 'G', 'H']);
-
-    // Groups with BC combinations
-    m.insert("BCGHIJKL", ['C', 'G', 'B', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("BCFHIJKL", ['C', 'F', 'B', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("BCFGIJKL", ['C', 'F', 'B', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("BCFGHJKL", ['C', 'F', 'B', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("BCFGHIKL", ['C', 'F', 'B', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("BCFGHIJK", ['C', 'F', 'B', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("BCEHIJKL", ['C', 'E', 'B', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("BCEGIJKL", ['C', 'E', 'B', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("BCEGHJKL", ['C', 'E', 'B', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("BCEGHIKL", ['C', 'E', 'B', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("BCEGHIJK", ['C', 'E', 'B', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("BCEFIJKL", ['C', 'E', 'B', 'K', 'I', 'F', 'J', 'L']);
-    m.insert("BCEFHJKL", ['C', 'E', 'B', 'K', 'J', 'F', 'H', 'L']);
-    m.insert("BCEFHIKL", ['C', 'E', 'B', 'K', 'I', 'F', 'H', 'L']);
-    m.insert("BCEFHIJK", ['C', 'E', 'B', 'J', 'I', 'F', 'H', 'K']);
-    m.insert("BCEFGJKL", ['C', 'E', 'B', 'K', 'J', 'F', 'G', 'L']);
-    m.insert("BCEFGIKL", ['C', 'E', 'B', 'K', 'I', 'F', 'G', 'L']);
-    m.insert("BCEFGIJK", ['C', 'E', 'B', 'J', 'I', 'F', 'G', 'K']);
-    m.insert("BCEFGHKL", ['C', 'E', 'B', 'K', 'F', 'G', 'H', 'L']);
-    m.insert("BCEFGHJK", ['C', 'E', 'B', 'J', 'F', 'G', 'H', 'K']);
-    m.insert("BCEFGHIL", ['C', 'E', 'B', 'L', 'I', 'F', 'G', 'H']);
-    m.insert("BCEFGHIJ", ['C', 'E', 'B', 'J', 'I', 'F', 'G', 'H']);
-    m.insert("BCDHIJKL", ['C', 'D', 'B', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("BCDGIJKL", ['C', 'D', 'B', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("BCDGHJKL", ['C', 'D', 'B', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("BCDGHIKL", ['C', 'D', 'B', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("BCDGHIJK", ['C', 'D', 'B', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("BCDFIJKL", ['C', 'D', 'B', 'K', 'I', 'F', 'J', 'L']);
-    m.insert("BCDFHJKL", ['C', 'D', 'B', 'K', 'J', 'F', 'H', 'L']);
-    m.insert("BCDFHIKL", ['C', 'D', 'B', 'K', 'I', 'F', 'H', 'L']);
-    m.insert("BCDFHIJK", ['C', 'D', 'B', 'J', 'I', 'F', 'H', 'K']);
-    m.insert("BCDFGJKL", ['C', 'D', 'B', 'K', 'J', 'F', 'G', 'L']);
-    m.insert("BCDFGIKL", ['C', 'D', 'B', 'K', 'I', 'F', 'G', 'L']);
-    m.insert("BCDFGIJK", ['C', 'D', 'B', 'J', 'I', 'F', 'G', 'K']);
-    m.insert("BCDFGHKL", ['C', 'D', 'B', 'K', 'F', 'G', 'H', 'L']);
-    m.insert("BCDFGHJK", ['C', 'D', 'B', 'J', 'F', 'G', 'H', 'K']);
-    m.insert("BCDFGHIL", ['C', 'D', 'B', 'L', 'I', 'F', 'G', 'H']);
-    m.insert("BCDFGHIJ", ['C', 'D', 'B', 'J', 'I', 'F', 'G', 'H']);
-    m.insert("BCDEIJKL", ['C', 'D', 'B', 'K', 'I', 'E', 'J', 'L']);
-    m.insert("BCDEHJKL", ['C', 'D', 'B', 'K', 'J', 'E', 'H', 'L']);
-    m.insert("BCDEHIKL", ['C', 'D', 'B', 'K', 'I', 'E', 'H', 'L']);
-    m.insert("BCDEHIJK", ['C', 'D', 'B', 'J', 'I', 'E', 'H', 'K']);
-    m.insert("BCDEGJKL", ['C', 'D', 'B', 'K', 'J', 'E', 'G', 'L']);
-    m.insert("BCDEGIKL", ['C', 'D', 'B', 'K', 'I', 'E', 'G', 'L']);
-    m.insert("BCDEGIJK", ['C', 'D', 'B', 'J', 'I', 'E', 'G', 'K']);
-    m.insert("BCDEGHKL", ['C', 'D', 'B', 'K', 'E', 'G', 'H', 'L']);
-    m.insert("BCDEGHJK", ['C', 'D', 'B', 'J', 'E', 'G', 'H', 'K']);
-    m.insert("BCDEGHIL", ['C', 'D', 'B', 'L', 'I', 'E', 'G', 'H']);
-    m.insert("BCDEGHIJ", ['C', 'D', 'B', 'J', 'I', 'E', 'G', 'H']);
-    m.insert("BCDEFJKL", ['C', 'D', 'B', 'K', 'J', 'E', 'F', 'L']);
-    m.insert("BCDEFIKL", ['C', 'D', 'B', 'K', 'I', 'E', 'F', 'L']);
-    m.insert("BCDEFIJK", ['C', 'D', 'B', 'J', 'I', 'E', 'F', 'K']);
-    m.insert("BCDEFHKL", ['C', 'D', 'B', 'K', 'E', 'F', 'H', 'L']);
-    m.insert("BCDEFHJK", ['C', 'D', 'B', 'J', 'E', 'F', 'H', 'K']);
-    m.insert("BCDEFHIL", ['C', 'D', 'B', 'L', 'I', 'E', 'F', 'H']);
-    m.insert("BCDEFHIJ", ['C', 'D', 'B', 'J', 'I', 'E', 'F', 'H']);
-    m.insert("BCDEFGKL", ['C', 'D', 'B', 'K', 'E', 'F', 'G', 'L']);
-    m.insert("BCDEFGJK", ['C', 'D', 'B', 'J', 'E', 'F', 'G', 'K']);
-    m.insert("BCDEFGIL", ['C', 'D', 'B', 'L', 'I', 'E', 'F', 'G']);
-    m.insert("BCDEFGIJ", ['C', 'D', 'B', 'J', 'I', 'E', 'F', 'G']);
-    m.insert("BCDEFGHL", ['C', 'D', 'B', 'L', 'E', 'F', 'G', 'H']);
-    m.insert("BCDEFGHK", ['C', 'D', 'B', 'K', 'E', 'F', 'G', 'H']);
-    m.insert("BCDEFGHJ", ['C', 'D', 'B', 'J', 'E', 'F', 'G', 'H']);
-    m.insert("BCDEFGHI", ['C', 'D', 'B', 'I', 'E', 'F', 'G', 'H']);
-
-    // Groups starting with A
-    m.insert("AFGHIJKL", ['F', 'G', 'A', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("AEGHIJKL", ['E', 'G', 'A', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("AEFHIJKL", ['E', 'F', 'A', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("AEFGIJKL", ['E', 'F', 'A', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("AEFGHJKL", ['E', 'F', 'A', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("AEFGHIKL", ['E', 'F', 'A', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("AEFGHIJK", ['E', 'F', 'A', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("ADGHIJKL", ['D', 'G', 'A', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("ADFHIJKL", ['D', 'F', 'A', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("ADFGIJKL", ['D', 'F', 'A', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("ADFGHJKL", ['D', 'F', 'A', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("ADFGHIKL", ['D', 'F', 'A', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("ADFGHIJK", ['D', 'F', 'A', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("ADEHIJKL", ['D', 'E', 'A', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("ADEGIJKL", ['D', 'E', 'A', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("ADEGHJKL", ['D', 'E', 'A', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("ADEGHIKL", ['D', 'E', 'A', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("ADEGHIJK", ['D', 'E', 'A', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("ADEFIJKL", ['D', 'E', 'A', 'K', 'I', 'F', 'J', 'L']);
-    m.insert("ADEFHJKL", ['D', 'E', 'A', 'K', 'J', 'F', 'H', 'L']);
-    m.insert("ADEFHIKL", ['D', 'E', 'A', 'K', 'I', 'F', 'H', 'L']);
-    m.insert("ADEFHIJK", ['D', 'E', 'A', 'J', 'I', 'F', 'H', 'K']);
-    m.insert("ADEFGJKL", ['D', 'E', 'A', 'K', 'J', 'F', 'G', 'L']);
-    m.insert("ADEFGIKL", ['D', 'E', 'A', 'K', 'I', 'F', 'G', 'L']);
-    m.insert("ADEFGIJK", ['D', 'E', 'A', 'J', 'I', 'F', 'G', 'K']);
-    m.insert("ADEFGHKL", ['D', 'E', 'A', 'K', 'F', 'G', 'H', 'L']);
-    m.insert("ADEFGHJK", ['D', 'E', 'A', 'J', 'F', 'G', 'H', 'K']);
-    m.insert("ADEFGHIL", ['D', 'E', 'A', 'L', 'I', 'F', 'G', 'H']);
-    m.insert("ADEFGHIJ", ['D', 'E', 'A', 'J', 'I', 'F', 'G', 'H']);
-
-    // Groups with AC combinations
-    m.insert("ACGHIJKL", ['C', 'G', 'A', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("ACFHIJKL", ['C', 'F', 'A', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("ACFGIJKL", ['C', 'F', 'A', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("ACFGHJKL", ['C', 'F', 'A', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("ACFGHIKL", ['C', 'F', 'A', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("ACFGHIJK", ['C', 'F', 'A', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("ACEHIJKL", ['C', 'E', 'A', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("ACEGIJKL", ['C', 'E', 'A', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("ACEGHJKL", ['C', 'E', 'A', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("ACEGHIKL", ['C', 'E', 'A', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("ACEGHIJK", ['C', 'E', 'A', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("ACEFIJKL", ['C', 'E', 'A', 'K', 'I', 'F', 'J', 'L']);
-    m.insert("ACEFHJKL", ['C', 'E', 'A', 'K', 'J', 'F', 'H', 'L']);
-    m.insert("ACEFHIKL", ['C', 'E', 'A', 'K', 'I', 'F', 'H', 'L']);
-    m.insert("ACEFHIJK", ['C', 'E', 'A', 'J', 'I', 'F', 'H', 'K']);
-    m.insert("ACEFGJKL", ['C', 'E', 'A', 'K', 'J', 'F', 'G', 'L']);
-    m.insert("ACEFGIKL", ['C', 'E', 'A', 'K', 'I', 'F', 'G', 'L']);
-    m.insert("ACEFGIJK", ['C', 'E', 'A', 'J', 'I', 'F', 'G', 'K']);
-    m.insert("ACEFGHKL", ['C', 'E', 'A', 'K', 'F', 'G', 'H', 'L']);
-    m.insert("ACEFGHJK", ['C', 'E', 'A', 'J', 'F', 'G', 'H', 'K']);
-    m.insert("ACEFGHIL", ['C', 'E', 'A', 'L', 'I', 'F', 'G', 'H']);
-    m.insert("ACEFGHIJ", ['C', 'E', 'A', 'J', 'I', 'F', 'G', 'H']);
-    m.insert("ACDHIJKL", ['C', 'D', 'A', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("ACDGIJKL", ['C', 'D', 'A', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("ACDGHJKL", ['C', 'D', 'A', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("ACDGHIKL", ['C', 'D', 'A', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("ACDGHIJK", ['C', 'D', 'A', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("ACDFIJKL", ['C', 'D', 'A', 'K', 'I', 'F', 'J', 'L']);
-    m.insert("ACDFHJKL", ['C', 'D', 'A', 'K', 'J', 'F', 'H', 'L']);
-    m.insert("ACDFHIKL", ['C', 'D', 'A', 'K', 'I', 'F', 'H', 'L']);
-    m.insert("ACDFHIJK", ['C', 'D', 'A', 'J', 'I', 'F', 'H', 'K']);
-    m.insert("ACDFGJKL", ['C', 'D', 'A', 'K', 'J', 'F', 'G', 'L']);
-    m.insert("ACDFGIKL", ['C', 'D', 'A', 'K', 'I', 'F', 'G', 'L']);
-    m.insert("ACDFGIJK", ['C', 'D', 'A', 'J', 'I', 'F', 'G', 'K']);
-    m.insert("ACDFGHKL", ['C', 'D', 'A', 'K', 'F', 'G', 'H', 'L']);
-    m.insert("ACDFGHJK", ['C', 'D', 'A', 'J', 'F', 'G', 'H', 'K']);
-    m.insert("ACDFGHIL", ['C', 'D', 'A', 'L', 'I', 'F', 'G', 'H']);
-    m.insert("ACDFGHIJ", ['C', 'D', 'A', 'J', 'I', 'F', 'G', 'H']);
-    m.insert("ACDEIJKL", ['C', 'D', 'A', 'K', 'I', 'E', 'J', 'L']);
-    m.insert("ACDEHJKL", ['C', 'D', 'A', 'K', 'J', 'E', 'H', 'L']);
-    m.insert("ACDEHIKL", ['C', 'D', 'A', 'K', 'I', 'E', 'H', 'L']);
-    m.insert("ACDEHIJK", ['C', 'D', 'A', 'J', 'I', 'E', 'H', 'K']);
-    m.insert("ACDEGJKL", ['C', 'D', 'A', 'K', 'J', 'E', 'G', 'L']);
-    m.insert("ACDEGIKL", ['C', 'D', 'A', 'K', 'I', 'E', 'G', 'L']);
-    m.insert("ACDEGIJK", ['C', 'D', 'A', 'J', 'I', 'E', 'G', 'K']);
-    m.insert("ACDEGHKL", ['C', 'D', 'A', 'K', 'E', 'G', 'H', 'L']);
-    m.insert("ACDEGHJK", ['C', 'D', 'A', 'J', 'E', 'G', 'H', 'K']);
-    m.insert("ACDEGHIL", ['C', 'D', 'A', 'L', 'I', 'E', 'G', 'H']);
-    m.insert("ACDEGHIJ", ['C', 'D', 'A', 'J', 'I', 'E', 'G', 'H']);
-    m.insert("ACDEFJKL", ['C', 'D', 'A', 'K', 'J', 'E', 'F', 'L']);
-    m.insert("ACDEFIKL", ['C', 'D', 'A', 'K', 'I', 'E', 'F', 'L']);
-    m.insert("ACDEFIJK", ['C', 'D', 'A', 'J', 'I', 'E', 'F', 'K']);
-    m.insert("ACDEFHKL", ['C', 'D', 'A', 'K', 'E', 'F', 'H', 'L']);
-    m.insert("ACDEFHJK", ['C', 'D', 'A', 'J', 'E', 'F', 'H', 'K']);
-    m.insert("ACDEFHIL", ['C', 'D', 'A', 'L', 'I', 'E', 'F', 'H']);
-    m.insert("ACDEFHIJ", ['C', 'D', 'A', 'J', 'I', 'E', 'F', 'H']);
-    m.insert("ACDEFGKL", ['C', 'D', 'A', 'K', 'E', 'F', 'G', 'L']);
-    m.insert("ACDEFGJK", ['C', 'D', 'A', 'J', 'E', 'F', 'G', 'K']);
-    m.insert("ACDEFGIL", ['C', 'D', 'A', 'L', 'I', 'E', 'F', 'G']);
-    m.insert("ACDEFGIJ", ['C', 'D', 'A', 'J', 'I', 'E', 'F', 'G']);
-    m.insert("ACDEFGHL", ['C', 'D', 'A', 'L', 'E', 'F', 'G', 'H']);
-    m.insert("ACDEFGHK", ['C', 'D', 'A', 'K', 'E', 'F', 'G', 'H']);
-    m.insert("ACDEFGHJ", ['C', 'D', 'A', 'J', 'E', 'F', 'G', 'H']);
-    m.insert("ACDEFGHI", ['C', 'D', 'A', 'I', 'E', 'F', 'G', 'H']);
-
-    // Groups with AB combinations
-    m.insert("ABGHIJKL", ['B', 'G', 'A', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("ABFHIJKL", ['B', 'F', 'A', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("ABFGIJKL", ['B', 'F', 'A', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("ABFGHJKL", ['B', 'F', 'A', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("ABFGHIKL", ['B', 'F', 'A', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("ABFGHIJK", ['B', 'F', 'A', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("ABEHIJKL", ['B', 'E', 'A', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("ABEGIJKL", ['B', 'E', 'A', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("ABEGHJKL", ['B', 'E', 'A', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("ABEGHIKL", ['B', 'E', 'A', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("ABEGHIJK", ['B', 'E', 'A', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("ABEFIJKL", ['B', 'E', 'A', 'K', 'I', 'F', 'J', 'L']);
-    m.insert("ABEFHJKL", ['B', 'E', 'A', 'K', 'J', 'F', 'H', 'L']);
-    m.insert("ABEFHIKL", ['B', 'E', 'A', 'K', 'I', 'F', 'H', 'L']);
-    m.insert("ABEFHIJK", ['B', 'E', 'A', 'J', 'I', 'F', 'H', 'K']);
-    m.insert("ABEFGJKL", ['B', 'E', 'A', 'K', 'J', 'F', 'G', 'L']);
-    m.insert("ABEFGIKL", ['B', 'E', 'A', 'K', 'I', 'F', 'G', 'L']);
-    m.insert("ABEFGIJK", ['B', 'E', 'A', 'J', 'I', 'F', 'G', 'K']);
-    m.insert("ABEFGHKL", ['B', 'E', 'A', 'K', 'F', 'G', 'H', 'L']);
-    m.insert("ABEFGHJK", ['B', 'E', 'A', 'J', 'F', 'G', 'H', 'K']);
-    m.insert("ABEFGHIL", ['B', 'E', 'A', 'L', 'I', 'F', 'G', 'H']);
-    m.insert("ABEFGHIJ", ['B', 'E', 'A', 'J', 'I', 'F', 'G', 'H']);
-    m.insert("ABDHIJKL", ['B', 'D', 'A', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("ABDGIJKL", ['B', 'D', 'A', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("ABDGHJKL", ['B', 'D', 'A', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("ABDGHIKL", ['B', 'D', 'A', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("ABDGHIJK", ['B', 'D', 'A', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("ABDFIJKL", ['B', 'D', 'A', 'K', 'I', 'F', 'J', 'L']);
-    m.insert("ABDFHJKL", ['B', 'D', 'A', 'K', 'J', 'F', 'H', 'L']);
-    m.insert("ABDFHIKL", ['B', 'D', 'A', 'K', 'I', 'F', 'H', 'L']);
-    m.insert("ABDFHIJK", ['B', 'D', 'A', 'J', 'I', 'F', 'H', 'K']);
-    m.insert("ABDFGJKL", ['B', 'D', 'A', 'K', 'J', 'F', 'G', 'L']);
-    m.insert("ABDFGIKL", ['B', 'D', 'A', 'K', 'I', 'F', 'G', 'L']);
-    m.insert("ABDFGIJK", ['B', 'D', 'A', 'J', 'I', 'F', 'G', 'K']);
-    m.insert("ABDFGHKL", ['B', 'D', 'A', 'K', 'F', 'G', 'H', 'L']);
-    m.insert("ABDFGHJK", ['B', 'D', 'A', 'J', 'F', 'G', 'H', 'K']);
-    m.insert("ABDFGHIL", ['B', 'D', 'A', 'L', 'I', 'F', 'G', 'H']);
-    m.insert("ABDFGHIJ", ['B', 'D', 'A', 'J', 'I', 'F', 'G', 'H']);
-    m.insert("ABDEIJKL", ['B', 'D', 'A', 'K', 'I', 'E', 'J', 'L']);
-    m.insert("ABDEHJKL", ['B', 'D', 'A', 'K', 'J', 'E', 'H', 'L']);
-    m.insert("ABDEHIKL", ['B', 'D', 'A', 'K', 'I', 'E', 'H', 'L']);
-    m.insert("ABDEHIJK", ['B', 'D', 'A', 'J', 'I', 'E', 'H', 'K']);
-    m.insert("ABDEGJKL", ['B', 'D', 'A', 'K', 'J', 'E', 'G', 'L']);
-    m.insert("ABDEGIKL", ['B', 'D', 'A', 'K', 'I', 'E', 'G', 'L']);
-    m.insert("ABDEGIJK", ['B', 'D', 'A', 'J', 'I', 'E', 'G', 'K']);
-    m.insert("ABDEGHKL", ['B', 'D', 'A', 'K', 'E', 'G', 'H', 'L']);
-    m.insert("ABDEGHJK", ['B', 'D', 'A', 'J', 'E', 'G', 'H', 'K']);
-    m.insert("ABDEGHIL", ['B', 'D', 'A', 'L', 'I', 'E', 'G', 'H']);
-    m.insert("ABDEGHIJ", ['B', 'D', 'A', 'J', 'I', 'E', 'G', 'H']);
-    m.insert("ABDEFJKL", ['B', 'D', 'A', 'K', 'J', 'E', 'F', 'L']);
-    m.insert("ABDEFIKL", ['B', 'D', 'A', 'K', 'I', 'E', 'F', 'L']);
-    m.insert("ABDEFIJK", ['B', 'D', 'A', 'J', 'I', 'E', 'F', 'K']);
-    m.insert("ABDEFHKL", ['B', 'D', 'A', 'K', 'E', 'F', 'H', 'L']);
-    m.insert("ABDEFHJK", ['B', 'D', 'A', 'J', 'E', 'F', 'H', 'K']);
-    m.insert("ABDEFHIL", ['B', 'D', 'A', 'L', 'I', 'E', 'F', 'H']);
-    m.insert("ABDEFHIJ", ['B', 'D', 'A', 'J', 'I', 'E', 'F', 'H']);
-    m.insert("ABDEFGKL", ['B', 'D', 'A', 'K', 'E', 'F', 'G', 'L']);
-    m.insert("ABDEFGJK", ['B', 'D', 'A', 'J', 'E', 'F', 'G', 'K']);
-    m.insert("ABDEFGIL", ['B', 'D', 'A', 'L', 'I', 'E', 'F', 'G']);
-    m.insert("ABDEFGIJ", ['B', 'D', 'A', 'J', 'I', 'E', 'F', 'G']);
-    m.insert("ABDEFGHL", ['B', 'D', 'A', 'L', 'E', 'F', 'G', 'H']);
-    m.insert("ABDEFGHK", ['B', 'D', 'A', 'K', 'E', 'F', 'G', 'H']);
-    m.insert("ABDEFGHJ", ['B', 'D', 'A', 'J', 'E', 'F', 'G', 'H']);
-    m.insert("ABDEFGHI", ['B', 'D', 'A', 'I', 'E', 'F', 'G', 'H']);
-
-    // Groups with ABC combinations
-    m.insert("ABCGHIJK", ['B', 'C', 'A', 'J', 'I', 'G', 'H', 'K']);
-    m.insert("ABCGHIKL", ['B', 'C', 'A', 'K', 'I', 'G', 'H', 'L']);
-    m.insert("ABCGHJKL", ['B', 'C', 'A', 'K', 'J', 'G', 'H', 'L']);
-    m.insert("ABCGIJKL", ['B', 'C', 'A', 'K', 'I', 'G', 'J', 'L']);
-    m.insert("ABCHIJKL", ['B', 'C', 'A', 'K', 'I', 'H', 'J', 'L']);
-    m.insert("ABCFHIJK", ['B', 'C', 'A', 'J', 'I', 'F', 'H', 'K']);
-    m.insert("ABCFHIKL", ['B', 'C', 'A', 'K', 'I', 'F', 'H', 'L']);
-    m.insert("ABCFHJKL", ['B', 'C', 'A', 'K', 'J', 'F', 'H', 'L']);
-    m.insert("ABCFIJKL", ['B', 'C', 'A', 'K', 'I', 'F', 'J', 'L']);
-    m.insert("ABCFGHIJ", ['B', 'C', 'A', 'J', 'I', 'F', 'G', 'H']);
-    m.insert("ABCFGHIK", ['B', 'C', 'A', 'K', 'I', 'F', 'G', 'H']);
-    m.insert("ABCFGHJK", ['B', 'C', 'A', 'J', 'F', 'G', 'H', 'K']);
-    m.insert("ABCFGHIL", ['B', 'C', 'A', 'L', 'I', 'F', 'G', 'H']);
-    m.insert("ABCFGHKL", ['B', 'C', 'A', 'K', 'F', 'G', 'H', 'L']);
-    m.insert("ABCFGIJK", ['B', 'C', 'A', 'J', 'I', 'F', 'G', 'K']);
-    m.insert("ABCFGIKL", ['B', 'C', 'A', 'K', 'I', 'F', 'G', 'L']);
-    m.insert("ABCFGJKL", ['B', 'C', 'A', 'K', 'J', 'F', 'G', 'L']);
-    m.insert("ABCEHIJK", ['B', 'C', 'A', 'J', 'I', 'E', 'H', 'K']);
-    m.insert("ABCEHIKL", ['B', 'C', 'A', 'K', 'I', 'E', 'H', 'L']);
-    m.insert("ABCEHJKL", ['B', 'C', 'A', 'K', 'J', 'E', 'H', 'L']);
-    m.insert("ABCEIJKL", ['B', 'C', 'A', 'K', 'I', 'E', 'J', 'L']);
-    m.insert("ABCEGHIJ", ['B', 'C', 'A', 'J', 'I', 'E', 'G', 'H']);
-    m.insert("ABCEGHIK", ['B', 'C', 'A', 'K', 'I', 'E', 'G', 'H']);
-    m.insert("ABCEGHJK", ['B', 'C', 'A', 'J', 'E', 'G', 'H', 'K']);
-    m.insert("ABCEGHIL", ['B', 'C', 'A', 'L', 'I', 'E', 'G', 'H']);
-    m.insert("ABCEGHKL", ['B', 'C', 'A', 'K', 'E', 'G', 'H', 'L']);
-    m.insert("ABCEGIJK", ['B', 'C', 'A', 'J', 'I', 'E', 'G', 'K']);
-    m.insert("ABCEGIKL", ['B', 'C', 'A', 'K', 'I', 'E', 'G', 'L']);
-    m.insert("ABCEGJKL", ['B', 'C', 'A', 'K', 'J', 'E', 'G', 'L']);
-    m.insert("ABCEFHIJ", ['B', 'C', 'A', 'J', 'I', 'E', 'F', 'H']);
-    m.insert("ABCEFHIK", ['B', 'C', 'A', 'K', 'I', 'E', 'F', 'H']);
-    m.insert("ABCEFHJK", ['B', 'C', 'A', 'J', 'E', 'F', 'H', 'K']);
-    m.insert("ABCEFHIL", ['B', 'C', 'A', 'L', 'I', 'E', 'F', 'H']);
-    m.insert("ABCEFHKL", ['B', 'C', 'A', 'K', 'E', 'F', 'H', 'L']);
-    m.insert("ABCEFIJK", ['B', 'C', 'A', 'J', 'I', 'E', 'F', 'K']);
-    m.insert("ABCEFIKL", ['B', 'C', 'A', 'K', 'I', 'E', 'F', 'L']);
-    m.insert("ABCEFJKL", ['B', 'C', 'A', 'K', 'J', 'E', 'F', 'L']);
-    m.insert("ABCEFGHI", ['B', 'C', 'A', 'I', 'E', 'F', 'G', 'H']);
-    m.insert("ABCEFGHJ", ['B', 'C', 'A', 'J', 'E', 'F', 'G', 'H']);
-    m.insert("ABCEFGHK", ['B', 'C', 'A', 'K', 'E', 'F', 'G', 'H']);
-    m.insert("ABCEFGHL", ['B', 'C', 'A', 'L', 'E', 'F', 'G', 'H']);
-    m.insert("ABCEFGIJ", ['B', 'C', 'A', 'J', 'I', 'E', 'F', 'G']);
-    m.insert("ABCEFGIK", ['B', 'C', 'A', 'K', 'I', 'E', 'F', 'G']);
-    m.insert("ABCEFGIL", ['B', 'C', 'A', 'L', 'I', 'E', 'F', 'G']);
-    m.insert("ABCEFGJK", ['B', 'C', 'A', 'J', 'E', 'F', 'G', 'K']);
-    m.insert("ABCEFGKL", ['B', 'C', 'A', 'K', 'E', 'F', 'G', 'L']);
-    m.insert("ABCDHIJK", ['B', 'C', 'A', 'J', 'I', 'D', 'H', 'K']);
-    m.insert("ABCDHIKL", ['B', 'C', 'A', 'K', 'I', 'D', 'H', 'L']);
-    m.insert("ABCDHJKL", ['B', 'C', 'A', 'K', 'J', 'D', 'H', 'L']);
-    m.insert("ABCDIJKL", ['B', 'C', 'A', 'K', 'I', 'D', 'J', 'L']);
-    m.insert("ABCDGHIJ", ['B', 'C', 'A', 'J', 'I', 'D', 'G', 'H']);
-    m.insert("ABCDGHIK", ['B', 'C', 'A', 'K', 'I', 'D', 'G', 'H']);
-    m.insert("ABCDGHJK", ['B', 'C', 'A', 'J', 'D', 'G', 'H', 'K']);
-    m.insert("ABCDGHIL", ['B', 'C', 'A', 'L', 'I', 'D', 'G', 'H']);
-    m.insert("ABCDGHKL", ['B', 'C', 'A', 'K', 'D', 'G', 'H', 'L']);
-    m.insert("ABCDGIJK", ['B', 'C', 'A', 'J', 'I', 'D', 'G', 'K']);
-    m.insert("ABCDGIKL", ['B', 'C', 'A', 'K', 'I', 'D', 'G', 'L']);
-    m.insert("ABCDGJKL", ['B', 'C', 'A', 'K', 'J', 'D', 'G', 'L']);
-    m.insert("ABCDFHIJ", ['B', 'C', 'A', 'J', 'I', 'D', 'F', 'H']);
-    m.insert("ABCDFHIK", ['B', 'C', 'A', 'K', 'I', 'D', 'F', 'H']);
-    m.insert("ABCDFHJK", ['B', 'C', 'A', 'J', 'D', 'F', 'H', 'K']);
-    m.insert("ABCDFHIL", ['B', 'C', 'A', 'L', 'I', 'D', 'F', 'H']);
-    m.insert("ABCDFHKL", ['B', 'C', 'A', 'K', 'D', 'F', 'H', 'L']);
-    m.insert("ABCDFIJK", ['B', 'C', 'A', 'J', 'I', 'D', 'F', 'K']);
-    m.insert("ABCDFIKL", ['B', 'C', 'A', 'K', 'I', 'D', 'F', 'L']);
-    m.insert("ABCDFJKL", ['B', 'C', 'A', 'K', 'J', 'D', 'F', 'L']);
-    m.insert("ABCDFGHI", ['B', 'C', 'A', 'I', 'D', 'F', 'G', 'H']);
-    m.insert("ABCDFGHJ", ['B', 'C', 'A', 'J', 'D', 'F', 'G', 'H']);
-    m.insert("ABCDFGHK", ['B', 'C', 'A', 'K', 'D', 'F', 'G', 'H']);
-    m.insert("ABCDFGHL", ['B', 'C', 'A', 'L', 'D', 'F', 'G', 'H']);
-    m.insert("ABCDFGIJ", ['B', 'C', 'A', 'J', 'I', 'D', 'F', 'G']);
-    m.insert("ABCDFGIK", ['B', 'C', 'A', 'K', 'I', 'D', 'F', 'G']);
-    m.insert("ABCDFGIL", ['B', 'C', 'A', 'L', 'I', 'D', 'F', 'G']);
-    m.insert("ABCDFGJK", ['B', 'C', 'A', 'J', 'D', 'F', 'G', 'K']);
-    m.insert("ABCDFGKL", ['B', 'C', 'A', 'K', 'D', 'F', 'G', 'L']);
-    m.insert("ABCDEHIJ", ['B', 'C', 'A', 'J', 'I', 'D', 'E', 'H']);
-    m.insert("ABCDEHIK", ['B', 'C', 'A', 'K', 'I', 'D', 'E', 'H']);
-    m.insert("ABCDEHJK", ['B', 'C', 'A', 'J', 'D', 'E', 'H', 'K']);
-    m.insert("ABCDEHIL", ['B', 'C', 'A', 'L', 'I', 'D', 'E', 'H']);
-    m.insert("ABCDEHKL", ['B', 'C', 'A', 'K', 'D', 'E', 'H', 'L']);
-    m.insert("ABCDEIJK", ['B', 'C', 'A', 'J', 'I', 'D', 'E', 'K']);
-    m.insert("ABCDEIKL", ['B', 'C', 'A', 'K', 'I', 'D', 'E', 'L']);
-    m.insert("ABCDEJKL", ['B', 'C', 'A', 'K', 'J', 'D', 'E', 'L']);
-    m.insert("ABCDEGHI", ['B', 'C', 'A', 'I', 'D', 'E', 'G', 'H']);
-    m.insert("ABCDEGHJ", ['B', 'C', 'A', 'J', 'D', 'E', 'G', 'H']);
-    m.insert("ABCDEGHK", ['B', 'C', 'A', 'K', 'D', 'E', 'G', 'H']);
-    m.insert("ABCDEGHL", ['B', 'C', 'A', 'L', 'D', 'E', 'G', 'H']);
-    m.insert("ABCDEGIJ", ['B', 'C', 'A', 'J', 'I', 'D', 'E', 'G']);
-    m.insert("ABCDEGIK", ['B', 'C', 'A', 'K', 'I', 'D', 'E', 'G']);
-    m.insert("ABCDEGIL", ['B', 'C', 'A', 'L', 'I', 'D', 'E', 'G']);
-    m.insert("ABCDEGJK", ['B', 'C', 'A', 'J', 'D', 'E', 'G', 'K']);
-    m.insert("ABCDEGKL", ['B', 'C', 'A', 'K', 'D', 'E', 'G', 'L']);
-    m.insert("ABCDEFHI", ['B', 'C', 'A', 'I', 'D', 'E', 'F', 'H']);
-    m.insert("ABCDEFHJ", ['B', 'C', 'A', 'J', 'D', 'E', 'F', 'H']);
-    m.insert("ABCDEFHK", ['B', 'C', 'A', 'K', 'D', 'E', 'F', 'H']);
-    m.insert("ABCDEFHL", ['B', 'C', 'A', 'L', 'D', 'E', 'F', 'H']);
-    m.insert("ABCDEFIJ", ['B', 'C', 'A', 'J', 'I', 'D', 'E', 'F']);
-    m.insert("ABCDEFIK", ['B', 'C', 'A', 'K', 'I', 'D', 'E', 'F']);
-    m.insert("ABCDEFIL", ['B', 'C', 'A', 'L', 'I', 'D', 'E', 'F']);
-    m.insert("ABCDEFJK", ['B', 'C', 'A', 'J', 'D', 'E', 'F', 'K']);
-    m.insert("ABCDEFKL", ['B', 'C', 'A', 'K', 'D', 'E', 'F', 'L']);
-    m.insert("ABCDEFGH", ['B', 'C', 'A', 'H', 'D', 'E', 'F', 'G']);
-    m.insert("ABCDEFGI", ['B', 'C', 'A', 'I', 'D', 'E', 'F', 'G']);
-    m.insert("ABCDEFGJ", ['B', 'C', 'A', 'J', 'D', 'E', 'F', 'G']);
-    m.insert("ABCDEFGK", ['B', 'C', 'A', 'K', 'D', 'E', 'F', 'G']);
-    m.insert("ABCDEFGL", ['B', 'C', 'A', 'L', 'D', 'E', 'F', 'G']);
-
-    // NOTE: This is a partial table. The full 495 combinations from FIFA Annex C
-    // should be populated here. The pattern shown covers the common cases.
-    // For production use, the complete table should be generated from the official
-    // FIFA regulations document.
-
-    m
+    // The lookup table has been cleared because the manually entered data contained
+    // violations of the pool constraints. The backtracking algorithm
+    // (compute_third_place_assignments) correctly generates valid assignments
+    // that respect all pool constraints.
+    //
+    // To populate this table with official FIFA data from Annex C, each entry
+    // must satisfy: for each slot i, the assigned group must be in THIRD_PLACE_POOLS[i].
+    //
+    // Pool constraints:
+    //   Slot 0 (1E opponent): A/B/C/D/F
+    //   Slot 1 (1I opponent): C/D/F/G/H
+    //   Slot 2 (1A opponent): C/E/F/H/I
+    //   Slot 3 (1L opponent): E/H/I/J/K
+    //   Slot 4 (1D opponent): B/E/F/I/J
+    //   Slot 5 (1G opponent): A/E/H/I/J
+    //   Slot 6 (1B opponent): E/F/G/I/J
+    //   Slot 7 (1K opponent): D/E/I/J/L
+    HashMap::new()
 });
 
 #[cfg(test)]
@@ -732,8 +332,10 @@ mod tests {
     }
 
     #[test]
-    fn test_third_place_table_has_entries() {
-        assert!(!THIRD_PLACE_TABLE.is_empty());
+    fn test_backtracking_finds_valid_assignment() {
+        // The lookup table is empty; the backtracking algorithm should find valid assignments
+        let result = get_third_place_assignments("EFGHIJKL");
+        assert!(result.is_some());
     }
 
     #[test]
@@ -749,5 +351,32 @@ mod tests {
         sorted.sort();
         sorted.dedup();
         assert_eq!(nums.len(), sorted.len());
+    }
+
+    #[test]
+    fn test_assignments_respect_pool_constraints() {
+        // Test multiple combinations to verify pool constraints are respected
+        let test_cases = vec![
+            "ABCDEFGH",
+            "ABCDEFIJ",
+            "EFGHIJKL",
+            "ABDEFGJK",
+        ];
+
+        for key in test_cases {
+            let result = get_third_place_assignments(key);
+            assert!(result.is_some(), "Should find assignment for {}", key);
+            let assignments = result.unwrap();
+
+            // Verify each assignment respects its pool constraint
+            for (slot_idx, &assigned_group) in assignments.iter().enumerate() {
+                let pool = &THIRD_PLACE_POOLS[slot_idx];
+                assert!(
+                    pool.contains(&assigned_group),
+                    "Slot {} assigned '{}' but pool is {:?} (key: {})",
+                    slot_idx, assigned_group, pool, key
+                );
+            }
+        }
     }
 }
