@@ -1,9 +1,10 @@
 //! Core simulation engine for running a single tournament.
 
 use rand_chacha::ChaCha8Rng;
+use std::collections::HashMap;
 
 use wc_core::{
-    Group, GroupResult, GroupStanding, KnockoutBracket, KnockoutRound, MatchResult,
+    bracket, Group, GroupResult, GroupStanding, KnockoutBracket, KnockoutRound, MatchResult,
     TeamId, Tournament, TournamentResult,
 };
 use wc_strategies::{MatchContext, PredictionStrategy};
@@ -28,11 +29,11 @@ impl<'a> SimulationEngine<'a> {
         // 1. Simulate group stage
         let group_results = self.simulate_group_stage(rng);
 
-        // 2. Determine teams advancing to knockout
-        let knockout_teams = self.determine_knockout_qualifiers(&group_results);
+        // 2. Build R32 pairings using official FIFA 2026 bracket structure
+        let r32_pairings = self.build_r32_pairings(&group_results);
 
         // 3. Simulate knockout stage
-        let knockout_bracket = self.simulate_knockout_stage(rng, knockout_teams);
+        let knockout_bracket = self.simulate_knockout_stage(rng, r32_pairings);
 
         // 4. Extract final standings
         let champion = knockout_bracket.final_match.winner().unwrap();
@@ -75,7 +76,7 @@ impl<'a> SimulationEngine<'a> {
 
         // Calculate standings with tiebreakers
         let standings =
-            wc_core::tiebreaker::calculate_standings(&group.teams, &matches);
+            wc_core::tiebreaker::calculate_standings(&group.teams, &matches, group.id);
         let standings =
             wc_core::tiebreaker::resolve_standings(standings, &matches);
 
@@ -86,44 +87,53 @@ impl<'a> SimulationEngine<'a> {
         }
     }
 
-    /// Determine the 32 teams advancing to knockout stage.
-    /// Top 2 from each group (24) + 8 best third-placed teams.
-    fn determine_knockout_qualifiers(&self, group_results: &[GroupResult]) -> Vec<TeamId> {
-        let mut qualifiers = Vec::with_capacity(32);
+    /// Build Round of 32 pairings using official FIFA 2026 bracket structure.
+    ///
+    /// Returns 16 pairs of TeamIds in bracket order (ordered so .chunks(2) feeds
+    /// correctly into Round of 16).
+    fn build_r32_pairings(&self, group_results: &[GroupResult]) -> Vec<(TeamId, TeamId)> {
+        // Build lookup maps for winners and runners-up
+        let mut winners: HashMap<char, TeamId> = HashMap::new();
+        let mut runners_up: HashMap<char, TeamId> = HashMap::new();
 
-        // Add group winners and runners-up (24 teams)
         for gr in group_results {
-            qualifiers.push(gr.winner());
-            qualifiers.push(gr.runner_up());
+            let group_char = gr.group_id.0;
+            winners.insert(group_char, gr.winner());
+            runners_up.insert(group_char, gr.runner_up());
         }
 
-        // Collect third-placed teams
-        let third_placed: Vec<&GroupStanding> = group_results
+        // Collect and rank third-placed teams
+        let third_standings: Vec<GroupStanding> = group_results
             .iter()
-            .map(|gr| &gr.standings[2])
+            .map(|gr| gr.standings[2].clone())
             .collect();
 
-        // Sort to find best 8 third-placed teams
-        let third_placed = wc_core::tiebreaker::rank_third_placed_teams(
-            &third_placed.iter().map(|s| (*s).clone()).collect::<Vec<_>>()
-        );
+        let ranked_thirds = wc_core::tiebreaker::rank_third_placed_teams(&third_standings);
 
-        // Add best 8 third-placed teams
-        for standing in third_placed.into_iter().take(8) {
-            qualifiers.push(standing.team_id);
-        }
+        // Take best 8 third-placed teams with their group letters
+        let qualifying_thirds: Vec<(char, TeamId)> = ranked_thirds
+            .into_iter()
+            .take(8)
+            .map(|s| (s.group_id.0, s.team_id))
+            .collect();
 
-        qualifiers
+        // Use bracket module to build pairings
+        bracket::build_r32_pairings(&winners, &runners_up, &qualifying_thirds)
     }
 
     /// Simulate the entire knockout stage.
     fn simulate_knockout_stage(
         &self,
         rng: &mut ChaCha8Rng,
-        teams: Vec<TeamId>,
+        r32_pairings: Vec<(TeamId, TeamId)>,
     ) -> KnockoutBracket {
-        // Round of 32 (16 matches)
-        let round_of_32 = self.simulate_knockout_round(rng, &teams, KnockoutRound::RoundOf32);
+        // Round of 32 (16 matches) - use explicit pairings from bracket module
+        let round_of_32: Vec<MatchResult> = r32_pairings
+            .iter()
+            .map(|(team_a, team_b)| {
+                self.simulate_single_match(rng, *team_a, *team_b, KnockoutRound::RoundOf32)
+            })
+            .collect();
         let ro32_winners: Vec<TeamId> = round_of_32
             .iter()
             .filter_map(|m| m.winner())
@@ -296,5 +306,35 @@ mod tests {
         // Same seed should produce same results
         assert_eq!(result1.champion, result2.champion);
         assert_eq!(result1.runner_up, result2.runner_up);
+    }
+
+    #[test]
+    fn test_winner_group_a_plays_third_place() {
+        // Verify that Winner of Group A plays a third-place team, NOT Runner-up A
+        // According to FIFA 2026 bracket: Match 79 is 1A vs 3(C/E/F/H/I)
+        let tournament = create_test_tournament();
+        let strategy = EloStrategy::default();
+        let engine = SimulationEngine::new(&tournament, &strategy);
+
+        let mut rng = ChaCha8Rng::seed_from_u64(42);
+        let result = engine.simulate(&mut rng);
+
+        // Get Group A winner and runner-up
+        let group_a = &result.group_results[0];
+        assert_eq!(group_a.group_id.0, 'A');
+        let winner_a = group_a.winner();
+        let runner_up_a = group_a.runner_up();
+
+        // Find Match 79 in R32 (slot 4 in our bracket ordering)
+        // According to R32_BRACKET, slot 4 is Match 79: 1A vs 3(C/E/F/H/I)
+        let match_79 = &result.knockout_bracket.round_of_32[4];
+
+        // One of the teams in match 79 should be Winner A
+        let has_winner_a = match_79.home_team == winner_a || match_79.away_team == winner_a;
+        assert!(has_winner_a, "Match 79 should include Winner of Group A");
+
+        // Neither team should be Runner-up A (the old incorrect pairing)
+        let has_runner_up_a = match_79.home_team == runner_up_a || match_79.away_team == runner_up_a;
+        assert!(!has_runner_up_a, "Match 79 should NOT include Runner-up of Group A");
     }
 }

@@ -6,6 +6,7 @@
 //! - Group stage structure and standings
 //! - Tournament configuration and results
 
+pub mod bracket;
 pub mod group;
 pub mod knockout;
 pub mod match_result;

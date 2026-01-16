@@ -423,14 +423,15 @@ mod tests {
         let group_results: Vec<GroupResult> = (0..12)
             .map(|i| {
                 let start = (i * 4) as u8;
+                let group_id = GroupId::from_index(i as u8);
                 GroupResult {
-                    group_id: GroupId::from_index(i as u8),
+                    group_id,
                     matches: vec![],
                     standings: vec![
-                        GroupStanding::new(TeamId(start)),
-                        GroupStanding::new(TeamId(start + 1)),
-                        GroupStanding::new(TeamId(start + 2)),
-                        GroupStanding::new(TeamId(start + 3)),
+                        GroupStanding::new(TeamId(start), group_id),
+                        GroupStanding::new(TeamId(start + 1), group_id),
+                        GroupStanding::new(TeamId(start + 2), group_id),
+                        GroupStanding::new(TeamId(start + 3), group_id),
                     ],
                 }
             })

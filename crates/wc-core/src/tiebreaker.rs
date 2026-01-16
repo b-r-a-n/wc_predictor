@@ -12,6 +12,7 @@
 
 use serde::{Deserialize, Serialize};
 
+use crate::group::GroupId;
 use crate::match_result::MatchResult;
 use crate::team::TeamId;
 
@@ -20,6 +21,8 @@ use crate::team::TeamId;
 pub struct GroupStanding {
     /// Team identifier
     pub team_id: TeamId,
+    /// Group this team belongs to
+    pub group_id: GroupId,
     /// Matches played
     pub played: u8,
     /// Matches won
@@ -40,6 +43,7 @@ impl Default for GroupStanding {
     fn default() -> Self {
         Self {
             team_id: TeamId(0),
+            group_id: GroupId('A'),
             played: 0,
             wins: 0,
             draws: 0,
@@ -52,10 +56,11 @@ impl Default for GroupStanding {
 }
 
 impl GroupStanding {
-    /// Create a new standing for a team.
-    pub fn new(team_id: TeamId) -> Self {
+    /// Create a new standing for a team in a specific group.
+    pub fn new(team_id: TeamId, group_id: GroupId) -> Self {
         Self {
             team_id,
+            group_id,
             ..Default::default()
         }
     }
@@ -83,8 +88,8 @@ impl GroupStanding {
 }
 
 /// Calculate standings from match results.
-pub fn calculate_standings(teams: &[TeamId], matches: &[MatchResult]) -> Vec<GroupStanding> {
-    let mut standings: Vec<GroupStanding> = teams.iter().map(|&id| GroupStanding::new(id)).collect();
+pub fn calculate_standings(teams: &[TeamId], matches: &[MatchResult], group_id: GroupId) -> Vec<GroupStanding> {
+    let mut standings: Vec<GroupStanding> = teams.iter().map(|&id| GroupStanding::new(id, group_id)).collect();
 
     for standing in &mut standings {
         for m in matches {
@@ -189,7 +194,7 @@ mod tests {
         let teams = [TeamId(0), TeamId(1)];
         let matches = vec![MatchResult::new(TeamId(0), TeamId(1), 2, 1)];
 
-        let standings = calculate_standings(&teams, &matches);
+        let standings = calculate_standings(&teams, &matches, GroupId('A'));
 
         assert_eq!(standings[0].points, 3);
         assert_eq!(standings[0].wins, 1);
@@ -212,7 +217,7 @@ mod tests {
             MatchResult::new(TeamId(1), TeamId(2), 0, 2), // Team 2: +3pts
         ];
 
-        let standings = calculate_standings(&teams, &matches);
+        let standings = calculate_standings(&teams, &matches, GroupId('A'));
         let resolved = resolve_standings(standings, &matches);
 
         // Team 0: 7pts (2W, 1D), GD: +3
@@ -232,6 +237,7 @@ mod tests {
         let mut standings = vec![
             GroupStanding {
                 team_id: TeamId(0),
+                group_id: GroupId('A'),
                 points: 6,
                 goals_for: 5,
                 goals_against: 3,
@@ -242,6 +248,7 @@ mod tests {
             },
             GroupStanding {
                 team_id: TeamId(1),
+                group_id: GroupId('A'),
                 points: 6,
                 goals_for: 5,
                 goals_against: 3,
