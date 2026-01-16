@@ -141,7 +141,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
 
   loadVenues: async () => {
     try {
-      const response = await fetch('/data/venues.json');
+      const response = await fetch(`${import.meta.env.BASE_URL}data/venues.json`);
       const data: VenueData = await response.json();
       set({
         venues: data.venues,
