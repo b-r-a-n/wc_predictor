@@ -4,6 +4,7 @@ import { WinProbabilityTable } from './components/results';
 import { GroupStageView } from './components/groups';
 import { KnockoutBracket } from './components/bracket';
 import { HeadToHeadCalculator } from './components/calculator';
+import { TeamDataEditor } from './components/editor';
 import { LoadingSpinner } from './components/common';
 import { useWasm } from './hooks/useWasm';
 import { useSimulatorStore } from './store/simulatorStore';
@@ -57,6 +58,7 @@ function App() {
       {activeTab === 'groups' && <GroupStageView />}
       {activeTab === 'bracket' && <KnockoutBracket />}
       {activeTab === 'calculator' && <HeadToHeadCalculator />}
+      {activeTab === 'editor' && <TeamDataEditor />}
     </Layout>
   );
 }

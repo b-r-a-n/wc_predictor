@@ -80,4 +80,4 @@ export interface CompositeWeights {
 
 // UI state types
 export type WasmStatus = 'loading' | 'ready' | 'error';
-export type TabId = 'results' | 'groups' | 'bracket' | 'calculator';
+export type TabId = 'results' | 'groups' | 'bracket' | 'calculator' | 'editor';
