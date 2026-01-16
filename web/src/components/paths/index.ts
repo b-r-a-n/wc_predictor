@@ -1,0 +1,1 @@
+export { TournamentPaths } from './TournamentPaths';

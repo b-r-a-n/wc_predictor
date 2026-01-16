@@ -60,6 +60,7 @@ export interface AggregatedResults {
   team_stats: Record<string, TeamStatistics>;  // Keys are stringified numbers due to JSON serialization
   most_likely_winner: number;
   most_likely_final: [number, number];
+  path_stats?: Record<string, PathStatistics>;  // Path statistics for each team (keys are stringified TeamIds)
 }
 
 // Match probability types
@@ -80,7 +81,79 @@ export interface CompositeWeights {
 
 // UI state types
 export type WasmStatus = 'loading' | 'ready' | 'error';
-export type TabId = 'results' | 'groups' | 'bracket' | 'calculator' | 'editor';
+export type TabId = 'results' | 'groups' | 'bracket' | 'calculator' | 'editor' | 'paths';
+
+// Knockout round types
+export type KnockoutRoundType =
+  | 'round_of_32'
+  | 'round_of_16'
+  | 'quarter_finals'
+  | 'semi_finals'
+  | 'third_place'
+  | 'final';
+
+// Venue information for World Cup 2026
+export interface Venue {
+  id: string;
+  name: string;
+  city: string;
+  country: 'USA' | 'Canada' | 'Mexico';
+  hostingRounds: KnockoutRoundType[];
+}
+
+// Venue data file structure
+export interface VenueData {
+  venues: Venue[];
+  bracketVenueMapping: Record<KnockoutRoundType, Record<string, string>>;
+}
+
+// Matchup frequencies at a specific round (matches Rust RoundMatchups)
+export interface RoundMatchups {
+  opponents: Record<string, number>; // opponent_id -> count
+}
+
+// Path statistics for a team (matches Rust PathStatistics)
+export interface PathStatistics {
+  team_id: number;
+  round_of_32_matchups: RoundMatchups;
+  round_of_16_matchups: RoundMatchups;
+  quarter_final_matchups: RoundMatchups;
+  semi_final_matchups: RoundMatchups;
+  final_matchups: RoundMatchups;
+  complete_paths: Record<string, number>; // path_key -> count
+}
+
+// Result from getTopPathsForTeam WASM function
+export interface PathEntry {
+  path: string;
+  count: number;
+  probability: number;
+}
+
+export interface TopPathsResult {
+  team_id: number;
+  total_simulations: number;
+  has_paths: boolean;
+  paths: PathEntry[];
+}
+
+// Parsed path for display purposes
+export interface ParsedPathRound {
+  round: KnockoutRoundType;
+  roundDisplayName: string;
+  opponentId: number;
+  opponent?: Team;
+  venue?: Venue;
+}
+
+// A fully resolved tournament path for display
+export interface TournamentPathDisplay {
+  rank: number;
+  pathKey: string;
+  probability: number;
+  occurrenceCount: number;
+  rounds: ParsedPathRound[];
+}
 
 // Team preset for LocalStorage persistence
 export interface TeamPreset {

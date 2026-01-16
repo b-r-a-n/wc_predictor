@@ -1,0 +1,162 @@
+{
+  "venues": [
+    {
+      "id": "metlife",
+      "name": "MetLife Stadium",
+      "city": "East Rutherford, NJ",
+      "country": "USA",
+      "hostingRounds": ["round_of_32", "round_of_16", "quarter_finals", "final"]
+    },
+    {
+      "id": "att",
+      "name": "AT&T Stadium",
+      "city": "Arlington, TX",
+      "country": "USA",
+      "hostingRounds": ["round_of_32", "round_of_16", "quarter_finals", "semi_finals"]
+    },
+    {
+      "id": "mercedes_benz",
+      "name": "Mercedes-Benz Stadium",
+      "city": "Atlanta, GA",
+      "country": "USA",
+      "hostingRounds": ["round_of_32", "round_of_16", "quarter_finals", "semi_finals"]
+    },
+    {
+      "id": "hard_rock",
+      "name": "Hard Rock Stadium",
+      "city": "Miami Gardens, FL",
+      "country": "USA",
+      "hostingRounds": ["round_of_32", "round_of_16", "quarter_finals", "third_place"]
+    },
+    {
+      "id": "sofi",
+      "name": "SoFi Stadium",
+      "city": "Inglewood, CA",
+      "country": "USA",
+      "hostingRounds": ["round_of_32", "round_of_16", "quarter_finals"]
+    },
+    {
+      "id": "nrg",
+      "name": "NRG Stadium",
+      "city": "Houston, TX",
+      "country": "USA",
+      "hostingRounds": ["round_of_32", "round_of_16"]
+    },
+    {
+      "id": "lincoln_financial",
+      "name": "Lincoln Financial Field",
+      "city": "Philadelphia, PA",
+      "country": "USA",
+      "hostingRounds": ["round_of_32", "round_of_16"]
+    },
+    {
+      "id": "arrowhead",
+      "name": "GEHA Field at Arrowhead Stadium",
+      "city": "Kansas City, MO",
+      "country": "USA",
+      "hostingRounds": ["round_of_32", "round_of_16"]
+    },
+    {
+      "id": "lumen",
+      "name": "Lumen Field",
+      "city": "Seattle, WA",
+      "country": "USA",
+      "hostingRounds": ["round_of_32"]
+    },
+    {
+      "id": "levis",
+      "name": "Levi's Stadium",
+      "city": "Santa Clara, CA",
+      "country": "USA",
+      "hostingRounds": ["round_of_32"]
+    },
+    {
+      "id": "gillette",
+      "name": "Gillette Stadium",
+      "city": "Foxborough, MA",
+      "country": "USA",
+      "hostingRounds": ["round_of_32"]
+    },
+    {
+      "id": "bmo",
+      "name": "BMO Field",
+      "city": "Toronto, ON",
+      "country": "Canada",
+      "hostingRounds": ["round_of_32"]
+    },
+    {
+      "id": "bc_place",
+      "name": "BC Place",
+      "city": "Vancouver, BC",
+      "country": "Canada",
+      "hostingRounds": ["round_of_32"]
+    },
+    {
+      "id": "azteca",
+      "name": "Estadio Azteca",
+      "city": "Mexico City",
+      "country": "Mexico",
+      "hostingRounds": ["round_of_32", "round_of_16"]
+    },
+    {
+      "id": "bbva",
+      "name": "Estadio BBVA",
+      "city": "Monterrey",
+      "country": "Mexico",
+      "hostingRounds": ["round_of_32"]
+    },
+    {
+      "id": "akron",
+      "name": "Estadio Akron",
+      "city": "Guadalajara",
+      "country": "Mexico",
+      "hostingRounds": ["round_of_32"]
+    }
+  ],
+  "bracketVenueMapping": {
+    "round_of_32": {
+      "0": "metlife",
+      "1": "att",
+      "2": "mercedes_benz",
+      "3": "hard_rock",
+      "4": "sofi",
+      "5": "nrg",
+      "6": "lincoln_financial",
+      "7": "arrowhead",
+      "8": "lumen",
+      "9": "levis",
+      "10": "gillette",
+      "11": "bmo",
+      "12": "bc_place",
+      "13": "azteca",
+      "14": "bbva",
+      "15": "akron"
+    },
+    "round_of_16": {
+      "0": "metlife",
+      "1": "att",
+      "2": "mercedes_benz",
+      "3": "hard_rock",
+      "4": "sofi",
+      "5": "nrg",
+      "6": "lincoln_financial",
+      "7": "azteca"
+    },
+    "quarter_finals": {
+      "0": "metlife",
+      "1": "sofi",
+      "2": "hard_rock",
+      "3": "arrowhead"
+    },
+    "semi_finals": {
+      "0": "att",
+      "1": "mercedes_benz"
+    },
+    "third_place": {
+      "0": "hard_rock"
+    },
+    "final": {
+      "0": "metlife"
+    }
+  }
+}

@@ -3,6 +3,8 @@
 export const memory: WebAssembly.Memory;
 export const __wbg_wcsimulator_free: (a: number, b: number) => void;
 export const calculateMatchProbability: (a: number, b: number, c: number) => any;
+export const getTeamMatchupStats: (a: any, b: number) => [number, number, number];
+export const getTopPathsForTeam: (a: any, b: number, c: number) => [number, number, number];
 export const getVersion: () => [number, number];
 export const simulateSingleTournament: (a: any, b: number, c: number, d: bigint) => [number, number, number];
 export const wcsimulator_getGroups: (a: number) => [number, number, number];

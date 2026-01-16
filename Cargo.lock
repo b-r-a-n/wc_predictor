@@ -544,6 +544,7 @@ dependencies = [
  "rand_chacha",
  "rayon",
  "serde",
+ "serde_json",
  "wc-core",
  "wc-strategies",
 ]
@@ -564,6 +565,7 @@ version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
  "getrandom",
+ "js-sys",
  "rand",
  "rand_chacha",
  "serde",
@@ -574,6 +576,7 @@ dependencies = [
  "wc-core",
  "wc-simulation",
  "wc-strategies",
+ "web-sys",
 ]
 
 [[package]]

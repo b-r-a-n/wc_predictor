@@ -1,10 +1,11 @@
 //! WASM API for World Cup simulation.
 
 use wasm_bindgen::prelude::*;
+use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::{from_value, to_value};
 
-use wc_core::Tournament;
-use wc_simulation::{SimulationConfig, SimulationRunner};
+use wc_core::{TeamId, Tournament};
+use wc_simulation::{AggregatedResults, SimulationConfig, SimulationRunner};
 use wc_strategies::{
     CompositeStrategy, EloStrategy, FifaRankingStrategy, MarketValueStrategy, PredictionStrategy,
 };
@@ -121,7 +122,14 @@ impl WcSimulator {
         let runner = SimulationRunner::new(&self.tournament, strategy, config);
         let results = runner.run_with_progress(|_, _| {});
 
-        to_value(&results).map_err(|e| JsError::new(&format!("Serialization error: {}", e)))
+        // Workaround: serde_wasm_bindgen drops some fields, so serialize to JSON and parse
+        let json_str = serde_json::to_string(&results)
+            .map_err(|e| JsError::new(&format!("JSON serialization error: {}", e)))?;
+
+        let js_value = js_sys::JSON::parse(&json_str)
+            .map_err(|e| JsError::new(&format!("JSON parse error: {:?}", e)))?;
+
+        Ok(js_value)
     }
 
     /// Get the list of teams.
@@ -217,4 +225,127 @@ pub fn calculate_match_probability(
 #[wasm_bindgen(js_name = getVersion)]
 pub fn get_version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
+}
+
+/// A single tournament path entry with human-readable information.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PathEntry {
+    /// The path string (e.g., "R32:5,R16:12,QF:3,SF:14,F:0")
+    pub path: String,
+    /// Number of times this path occurred
+    pub count: u32,
+    /// Probability of this path (count / total_simulations)
+    pub probability: f64,
+}
+
+/// Result of getting top paths for a team.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TopPathsResult {
+    /// Team ID
+    pub team_id: u8,
+    /// Total simulations run
+    pub total_simulations: u32,
+    /// Whether this team has path statistics (false if eliminated in group stage always)
+    pub has_paths: bool,
+    /// The top N paths sorted by count descending
+    pub paths: Vec<PathEntry>,
+}
+
+/// Get top N tournament paths for a specific team.
+///
+/// This helper function extracts and formats path statistics from simulation results.
+/// Useful for visualizing the most common tournament paths a team takes.
+///
+/// # Arguments
+/// * `results` - The AggregatedResults from a simulation run
+/// * `team_id` - The team ID to get paths for
+/// * `top_n` - Maximum number of paths to return
+///
+/// # Returns
+/// A TopPathsResult containing the top N paths sorted by occurrence count.
+///
+/// # Example
+/// ```javascript
+/// const results = simulator.runEloSimulation(10000, undefined);
+/// const topPaths = getTopPathsForTeam(results, 0, 10);
+/// console.log(topPaths.paths);
+/// ```
+#[wasm_bindgen(js_name = getTopPathsForTeam)]
+pub fn get_top_paths_for_team(
+    results: JsValue,
+    team_id: u8,
+    top_n: usize,
+) -> Result<JsValue, JsError> {
+    let aggregated: AggregatedResults = from_value(results)
+        .map_err(|e| JsError::new(&format!("Failed to deserialize results: {}", e)))?;
+
+    let team = TeamId(team_id);
+    let total_simulations = aggregated.total_simulations;
+
+    // Check if team has path statistics
+    let path_stats = aggregated.path_stats.get(&team);
+
+    let result = match path_stats {
+        Some(stats) => {
+            // Get all paths and sort by count descending
+            let mut paths: Vec<_> = stats.complete_paths.iter().collect();
+            paths.sort_by(|a, b| b.1.cmp(a.1));
+
+            // Take top N and convert to PathEntry
+            let top_paths: Vec<PathEntry> = paths
+                .into_iter()
+                .take(top_n)
+                .map(|(path, count)| PathEntry {
+                    path: path.clone(),
+                    count: *count,
+                    probability: *count as f64 / total_simulations as f64,
+                })
+                .collect();
+
+            TopPathsResult {
+                team_id,
+                total_simulations,
+                has_paths: !top_paths.is_empty(),
+                paths: top_paths,
+            }
+        }
+        None => TopPathsResult {
+            team_id,
+            total_simulations,
+            has_paths: false,
+            paths: vec![],
+        },
+    };
+
+    to_value(&result).map_err(|e| JsError::new(&format!("Serialization error: {}", e)))
+}
+
+/// Get matchup frequencies for a specific team at each knockout round.
+///
+/// Returns opponent frequencies at each round of the knockout stage.
+///
+/// # Arguments
+/// * `results` - The AggregatedResults from a simulation run
+/// * `team_id` - The team ID to get matchup stats for
+///
+/// # Returns
+/// An object containing matchup frequencies for each knockout round.
+#[wasm_bindgen(js_name = getTeamMatchupStats)]
+pub fn get_team_matchup_stats(results: JsValue, team_id: u8) -> Result<JsValue, JsError> {
+    let aggregated: AggregatedResults = from_value(results)
+        .map_err(|e| JsError::new(&format!("Failed to deserialize results: {}", e)))?;
+
+    let team = TeamId(team_id);
+
+    match aggregated.path_stats.get(&team) {
+        Some(stats) => {
+            to_value(stats).map_err(|e| JsError::new(&format!("Serialization error: {}", e)))
+        }
+        None => {
+            // Return empty PathStatistics for teams with no knockout appearances
+            use wc_simulation::PathStatistics;
+            let empty_stats = PathStatistics::new(team);
+            to_value(&empty_stats).map_err(|e| JsError::new(&format!("Serialization error: {}", e)))
+        }
+    }
 }

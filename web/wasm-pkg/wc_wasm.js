@@ -160,6 +160,62 @@ export function calculateMatchProbability(team_a_elo, team_b_elo, is_knockout) {
 }
 
 /**
+ * Get matchup frequencies for a specific team at each knockout round.
+ *
+ * Returns opponent frequencies at each round of the knockout stage.
+ *
+ * # Arguments
+ * * `results` - The AggregatedResults from a simulation run
+ * * `team_id` - The team ID to get matchup stats for
+ *
+ * # Returns
+ * An object containing matchup frequencies for each knockout round.
+ * @param {any} results
+ * @param {number} team_id
+ * @returns {any}
+ */
+export function getTeamMatchupStats(results, team_id) {
+    const ret = wasm.getTeamMatchupStats(results, team_id);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return takeFromExternrefTable0(ret[0]);
+}
+
+/**
+ * Get top N tournament paths for a specific team.
+ *
+ * This helper function extracts and formats path statistics from simulation results.
+ * Useful for visualizing the most common tournament paths a team takes.
+ *
+ * # Arguments
+ * * `results` - The AggregatedResults from a simulation run
+ * * `team_id` - The team ID to get paths for
+ * * `top_n` - Maximum number of paths to return
+ *
+ * # Returns
+ * A TopPathsResult containing the top N paths sorted by occurrence count.
+ *
+ * # Example
+ * ```javascript
+ * const results = simulator.runEloSimulation(10000, undefined);
+ * const topPaths = getTopPathsForTeam(results, 0, 10);
+ * console.log(topPaths.paths);
+ * ```
+ * @param {any} results
+ * @param {number} team_id
+ * @param {number} top_n
+ * @returns {any}
+ */
+export function getTopPathsForTeam(results, team_id, top_n) {
+    const ret = wasm.getTopPathsForTeam(results, team_id, top_n);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return takeFromExternrefTable0(ret[0]);
+}
+
+/**
  * Get version information.
  * @returns {string}
  */
@@ -389,6 +445,10 @@ function __wbg_get_imports() {
             const ret = arg0.next;
             return ret;
         },
+        __wbg_parse_708461a1feddfb38: function() { return handleError(function (arg0, arg1) {
+            const ret = JSON.parse(getStringFromWasm0(arg0, arg1));
+            return ret;
+        }, arguments); },
         __wbg_prototypesetcall_bdcdcc5842e4d77d: function(arg0, arg1, arg2) {
             Uint8Array.prototype.set.call(getArrayU8FromWasm0(arg0, arg1), arg2);
         },

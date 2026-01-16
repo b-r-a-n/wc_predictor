@@ -4,7 +4,9 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use wc_core::{TeamId, Tournament, TournamentResult};
+use wc_core::{MatchResult, TeamId, Tournament, TournamentResult};
+
+use crate::path_tracker::PathStatistics;
 
 /// Aggregated statistics from multiple tournament simulations.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -17,6 +19,8 @@ pub struct AggregatedResults {
     pub most_likely_winner: TeamId,
     /// Most likely final matchup
     pub most_likely_final: (TeamId, TeamId),
+    /// Path statistics for each team through knockout stages
+    pub path_stats: HashMap<TeamId, PathStatistics>,
 }
 
 /// Statistics for a single team across all simulations.
@@ -76,6 +80,7 @@ impl AggregatedResults {
         let total = results.len() as u32;
         let mut team_stats: HashMap<TeamId, TeamStatistics> = HashMap::new();
         let mut finals_count: HashMap<(TeamId, TeamId), u32> = HashMap::new();
+        let mut path_stats: HashMap<TeamId, PathStatistics> = HashMap::new();
 
         // Initialize stats for all teams
         for team in &tournament.teams {
@@ -87,6 +92,7 @@ impl AggregatedResults {
                     ..Default::default()
                 },
             );
+            path_stats.insert(team.id, PathStatistics::new(team.id));
         }
 
         // Aggregate results
@@ -226,6 +232,28 @@ impl AggregatedResults {
                     }
                 }
             }
+
+            // Track path statistics for all knockout qualifiers
+            for &team_id in &knockout_qualifiers {
+                // Find opponent at each round (team participated if they're in a match)
+                let r32_opponent = find_opponent(&result.knockout_bracket.round_of_32, team_id);
+                let r16_opponent = find_opponent(&result.knockout_bracket.round_of_16, team_id);
+                let qf_opponent = find_opponent(&result.knockout_bracket.quarter_finals, team_id);
+                let sf_opponent = find_opponent(&result.knockout_bracket.semi_finals, team_id);
+                let final_opponent =
+                    find_opponent(std::slice::from_ref(&result.knockout_bracket.final_match), team_id);
+
+                if let Some(stats) = path_stats.get_mut(&team_id) {
+                    let path_key = stats.record_path(
+                        r32_opponent,
+                        r16_opponent,
+                        qf_opponent,
+                        sf_opponent,
+                        final_opponent,
+                    );
+                    stats.record_complete_path(path_key);
+                }
+            }
         }
 
         // Calculate probabilities
@@ -234,6 +262,11 @@ impl AggregatedResults {
             stats.final_probability = stats.reached_final as f64 / total as f64;
             stats.semi_final_probability = stats.reached_semi_finals as f64 / total as f64;
             stats.knockout_probability = stats.reached_round_of_32 as f64 / total as f64;
+        }
+
+        // Prune path statistics to top 100 entries per team
+        for stats in path_stats.values_mut() {
+            stats.prune_paths(100);
         }
 
         // Find most likely winner
@@ -255,6 +288,7 @@ impl AggregatedResults {
             team_stats,
             most_likely_winner,
             most_likely_final,
+            path_stats,
         }
     }
 
@@ -273,6 +307,20 @@ impl AggregatedResults {
     pub fn top_n(&self, n: usize) -> Vec<&TeamStatistics> {
         self.rankings().into_iter().take(n).collect()
     }
+}
+
+/// Find the opponent for a team in a list of matches.
+/// Returns Some(opponent_id) if the team participated in a match in this round.
+fn find_opponent(matches: &[MatchResult], team_id: TeamId) -> Option<TeamId> {
+    for m in matches {
+        if m.home_team == team_id {
+            return Some(m.away_team);
+        }
+        if m.away_team == team_id {
+            return Some(m.home_team);
+        }
+    }
+    None
 }
 
 #[cfg(test)]
@@ -382,5 +430,88 @@ mod tests {
         // Champion should be first
         assert_eq!(rankings[0].team_id, TeamId(0));
         assert_eq!(rankings[0].win_probability, 1.0);
+    }
+
+    #[test]
+    fn test_path_statistics_tracking() {
+        let tournament = create_test_tournament();
+        let results = vec![create_dummy_tournament_result()];
+
+        let aggregated = AggregatedResults::from_results(results, &tournament);
+
+        // path_stats should be populated for all teams
+        assert_eq!(aggregated.path_stats.len(), 48);
+
+        // Check champion (Team 0) path statistics
+        // Based on the knockout bracket setup:
+        // R32: Team 0 vs Team 1 (0 wins)
+        // R16: Team 0 vs Team 2 (0 wins)
+        // QF: Team 0 vs Team 4 (0 wins)
+        // SF: Team 0 vs Team 8 (0 wins)
+        // F: Team 0 vs Team 16 (0 wins)
+        let team_0_path = aggregated.path_stats.get(&TeamId(0)).unwrap();
+        assert_eq!(
+            team_0_path.round_of_32_matchups.opponents.get(&TeamId(1)),
+            Some(&1)
+        );
+        assert_eq!(
+            team_0_path.round_of_16_matchups.opponents.get(&TeamId(2)),
+            Some(&1)
+        );
+        assert_eq!(
+            team_0_path.quarter_final_matchups.opponents.get(&TeamId(4)),
+            Some(&1)
+        );
+        assert_eq!(
+            team_0_path.semi_final_matchups.opponents.get(&TeamId(8)),
+            Some(&1)
+        );
+        assert_eq!(
+            team_0_path.final_matchups.opponents.get(&TeamId(16)),
+            Some(&1)
+        );
+
+        // Team 0 should have one complete path
+        assert_eq!(team_0_path.complete_paths.len(), 1);
+        let expected_path = "R32:1,R16:2,QF:4,SF:8,F:16";
+        assert_eq!(
+            team_0_path.complete_paths.get(expected_path),
+            Some(&1)
+        );
+
+        // Check a team eliminated in R32 (Team 1)
+        // Team 1 played Team 0 in R32 and lost
+        let team_1_path = aggregated.path_stats.get(&TeamId(1)).unwrap();
+        assert_eq!(
+            team_1_path.round_of_32_matchups.opponents.get(&TeamId(0)),
+            Some(&1)
+        );
+        // Team 1 should not have any R16+ matchups
+        assert!(team_1_path.round_of_16_matchups.opponents.is_empty());
+        // Team 1's complete path should just be R32
+        let expected_team_1_path = "R32:0";
+        assert_eq!(
+            team_1_path.complete_paths.get(expected_team_1_path),
+            Some(&1)
+        );
+    }
+
+    #[test]
+    fn test_path_stats_serialization() {
+        use crate::runner::{SimulationConfig, SimulationRunner};
+        use wc_strategies::EloStrategy;
+
+        let tournament = create_test_tournament();
+        let strategy = EloStrategy::default();
+        let config = SimulationConfig::with_iterations(10).with_seed(42);
+        let runner = SimulationRunner::new(&tournament, &strategy, config);
+        let results = runner.run_with_progress(|_, _| {});
+
+        let json = serde_json::to_string(&results).unwrap();
+        // Find path_stats position
+        let path_stats_pos = json.find("path_stats").expect("path_stats not found!");
+        println!("path_stats at position: {}", path_stats_pos);
+        println!("Around path_stats: {}", &json[path_stats_pos..json.len().min(path_stats_pos + 200)]);
+        assert!(json.contains("path_stats"), "path_stats should be in JSON output");
     }
 }

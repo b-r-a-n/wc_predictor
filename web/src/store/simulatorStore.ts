@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Team, Group, AggregatedResults, Strategy, CompositeWeights, TabId, WasmStatus, TeamPreset } from '../types';
+import type { Team, Group, AggregatedResults, Strategy, CompositeWeights, TabId, WasmStatus, TeamPreset, Venue, VenueData } from '../types';
 import type { WasmApi } from '../hooks/useWasm';
 
 // LocalStorage keys
@@ -35,6 +35,11 @@ interface SimulatorState {
   // UI state
   activeTab: TabId;
 
+  // Path visualization state
+  selectedTeamForPaths: number | null;
+  venues: Venue[] | null;
+  venueMapping: Record<string, Record<string, string>> | null;
+
   // Actions
   setWasmStatus: (status: WasmStatus, error?: string | null) => void;
   setWasmApi: (api: WasmApi) => void;
@@ -43,6 +48,10 @@ interface SimulatorState {
   setCompositeWeights: (weights: CompositeWeights) => void;
   setActiveTab: (tab: TabId) => void;
   runSimulation: () => void;
+
+  // Path visualization actions
+  setSelectedTeamForPaths: (teamId: number | null) => void;
+  loadVenues: () => Promise<void>;
 
   // Team editing actions
   updateTeam: (teamId: number, field: keyof Team, value: number) => void;
@@ -88,11 +97,16 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
   // Initial UI state
   activeTab: 'results',
 
+  // Initial path visualization state
+  selectedTeamForPaths: null,
+  venues: null,
+  venueMapping: null,
+
   // Actions
   setWasmStatus: (status, error = null) => set({ wasmStatus: status, wasmError: error }),
 
   setWasmApi: (api) => {
-    const { originalTeams, loadCurrentEditsFromStorage, loadPresetsFromStorage } = get();
+    const { originalTeams, loadCurrentEditsFromStorage, loadPresetsFromStorage, loadVenues } = get();
     // Only set originalTeams if it's empty (first initialization)
     const newOriginalTeams = originalTeams.length === 0
       ? api.teams.map(t => ({ ...t }))
@@ -109,6 +123,9 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
     // Load persisted data from LocalStorage after WASM init
     loadPresetsFromStorage();
     loadCurrentEditsFromStorage();
+
+    // Load venue data for path visualization
+    loadVenues();
   },
 
   setStrategy: (strategy) => set({ strategy }),
@@ -118,6 +135,22 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
   setCompositeWeights: (weights) => set({ compositeWeights: weights }),
 
   setActiveTab: (tab) => set({ activeTab: tab }),
+
+  // Path visualization actions
+  setSelectedTeamForPaths: (teamId) => set({ selectedTeamForPaths: teamId }),
+
+  loadVenues: async () => {
+    try {
+      const response = await fetch('/data/venues.json');
+      const data: VenueData = await response.json();
+      set({
+        venues: data.venues,
+        venueMapping: data.bracketVenueMapping
+      });
+    } catch (error) {
+      console.error('Failed to load venues:', error);
+    }
+  },
 
   runSimulation: () => {
     const { wasmApi, teamsModified, strategy, iterations, compositeWeights, isSimulating, reinitializeSimulator } = get();
@@ -296,11 +329,24 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
             teamStats = result.team_stats as Record<string, unknown>;
           }
 
+          // Get path_stats if available (may be a Map that needs conversion)
+          let pathStats: Record<string, unknown> | undefined;
+          const rawPathStats = (rawResult as any).path_stats;
+          if (rawPathStats instanceof Map) {
+            pathStats = {};
+            rawPathStats.forEach((value: unknown, key: number) => {
+              pathStats![String(key)] = value;
+            });
+          } else if (rawPathStats) {
+            pathStats = rawPathStats as Record<string, unknown>;
+          }
+
           return {
             total_simulations: result.total_simulations,
             team_stats: teamStats,
             most_likely_winner: result.most_likely_winner,
             most_likely_final: result.most_likely_final,
+            path_stats: pathStats,
           } as AggregatedResults;
         },
         calculateMatchProbability: wasmApi?.calculateMatchProbability || (() => ({ home_win: 0, draw: 0, away_win: 0 })),

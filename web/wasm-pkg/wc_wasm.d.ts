@@ -75,6 +75,43 @@ export class WcSimulator {
 export function calculateMatchProbability(team_a_elo: number, team_b_elo: number, is_knockout: boolean): any;
 
 /**
+ * Get matchup frequencies for a specific team at each knockout round.
+ *
+ * Returns opponent frequencies at each round of the knockout stage.
+ *
+ * # Arguments
+ * * `results` - The AggregatedResults from a simulation run
+ * * `team_id` - The team ID to get matchup stats for
+ *
+ * # Returns
+ * An object containing matchup frequencies for each knockout round.
+ */
+export function getTeamMatchupStats(results: any, team_id: number): any;
+
+/**
+ * Get top N tournament paths for a specific team.
+ *
+ * This helper function extracts and formats path statistics from simulation results.
+ * Useful for visualizing the most common tournament paths a team takes.
+ *
+ * # Arguments
+ * * `results` - The AggregatedResults from a simulation run
+ * * `team_id` - The team ID to get paths for
+ * * `top_n` - Maximum number of paths to return
+ *
+ * # Returns
+ * A TopPathsResult containing the top N paths sorted by occurrence count.
+ *
+ * # Example
+ * ```javascript
+ * const results = simulator.runEloSimulation(10000, undefined);
+ * const topPaths = getTopPathsForTeam(results, 0, 10);
+ * console.log(topPaths.paths);
+ * ```
+ */
+export function getTopPathsForTeam(results: any, team_id: number, top_n: number): any;
+
+/**
  * Get version information.
  */
 export function getVersion(): string;
@@ -97,6 +134,8 @@ export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly __wbg_wcsimulator_free: (a: number, b: number) => void;
     readonly calculateMatchProbability: (a: number, b: number, c: number) => any;
+    readonly getTeamMatchupStats: (a: any, b: number) => [number, number, number];
+    readonly getTopPathsForTeam: (a: any, b: number, c: number) => [number, number, number];
     readonly getVersion: () => [number, number];
     readonly simulateSingleTournament: (a: any, b: number, c: number, d: bigint) => [number, number, number];
     readonly wcsimulator_getGroups: (a: number) => [number, number, number];
