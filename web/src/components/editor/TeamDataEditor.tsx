@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useSimulatorStore } from '../../store/simulatorStore';
 import { getFlagEmoji } from '../../utils/formatting';
 import { Button } from '../common/Button';
-import type { Team, Confederation } from '../../types';
+import type { Team, Confederation, TeamPreset } from '../../types';
 
 type SortKey = 'name' | 'elo' | 'market' | 'fifa' | 'group' | 'confederation';
 type SortDirection = 'asc' | 'desc';
@@ -46,9 +46,14 @@ export function TeamDataEditor() {
     originalTeams,
     groups,
     editedTeamIds,
+    presets,
+    activePresetName,
     updateTeam,
     resetTeam,
     resetAllTeams,
+    savePreset,
+    loadPreset,
+    deletePreset,
   } = useSimulatorStore();
 
   const [sortKey, setSortKey] = useState<SortKey>('name');
@@ -56,6 +61,8 @@ export function TeamDataEditor() {
   const [filterConfederation, setFilterConfederation] = useState<FilterConfederation>('all');
   const [filterGroup, setFilterGroup] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [newPresetName, setNewPresetName] = useState('');
 
   // Create team-to-group mapping
   const teamGroupMap = useMemo(() => {
@@ -130,6 +137,20 @@ export function TeamDataEditor() {
     }
   };
 
+  const handleSavePreset = () => {
+    if (newPresetName.trim()) {
+      savePreset(newPresetName.trim());
+      setNewPresetName('');
+      setShowSaveModal(false);
+    }
+  };
+
+  const handleDeletePreset = (name: string) => {
+    if (confirm(`Delete preset "${name}"?`)) {
+      deletePreset(name);
+    }
+  };
+
   const hasEdits = editedTeamIds.size > 0;
 
   return (
@@ -151,6 +172,14 @@ export function TeamDataEditor() {
           <Button
             variant="outline"
             size="sm"
+            onClick={() => setShowSaveModal(true)}
+            disabled={!hasEdits}
+          >
+            Save As...
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={resetAllTeams}
             disabled={!hasEdits}
           >
@@ -158,6 +187,59 @@ export function TeamDataEditor() {
           </Button>
         </div>
       </div>
+
+      {/* Presets Section */}
+      {presets.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <h3 className="text-sm font-medium text-gray-700 mb-3">Saved Presets</h3>
+          <div className="flex flex-wrap gap-2">
+            {presets.map((preset) => (
+              <PresetCard
+                key={preset.name}
+                preset={preset}
+                isActive={activePresetName === preset.name}
+                onLoad={() => loadPreset(preset.name)}
+                onDelete={() => handleDeletePreset(preset.name)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Save Preset Modal */}
+      {showSaveModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Save Preset</h3>
+            <input
+              type="text"
+              placeholder="Preset name..."
+              value={newPresetName}
+              onChange={(e) => setNewPresetName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSavePreset()}
+              autoFocus
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-4"
+            />
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowSaveModal(false);
+                  setNewPresetName('');
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSavePreset}
+                disabled={!newPresetName.trim()}
+              >
+                Save
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -515,6 +597,57 @@ function EditableCell({
       {diff && (
         <span className={`ml-1 text-xs ${diffColor}`}>({diff})</span>
       )}
+    </div>
+  );
+}
+
+interface PresetCardProps {
+  preset: TeamPreset;
+  isActive: boolean;
+  onLoad: () => void;
+  onDelete: () => void;
+}
+
+function PresetCard({ preset, isActive, onLoad, onDelete }: PresetCardProps) {
+  const date = new Date(preset.createdAt);
+  const formattedDate = date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+  });
+
+  return (
+    <div
+      className={`flex items-center gap-3 px-3 py-2 rounded-lg border ${
+        isActive
+          ? 'border-blue-500 bg-blue-50'
+          : 'border-gray-200 bg-gray-50 hover:bg-gray-100'
+      }`}
+    >
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-900 truncate">{preset.name}</span>
+          {isActive && (
+            <span className="text-xs text-blue-600 font-medium">(active)</span>
+          )}
+        </div>
+        <span className="text-xs text-gray-500">{formattedDate}</span>
+      </div>
+      <div className="flex items-center gap-1">
+        {!isActive && (
+          <button
+            onClick={onLoad}
+            className="px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded"
+          >
+            Load
+          </button>
+        )}
+        <button
+          onClick={onDelete}
+          className="px-2 py-1 text-xs font-medium text-red-600 hover:text-red-800 hover:bg-red-100 rounded"
+        >
+          Delete
+        </button>
+      </div>
     </div>
   );
 }

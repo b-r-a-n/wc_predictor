@@ -1,6 +1,10 @@
 import { create } from 'zustand';
-import type { Team, Group, AggregatedResults, Strategy, CompositeWeights, TabId, WasmStatus } from '../types';
+import type { Team, Group, AggregatedResults, Strategy, CompositeWeights, TabId, WasmStatus, TeamPreset } from '../types';
 import type { WasmApi } from '../hooks/useWasm';
+
+// LocalStorage keys
+const STORAGE_KEY_CURRENT_EDITS = 'wc_predictor_current_edits';
+const STORAGE_KEY_PRESETS = 'wc_predictor_presets';
 
 interface SimulatorState {
   // WASM state
@@ -14,6 +18,10 @@ interface SimulatorState {
   // Team editing state
   editedTeamIds: Set<number>;
   teamsModified: boolean;
+
+  // Presets state
+  presets: TeamPreset[];
+  activePresetName: string | null;
 
   // Simulation settings
   strategy: Strategy;
@@ -41,6 +49,14 @@ interface SimulatorState {
   resetTeam: (teamId: number) => void;
   resetAllTeams: () => void;
   reinitializeSimulator: () => Promise<void>;
+
+  // Persistence actions
+  saveCurrentEditsToStorage: () => void;
+  loadCurrentEditsFromStorage: () => void;
+  loadPresetsFromStorage: () => void;
+  savePreset: (name: string) => void;
+  loadPreset: (name: string) => void;
+  deletePreset: (name: string) => void;
 }
 
 export const useSimulatorStore = create<SimulatorState>((set, get) => ({
@@ -55,6 +71,10 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
   // Initial team editing state
   editedTeamIds: new Set<number>(),
   teamsModified: false,
+
+  // Initial presets state
+  presets: [],
+  activePresetName: null,
 
   // Initial simulation settings
   strategy: 'elo',
@@ -72,7 +92,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
   setWasmStatus: (status, error = null) => set({ wasmStatus: status, wasmError: error }),
 
   setWasmApi: (api) => {
-    const { originalTeams } = get();
+    const { originalTeams, loadCurrentEditsFromStorage, loadPresetsFromStorage } = get();
     // Only set originalTeams if it's empty (first initialization)
     const newOriginalTeams = originalTeams.length === 0
       ? api.teams.map(t => ({ ...t }))
@@ -85,6 +105,10 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
       groups: api.groups,
       wasmStatus: 'ready',
     });
+
+    // Load persisted data from LocalStorage after WASM init
+    loadPresetsFromStorage();
+    loadCurrentEditsFromStorage();
   },
 
   setStrategy: (strategy) => set({ strategy }),
@@ -130,7 +154,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
 
   // Team editing actions
   updateTeam: (teamId, field, value) => {
-    const { teams, originalTeams, editedTeamIds } = get();
+    const { teams, originalTeams, editedTeamIds, saveCurrentEditsToStorage } = get();
 
     const updatedTeams = teams.map((team) =>
       team.id === teamId ? { ...team, [field]: value } : team
@@ -158,7 +182,11 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
       teams: updatedTeams,
       editedTeamIds: newEditedIds,
       teamsModified: newEditedIds.size > 0,
+      activePresetName: null,  // Clear active preset when manually editing
     });
+
+    // Auto-save to LocalStorage
+    setTimeout(() => saveCurrentEditsToStorage(), 0);
   },
 
   resetTeam: (teamId) => {
@@ -188,7 +216,15 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
       teams: originalTeams.map((t) => ({ ...t })),
       editedTeamIds: new Set<number>(),
       teamsModified: false,
+      activePresetName: null,
     });
+
+    // Clear current edits from LocalStorage
+    try {
+      localStorage.removeItem(STORAGE_KEY_CURRENT_EDITS);
+    } catch (e) {
+      console.warn('Failed to clear LocalStorage:', e);
+    }
   },
 
   reinitializeSimulator: async () => {
@@ -279,6 +315,155 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
     } catch (error) {
       console.error('Failed to reinitialize simulator:', error);
       throw error;
+    }
+  },
+
+  // Persistence actions
+  saveCurrentEditsToStorage: () => {
+    const { teams, editedTeamIds } = get();
+    if (editedTeamIds.size === 0) {
+      // No edits, remove from storage
+      try {
+        localStorage.removeItem(STORAGE_KEY_CURRENT_EDITS);
+      } catch (e) {
+        console.warn('Failed to clear LocalStorage:', e);
+      }
+      return;
+    }
+
+    // Only save edited teams (as a diff)
+    const editedTeams = teams.filter(t => editedTeamIds.has(t.id));
+    try {
+      localStorage.setItem(STORAGE_KEY_CURRENT_EDITS, JSON.stringify(editedTeams));
+    } catch (e) {
+      console.warn('Failed to save to LocalStorage:', e);
+    }
+  },
+
+  loadCurrentEditsFromStorage: () => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY_CURRENT_EDITS);
+      if (!stored) return;
+
+      const editedTeams: Team[] = JSON.parse(stored);
+      const { teams } = get();
+
+      // Apply saved edits to current teams
+      const newEditedIds = new Set<number>();
+      const updatedTeams = teams.map(team => {
+        const savedEdit = editedTeams.find(t => t.id === team.id);
+        if (savedEdit) {
+          newEditedIds.add(team.id);
+          return {
+            ...team,
+            elo_rating: savedEdit.elo_rating,
+            market_value_millions: savedEdit.market_value_millions,
+            fifa_ranking: savedEdit.fifa_ranking,
+          };
+        }
+        return team;
+      });
+
+      set({
+        teams: updatedTeams,
+        editedTeamIds: newEditedIds,
+        teamsModified: newEditedIds.size > 0,
+      });
+
+      console.log(`Restored ${newEditedIds.size} edited teams from LocalStorage`);
+    } catch (e) {
+      console.warn('Failed to load from LocalStorage:', e);
+    }
+  },
+
+  loadPresetsFromStorage: () => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY_PRESETS);
+      if (!stored) return;
+
+      const presets: TeamPreset[] = JSON.parse(stored);
+      set({ presets });
+      console.log(`Loaded ${presets.length} presets from LocalStorage`);
+    } catch (e) {
+      console.warn('Failed to load presets from LocalStorage:', e);
+    }
+  },
+
+  savePreset: (name: string) => {
+    const { teams, presets } = get();
+
+    // Check if preset with same name exists
+    const existingIndex = presets.findIndex(p => p.name === name);
+    const newPreset: TeamPreset = {
+      name,
+      teams: teams.map(t => ({ ...t })),
+      createdAt: Date.now(),
+    };
+
+    let newPresets: TeamPreset[];
+    if (existingIndex >= 0) {
+      // Update existing preset
+      newPresets = [...presets];
+      newPresets[existingIndex] = newPreset;
+    } else {
+      // Add new preset
+      newPresets = [...presets, newPreset];
+    }
+
+    set({ presets: newPresets, activePresetName: name });
+
+    try {
+      localStorage.setItem(STORAGE_KEY_PRESETS, JSON.stringify(newPresets));
+    } catch (e) {
+      console.warn('Failed to save presets to LocalStorage:', e);
+    }
+  },
+
+  loadPreset: (name: string) => {
+    const { presets, originalTeams } = get();
+    const preset = presets.find(p => p.name === name);
+    if (!preset) return;
+
+    // Calculate which teams differ from original
+    const newEditedIds = new Set<number>();
+    preset.teams.forEach(team => {
+      const original = originalTeams.find(t => t.id === team.id);
+      if (original) {
+        const isDifferent =
+          original.elo_rating !== team.elo_rating ||
+          original.market_value_millions !== team.market_value_millions ||
+          original.fifa_ranking !== team.fifa_ranking;
+        if (isDifferent) {
+          newEditedIds.add(team.id);
+        }
+      }
+    });
+
+    set({
+      teams: preset.teams.map(t => ({ ...t })),
+      editedTeamIds: newEditedIds,
+      teamsModified: newEditedIds.size > 0,
+      activePresetName: name,
+    });
+
+    // Update current edits storage to match loaded preset
+    const { saveCurrentEditsToStorage } = get();
+    saveCurrentEditsToStorage();
+  },
+
+  deletePreset: (name: string) => {
+    const { presets, activePresetName } = get();
+    const newPresets = presets.filter(p => p.name !== name);
+
+    set({
+      presets: newPresets,
+      activePresetName: activePresetName === name ? null : activePresetName,
+    });
+
+    try {
+      localStorage.setItem(STORAGE_KEY_PRESETS, JSON.stringify(newPresets));
+    } catch (e) {
+      console.warn('Failed to save presets to LocalStorage:', e);
     }
   },
 }));

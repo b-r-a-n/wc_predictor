@@ -81,3 +81,10 @@ export interface CompositeWeights {
 // UI state types
 export type WasmStatus = 'loading' | 'ready' | 'error';
 export type TabId = 'results' | 'groups' | 'bracket' | 'calculator' | 'editor';
+
+// Team preset for LocalStorage persistence
+export interface TeamPreset {
+  name: string;
+  teams: Team[];
+  createdAt: number;  // timestamp
+}
