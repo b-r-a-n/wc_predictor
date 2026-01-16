@@ -39,8 +39,9 @@ export function BracketSlot({
         {formatPercent(probability)}
       </div>
       {venue && (
-        <div className={`text-xs mt-1 truncate ${isMuted ? 'text-gray-300' : ''}`}>
-          {venue.name}, {venue.city.split(',')[0]}
+        <div className={`text-xs mt-1 ${isMuted ? 'text-gray-300' : ''}`}>
+          <div className="truncate">{venue.name}</div>
+          <div className="truncate opacity-75">{venue.city}</div>
         </div>
       )}
     </div>
