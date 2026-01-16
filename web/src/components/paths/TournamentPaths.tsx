@@ -1,34 +1,22 @@
 import { useMemo, useCallback } from 'react';
 import { useSimulatorStore } from '../../store/simulatorStore';
-import { getFlagEmoji } from '../../utils/formatting';
-import { PathTable } from './PathTable';
-import type { Team, TopPathsResult, TournamentPathDisplay, KnockoutRoundType, Venue, PathEntry } from '../../types';
+import { getFlagEmoji, formatNumber } from '../../utils/formatting';
+import { BracketSlot } from './BracketSlot';
+import type { Team, Venue, BracketSlotStats, KnockoutRoundType } from '../../types';
 
-// Parse path string like "R32:5,R16:12,QF:3,SF:14,F:0" to extract round and opponent IDs
-function parsePath(pathKey: string): { round: string; opponentId: number }[] {
-  return pathKey.split(',').map(part => {
-    const [round, id] = part.split(':');
-    return { round, opponentId: parseInt(id) };
-  });
-}
-
-// Map abbreviations to display names
-const roundNames: Record<string, string> = {
-  'R32': 'Round of 32',
-  'R16': 'Round of 16',
-  'QF': 'Quarter-finals',
-  'SF': 'Semi-finals',
-  'F': 'Final'
-};
-
-// Map abbreviations to KnockoutRoundType
-const roundToType: Record<string, KnockoutRoundType> = {
-  'R32': 'round_of_32',
-  'R16': 'round_of_16',
-  'QF': 'quarter_finals',
-  'SF': 'semi_finals',
-  'F': 'final'
-};
+// Round configuration for the bracket
+const ROUNDS: {
+  key: keyof BracketSlotStats;
+  displayName: string;
+  slotCount: number;
+  mappingKey: KnockoutRoundType;
+}[] = [
+  { key: 'round_of_32', displayName: 'R32', slotCount: 16, mappingKey: 'round_of_32' },
+  { key: 'round_of_16', displayName: 'R16', slotCount: 8, mappingKey: 'round_of_16' },
+  { key: 'quarter_finals', displayName: 'QF', slotCount: 4, mappingKey: 'quarter_finals' },
+  { key: 'semi_finals', displayName: 'SF', slotCount: 2, mappingKey: 'semi_finals' },
+  { key: 'final_match', displayName: 'Final', slotCount: 1, mappingKey: 'final' },
+];
 
 export function TournamentPaths() {
   const {
@@ -55,91 +43,52 @@ export function TournamentPaths() {
     return map;
   }, [venues]);
 
-  // Get top paths for the selected team
-  // Extract directly from results.path_stats instead of calling WASM
-  // (WASM can't deserialize back due to string key conversion)
-  const pathsData = useMemo((): TopPathsResult | null => {
+  // Get bracket slot stats for the selected team
+  const bracketStats = useMemo((): BracketSlotStats | null => {
     if (!results || selectedTeamForPaths === null) return null;
 
-    const pathStats = results.path_stats;
-    if (!pathStats) {
-      return null;
-    }
+    const bracketSlotStats = results.bracket_slot_stats;
+    if (!bracketSlotStats) return null;
 
-    // path_stats keys are stringified TeamIds
-    const teamPathStats = pathStats[String(selectedTeamForPaths)];
-    if (!teamPathStats) {
-      return {
-        team_id: selectedTeamForPaths,
-        total_simulations: results.total_simulations,
-        has_paths: false,
-        paths: []
-      };
-    }
-
-    // Get complete_paths and sort by count descending
-    const completePaths = teamPathStats.complete_paths;
-    const sortedPaths = Object.entries(completePaths)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 5);
-
-    const paths: PathEntry[] = sortedPaths.map(([path, count]) => ({
-      path,
-      count,
-      probability: count / results.total_simulations
-    }));
-
-    return {
-      team_id: selectedTeamForPaths,
-      total_simulations: results.total_simulations,
-      has_paths: paths.length > 0,
-      paths
-    };
+    const teamStats = bracketSlotStats[String(selectedTeamForPaths)] as BracketSlotStats | undefined;
+    return teamStats || null;
   }, [results, selectedTeamForPaths]);
 
-  // Transform paths data into displayable format
-  const displayPaths = useMemo((): TournamentPathDisplay[] => {
-    if (!pathsData || !pathsData.has_paths) return [];
+  // Get probability for a specific slot
+  const getSlotProbability = useCallback((
+    roundKey: keyof BracketSlotStats,
+    slotIndex: number
+  ): number => {
+    if (!bracketStats || !results) return 0;
 
-    return pathsData.paths.map((pathEntry, index) => {
-      const parsedRounds = parsePath(pathEntry.path);
+    if (roundKey === 'final_match') {
+      // Final is a single number, not a record
+      const count = bracketStats.final_match as number;
+      return count / results.total_simulations;
+    }
 
-      const rounds = parsedRounds.map((pr, roundIndex) => {
-        const roundType = roundToType[pr.round];
-        const opponent = teamMap.get(pr.opponentId);
+    const roundData = bracketStats[roundKey] as Record<string, number>;
+    if (!roundData) return 0;
 
-        // Try to get venue from mapping
-        let venue: Venue | undefined;
-        if (venueMapping && roundType) {
-          // For simplicity, use match index 0 for each round since exact match position is not in path
-          const roundMapping = venueMapping[roundType];
-          if (roundMapping) {
-            // Use roundIndex as approximate slot - this is a simplification
-            const venueId = roundMapping[String(roundIndex % Object.keys(roundMapping).length)] || roundMapping['0'];
-            if (venueId) {
-              venue = venueMap.get(venueId);
-            }
-          }
-        }
+    const count = roundData[String(slotIndex)] || 0;
+    return count / results.total_simulations;
+  }, [bracketStats, results]);
 
-        return {
-          round: roundType,
-          roundDisplayName: roundNames[pr.round] || pr.round,
-          opponentId: pr.opponentId,
-          opponent,
-          venue
-        };
-      });
+  // Get venue for a specific slot
+  const getSlotVenue = useCallback((
+    mappingKey: KnockoutRoundType,
+    slotIndex: number
+  ): Venue | undefined => {
+    if (!venueMapping) return undefined;
 
-      return {
-        rank: index + 1,
-        pathKey: pathEntry.path,
-        probability: pathEntry.probability,
-        occurrenceCount: pathEntry.count,
-        rounds
-      };
-    });
-  }, [pathsData, teamMap, venueMap, venueMapping]);
+    const roundMapping = venueMapping[mappingKey];
+    if (!roundMapping) return undefined;
+
+    const venueId = roundMapping[String(slotIndex)];
+    if (!venueId) return undefined;
+
+    return venueMap.get(venueId);
+  }, [venueMapping, venueMap]);
 
   const handleTeamChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -149,11 +98,14 @@ export function TournamentPaths() {
   // Get selected team info for display
   const selectedTeam = selectedTeamForPaths !== null ? teamMap.get(selectedTeamForPaths) : null;
 
+  // Check if team has any bracket slot data
+  const hasData = bracketStats !== null;
+
   // Show message if no simulation has been run
   if (!results) {
     return (
       <div className="flex items-center justify-center h-64 text-gray-500">
-        Run a simulation to see tournament paths
+        Run a simulation to see bracket positions
       </div>
     );
   }
@@ -162,9 +114,9 @@ export function TournamentPaths() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Tournament Paths</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Bracket Positions</h2>
           <p className="text-sm text-gray-500">
-            View the most likely knockout stage paths for each team
+            View probability of each bracket position for a team
           </p>
         </div>
 
@@ -200,7 +152,7 @@ export function TournamentPaths() {
             <div>
               <h3 className="text-xl font-bold">{selectedTeam.name}</h3>
               <p className="text-blue-100 text-sm">
-                Top 5 most likely tournament paths
+                Bracket position probabilities
               </p>
             </div>
           </div>
@@ -212,43 +164,87 @@ export function TournamentPaths() {
         <div className="flex items-center justify-center h-48 text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
           <div className="text-center">
             <span className="text-4xl block mb-2">&#127942;</span>
-            <p>Select a team to view their tournament paths</p>
+            <p>Select a team to view their bracket positions</p>
           </div>
         </div>
       )}
 
-      {/* Error state - WASM call failed or no path_stats */}
-      {selectedTeamForPaths !== null && !pathsData && (
+      {/* No data available for selected team */}
+      {selectedTeamForPaths !== null && !hasData && (
         <div className="flex items-center justify-center h-48 text-amber-600 bg-amber-50 rounded-lg border border-amber-200">
           <div className="text-center">
             <span className="text-4xl block mb-2">&#9888;</span>
-            <p className="font-medium">Path data not available</p>
+            <p className="font-medium">Bracket data not available</p>
             <p className="text-sm text-amber-500 mt-1">
-              Please re-run the simulation to generate path statistics
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* No paths available for selected team */}
-      {selectedTeamForPaths !== null && pathsData && !pathsData.has_paths && (
-        <div className="flex items-center justify-center h-48 text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
-          <div className="text-center">
-            <span className="text-4xl block mb-2">&#128683;</span>
-            <p>No knockout stage paths found for this team</p>
-            <p className="text-sm text-gray-400 mt-1">
               This team may not have reached the knockout stage in any simulation
             </p>
           </div>
         </div>
       )}
 
-      {/* Path table */}
-      {displayPaths.length > 0 && (
-        <PathTable
-          paths={displayPaths}
-          totalSimulations={pathsData?.total_simulations ?? 0}
-        />
+      {/* Bracket visualization */}
+      {selectedTeamForPaths !== null && hasData && (
+        <>
+          {/* Summary header */}
+          <div className="text-sm text-gray-500">
+            Based on {formatNumber(results.total_simulations)} simulations
+          </div>
+
+          {/* Bracket grid */}
+          <div className="bg-white rounded-lg border border-gray-200 p-4 overflow-x-auto">
+            <div className="flex gap-4 min-w-max">
+              {ROUNDS.map((round) => (
+                <div key={round.key} className="flex flex-col gap-2" style={{ width: '140px' }}>
+                  {/* Round header */}
+                  <div className="text-center font-semibold text-gray-700 text-sm py-2 bg-gray-100 rounded-md">
+                    {round.displayName}
+                  </div>
+
+                  {/* Slots for this round */}
+                  <div className="flex flex-col gap-2">
+                    {Array.from({ length: round.slotCount }, (_, slotIndex) => (
+                      <BracketSlot
+                        key={`${round.key}-${slotIndex}`}
+                        round={round.key}
+                        slotIndex={slotIndex}
+                        probability={getSlotProbability(round.key, slotIndex)}
+                        totalSimulations={results.total_simulations}
+                        venue={getSlotVenue(round.mappingKey, slotIndex)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Legend */}
+          <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
+            <h4 className="text-sm font-semibold text-gray-700 mb-3">Probability Legend</h4>
+            <div className="flex flex-wrap gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded bg-green-500"></div>
+                <span className="text-sm text-gray-600">&gt;20%</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded bg-green-300"></div>
+                <span className="text-sm text-gray-600">10-20%</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded bg-yellow-300"></div>
+                <span className="text-sm text-gray-600">5-10%</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded bg-gray-200"></div>
+                <span className="text-sm text-gray-600">1-5%</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded bg-gray-100 border border-gray-200"></div>
+                <span className="text-sm text-gray-600">&lt;1%</span>
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
