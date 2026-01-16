@@ -9,6 +9,40 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use wc_core::TeamId;
 
+/// Tracks which bracket slots (positions) a team plays in at each knockout round.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct BracketSlotStats {
+    /// Round of 32 slot appearances (slot 0-15 -> count)
+    pub round_of_32: HashMap<u8, u32>,
+    /// Round of 16 slot appearances (slot 0-7 -> count)
+    pub round_of_16: HashMap<u8, u32>,
+    /// Quarter-finals slot appearances (slot 0-3 -> count)
+    pub quarter_finals: HashMap<u8, u32>,
+    /// Semi-finals slot appearances (slot 0-1 -> count)
+    pub semi_finals: HashMap<u8, u32>,
+    /// Final appearances count
+    pub final_match: u32,
+}
+
+impl BracketSlotStats {
+    /// Create new empty bracket slot stats.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Record a slot appearance for a given round.
+    pub fn record_slot(&mut self, round: &str, slot: u8) {
+        match round {
+            "round_of_32" => *self.round_of_32.entry(slot).or_insert(0) += 1,
+            "round_of_16" => *self.round_of_16.entry(slot).or_insert(0) += 1,
+            "quarter_finals" => *self.quarter_finals.entry(slot).or_insert(0) += 1,
+            "semi_finals" => *self.semi_finals.entry(slot).or_insert(0) += 1,
+            "final" => self.final_match += 1,
+            _ => {}
+        }
+    }
+}
+
 /// Tracks opponent frequencies at a specific knockout round.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct RoundMatchups {
@@ -214,5 +248,48 @@ mod tests {
         stats.prune_paths(100);
 
         assert_eq!(stats.complete_paths.len(), 50);
+    }
+
+    #[test]
+    fn test_bracket_slot_stats_new() {
+        let stats = BracketSlotStats::new();
+        assert!(stats.round_of_32.is_empty());
+        assert!(stats.round_of_16.is_empty());
+        assert!(stats.quarter_finals.is_empty());
+        assert!(stats.semi_finals.is_empty());
+        assert_eq!(stats.final_match, 0);
+    }
+
+    #[test]
+    fn test_bracket_slot_stats_record_slot() {
+        let mut stats = BracketSlotStats::new();
+
+        stats.record_slot("round_of_32", 5);
+        stats.record_slot("round_of_32", 5);
+        stats.record_slot("round_of_32", 10);
+        stats.record_slot("round_of_16", 3);
+        stats.record_slot("quarter_finals", 1);
+        stats.record_slot("semi_finals", 0);
+        stats.record_slot("final", 0);
+        stats.record_slot("final", 0);
+
+        assert_eq!(stats.round_of_32.get(&5), Some(&2));
+        assert_eq!(stats.round_of_32.get(&10), Some(&1));
+        assert_eq!(stats.round_of_16.get(&3), Some(&1));
+        assert_eq!(stats.quarter_finals.get(&1), Some(&1));
+        assert_eq!(stats.semi_finals.get(&0), Some(&1));
+        assert_eq!(stats.final_match, 2);
+    }
+
+    #[test]
+    fn test_bracket_slot_stats_unknown_round() {
+        let mut stats = BracketSlotStats::new();
+        stats.record_slot("unknown_round", 0);
+        // Should not panic and all maps should remain empty
+        assert!(stats.round_of_32.is_empty());
+        assert!(stats.round_of_16.is_empty());
+        assert!(stats.quarter_finals.is_empty());
+        assert!(stats.semi_finals.is_empty());
+        assert_eq!(stats.final_match, 0);
     }
 }

@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use wc_core::{MatchResult, TeamId, Tournament, TournamentResult};
 
-use crate::path_tracker::PathStatistics;
+use crate::path_tracker::{BracketSlotStats, PathStatistics};
 
 /// Aggregated statistics from multiple tournament simulations.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -21,6 +21,8 @@ pub struct AggregatedResults {
     pub most_likely_final: (TeamId, TeamId),
     /// Path statistics for each team through knockout stages
     pub path_stats: HashMap<TeamId, PathStatistics>,
+    /// Bracket slot statistics for each team (which positions they play in)
+    pub bracket_slot_stats: HashMap<TeamId, BracketSlotStats>,
 }
 
 /// Statistics for a single team across all simulations.
@@ -81,6 +83,7 @@ impl AggregatedResults {
         let mut team_stats: HashMap<TeamId, TeamStatistics> = HashMap::new();
         let mut finals_count: HashMap<(TeamId, TeamId), u32> = HashMap::new();
         let mut path_stats: HashMap<TeamId, PathStatistics> = HashMap::new();
+        let mut bracket_slot_stats: HashMap<TeamId, BracketSlotStats> = HashMap::new();
 
         // Initialize stats for all teams
         for team in &tournament.teams {
@@ -93,6 +96,7 @@ impl AggregatedResults {
                 },
             );
             path_stats.insert(team.id, PathStatistics::new(team.id));
+            bracket_slot_stats.insert(team.id, BracketSlotStats::new());
         }
 
         // Aggregate results
@@ -233,6 +237,58 @@ impl AggregatedResults {
                 }
             }
 
+            // Track bracket slot positions for each round
+            // Round of 32: slots 0-15
+            for (slot, m) in result.knockout_bracket.round_of_32.iter().enumerate() {
+                if let Some(stats) = bracket_slot_stats.get_mut(&m.home_team) {
+                    stats.record_slot("round_of_32", slot as u8);
+                }
+                if let Some(stats) = bracket_slot_stats.get_mut(&m.away_team) {
+                    stats.record_slot("round_of_32", slot as u8);
+                }
+            }
+
+            // Round of 16: slots 0-7
+            for (slot, m) in result.knockout_bracket.round_of_16.iter().enumerate() {
+                if let Some(stats) = bracket_slot_stats.get_mut(&m.home_team) {
+                    stats.record_slot("round_of_16", slot as u8);
+                }
+                if let Some(stats) = bracket_slot_stats.get_mut(&m.away_team) {
+                    stats.record_slot("round_of_16", slot as u8);
+                }
+            }
+
+            // Quarter-finals: slots 0-3
+            for (slot, m) in result.knockout_bracket.quarter_finals.iter().enumerate() {
+                if let Some(stats) = bracket_slot_stats.get_mut(&m.home_team) {
+                    stats.record_slot("quarter_finals", slot as u8);
+                }
+                if let Some(stats) = bracket_slot_stats.get_mut(&m.away_team) {
+                    stats.record_slot("quarter_finals", slot as u8);
+                }
+            }
+
+            // Semi-finals: slots 0-1
+            for (slot, m) in result.knockout_bracket.semi_finals.iter().enumerate() {
+                if let Some(stats) = bracket_slot_stats.get_mut(&m.home_team) {
+                    stats.record_slot("semi_finals", slot as u8);
+                }
+                if let Some(stats) = bracket_slot_stats.get_mut(&m.away_team) {
+                    stats.record_slot("semi_finals", slot as u8);
+                }
+            }
+
+            // Final: single match
+            {
+                let m = &result.knockout_bracket.final_match;
+                if let Some(stats) = bracket_slot_stats.get_mut(&m.home_team) {
+                    stats.record_slot("final", 0);
+                }
+                if let Some(stats) = bracket_slot_stats.get_mut(&m.away_team) {
+                    stats.record_slot("final", 0);
+                }
+            }
+
             // Track path statistics for all knockout qualifiers
             for &team_id in &knockout_qualifiers {
                 // Find opponent at each round (team participated if they're in a match)
@@ -289,6 +345,7 @@ impl AggregatedResults {
             most_likely_winner,
             most_likely_final,
             path_stats,
+            bracket_slot_stats,
         }
     }
 
@@ -513,5 +570,67 @@ mod tests {
         println!("path_stats at position: {}", path_stats_pos);
         println!("Around path_stats: {}", &json[path_stats_pos..json.len().min(path_stats_pos + 200)]);
         assert!(json.contains("path_stats"), "path_stats should be in JSON output");
+    }
+
+    #[test]
+    fn test_bracket_slot_stats_tracking() {
+        let tournament = create_test_tournament();
+        let results = vec![create_dummy_tournament_result()];
+
+        let aggregated = AggregatedResults::from_results(results, &tournament);
+
+        // bracket_slot_stats should be populated for all teams
+        assert_eq!(aggregated.bracket_slot_stats.len(), 48);
+
+        // Check Team 0's bracket slot stats
+        // Based on the knockout bracket setup:
+        // R32: match 0 (Team 0 vs Team 1) -> slot 0
+        // R16: match 0 (Team 0 vs Team 2) -> slot 0
+        // QF: match 0 (Team 0 vs Team 4) -> slot 0
+        // SF: match 0 (Team 0 vs Team 8) -> slot 0
+        // Final: Team 0 vs Team 16
+        let team_0_slots = aggregated.bracket_slot_stats.get(&TeamId(0)).unwrap();
+        assert_eq!(team_0_slots.round_of_32.get(&0), Some(&1));
+        assert_eq!(team_0_slots.round_of_16.get(&0), Some(&1));
+        assert_eq!(team_0_slots.quarter_finals.get(&0), Some(&1));
+        assert_eq!(team_0_slots.semi_finals.get(&0), Some(&1));
+        assert_eq!(team_0_slots.final_match, 1);
+
+        // Check Team 16's bracket slot stats
+        // R32: match 8 (Team 16 vs Team 17) -> slot 8
+        // R16: match 4 (Team 16 vs Team 18) -> slot 4
+        // QF: match 2 (Team 16 vs Team 20) -> slot 2
+        // SF: match 1 (Team 16 vs Team 24) -> slot 1
+        // Final: Team 16 vs Team 0
+        let team_16_slots = aggregated.bracket_slot_stats.get(&TeamId(16)).unwrap();
+        assert_eq!(team_16_slots.round_of_32.get(&8), Some(&1));
+        assert_eq!(team_16_slots.round_of_16.get(&4), Some(&1));
+        assert_eq!(team_16_slots.quarter_finals.get(&2), Some(&1));
+        assert_eq!(team_16_slots.semi_finals.get(&1), Some(&1));
+        assert_eq!(team_16_slots.final_match, 1);
+
+        // Check Team 1 (eliminated in R32)
+        // R32: match 0 (Team 0 vs Team 1) -> slot 0
+        let team_1_slots = aggregated.bracket_slot_stats.get(&TeamId(1)).unwrap();
+        assert_eq!(team_1_slots.round_of_32.get(&0), Some(&1));
+        assert!(team_1_slots.round_of_16.is_empty());
+        assert!(team_1_slots.quarter_finals.is_empty());
+        assert!(team_1_slots.semi_finals.is_empty());
+        assert_eq!(team_1_slots.final_match, 0);
+    }
+
+    #[test]
+    fn test_bracket_slot_stats_serialization() {
+        use crate::runner::{SimulationConfig, SimulationRunner};
+        use wc_strategies::EloStrategy;
+
+        let tournament = create_test_tournament();
+        let strategy = EloStrategy::default();
+        let config = SimulationConfig::with_iterations(10).with_seed(42);
+        let runner = SimulationRunner::new(&tournament, &strategy, config);
+        let results = runner.run_with_progress(|_, _| {});
+
+        let json = serde_json::to_string(&results).unwrap();
+        assert!(json.contains("bracket_slot_stats"), "bracket_slot_stats should be in JSON output");
     }
 }
