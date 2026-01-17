@@ -8,8 +8,8 @@ use serde::Serialize;
 
 use wc_core::Tournament;
 use wc_strategies::{
-    CompositeStrategy, EloStrategy, FifaRankingStrategy, MarketValueStrategy, MatchContext,
-    PredictionStrategy,
+    CompositeStrategy, EloStrategy, FifaRankingStrategy, FormStrategy, MarketValueStrategy,
+    MatchContext, PredictionStrategy,
 };
 
 use crate::cli::{MatchArgs, OutputFormat, StrategyChoice};
@@ -31,11 +31,13 @@ pub fn run_match(args: &MatchArgs, tournament: &Tournament, format: OutputFormat
         StrategyChoice::Elo => Box::new(EloStrategy::default()),
         StrategyChoice::Fifa => Box::new(FifaRankingStrategy::default()),
         StrategyChoice::Market => Box::new(MarketValueStrategy::default()),
+        StrategyChoice::Form => Box::new(FormStrategy::default()),
         StrategyChoice::Composite => Box::new(
             CompositeStrategy::new("Composite")
-                .add_strategy(EloStrategy::default(), 0.4)
-                .add_strategy(MarketValueStrategy::default(), 0.3)
-                .add_strategy(FifaRankingStrategy::default(), 0.3),
+                .add_strategy(EloStrategy::default(), 0.35)
+                .add_strategy(MarketValueStrategy::default(), 0.25)
+                .add_strategy(FifaRankingStrategy::default(), 0.25)
+                .add_strategy(FormStrategy::default(), 0.15),
         ),
     };
 

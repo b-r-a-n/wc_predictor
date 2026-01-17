@@ -7,7 +7,8 @@ use serde_wasm_bindgen::{from_value, to_value};
 use wc_core::{TeamId, Tournament};
 use wc_simulation::{AggregatedResults, SimulationConfig, SimulationRunner};
 use wc_strategies::{
-    CompositeStrategy, EloStrategy, FifaRankingStrategy, MarketValueStrategy, PredictionStrategy,
+    CompositeStrategy, EloStrategy, FifaRankingStrategy, FormStrategy, MarketValueStrategy,
+    PredictionStrategy,
 };
 
 /// Main simulator interface for JavaScript.
@@ -80,12 +81,24 @@ impl WcSimulator {
         self.run_simulation(&strategy, iterations, seed)
     }
 
+    /// Run simulation using form-based predictions (Sofascore).
+    #[wasm_bindgen(js_name = runFormSimulation)]
+    pub fn run_form_simulation(
+        &self,
+        iterations: u32,
+        seed: Option<u64>,
+    ) -> Result<JsValue, JsError> {
+        let strategy = FormStrategy::default();
+        self.run_simulation(&strategy, iterations, seed)
+    }
+
     /// Run simulation using a composite strategy.
     ///
     /// # Arguments
     /// * `elo_weight` - Weight for ELO strategy (0.0 to 1.0)
     /// * `market_weight` - Weight for market value strategy
     /// * `fifa_weight` - Weight for FIFA ranking strategy
+    /// * `form_weight` - Weight for form strategy (Sofascore)
     /// * `iterations` - Number of simulations
     /// * `seed` - Optional seed
     #[wasm_bindgen(js_name = runCompositeSimulation)]
@@ -94,13 +107,15 @@ impl WcSimulator {
         elo_weight: f64,
         market_weight: f64,
         fifa_weight: f64,
+        form_weight: f64,
         iterations: u32,
         seed: Option<u64>,
     ) -> Result<JsValue, JsError> {
         let strategy = CompositeStrategy::new("Composite")
             .add_strategy(EloStrategy::default(), elo_weight)
             .add_strategy(MarketValueStrategy::default(), market_weight)
-            .add_strategy(FifaRankingStrategy::default(), fifa_weight);
+            .add_strategy(FifaRankingStrategy::default(), fifa_weight)
+            .add_strategy(FormStrategy::default(), form_weight);
 
         self.run_simulation(&strategy, iterations, seed)
     }
@@ -179,11 +194,13 @@ pub fn simulate_single_tournament(
         "elo" => Box::new(EloStrategy::default()),
         "market_value" => Box::new(MarketValueStrategy::default()),
         "fifa_ranking" => Box::new(FifaRankingStrategy::default()),
+        "form" => Box::new(FormStrategy::default()),
         "composite" => Box::new(
             CompositeStrategy::new("Default Composite")
-                .add_strategy(EloStrategy::default(), 0.4)
-                .add_strategy(MarketValueStrategy::default(), 0.3)
-                .add_strategy(FifaRankingStrategy::default(), 0.3),
+                .add_strategy(EloStrategy::default(), 0.35)
+                .add_strategy(MarketValueStrategy::default(), 0.25)
+                .add_strategy(FifaRankingStrategy::default(), 0.25)
+                .add_strategy(FormStrategy::default(), 0.15),
         ),
         _ => return Err(JsError::new(&format!("Unknown strategy: {}", strategy))),
     };

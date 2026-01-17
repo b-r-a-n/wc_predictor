@@ -73,12 +73,13 @@ export interface MatchProbabilities {
 }
 
 // Strategy types
-export type Strategy = 'elo' | 'market_value' | 'fifa_ranking' | 'composite';
+export type Strategy = 'elo' | 'market_value' | 'fifa_ranking' | 'form' | 'composite';
 
 export interface CompositeWeights {
   elo: number;
   market: number;
   fifa: number;
+  form: number;
 }
 
 // UI state types

@@ -28,6 +28,8 @@ pub struct TeamData {
     pub market_value_millions: f64,
     pub fifa_ranking: u16,
     pub world_cup_wins: u8,
+    #[serde(default)]
+    pub sofascore_form: f64,
 }
 
 /// Group data from JSON.
@@ -62,6 +64,7 @@ impl TournamentData {
                     .with_market_value(t.market_value_millions)
                     .with_fifa_ranking(t.fifa_ranking)
                     .with_world_cup_wins(t.world_cup_wins)
+                    .with_sofascore_form(t.sofascore_form)
             })
             .collect();
 

@@ -7,10 +7,12 @@ declare module '../../wasm-pkg' {
     runEloSimulation(iterations: number, seed?: bigint): unknown;
     runMarketValueSimulation(iterations: number, seed?: bigint): unknown;
     runFifaRankingSimulation(iterations: number, seed?: bigint): unknown;
+    runFormSimulation(iterations: number, seed?: bigint): unknown;
     runCompositeSimulation(
       elo_weight: number,
       market_weight: number,
       fifa_weight: number,
+      form_weight: number,
       iterations: number,
       seed?: bigint
     ): unknown;

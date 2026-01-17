@@ -88,7 +88,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
   // Initial simulation settings
   strategy: 'elo',
   iterations: 10000,
-  compositeWeights: { elo: 0.4, market: 0.3, fifa: 0.3 },
+  compositeWeights: { elo: 0.35, market: 0.25, fifa: 0.25, form: 0.15 },
 
   // Initial simulation state
   isSimulating: false,
@@ -296,12 +296,16 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
             case 'fifa_ranking':
               rawResult = simulator.runFifaRankingSimulation(iterations);
               break;
+            case 'form':
+              rawResult = simulator.runFormSimulation(iterations);
+              break;
             case 'composite': {
-              const weights = compositeWeights ?? { elo: 0.4, market: 0.3, fifa: 0.3 };
+              const weights = compositeWeights ?? { elo: 0.35, market: 0.25, fifa: 0.25, form: 0.15 };
               rawResult = simulator.runCompositeSimulation(
                 weights.elo,
                 weights.market,
                 weights.fifa,
+                weights.form,
                 iterations
               );
               break;

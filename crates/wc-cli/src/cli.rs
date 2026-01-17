@@ -75,6 +75,8 @@ pub enum StrategyChoice {
     Fifa,
     /// Squad market value based prediction
     Market,
+    /// Recent form based prediction (Sofascore)
+    Form,
     /// Composite strategy (weighted combination)
     Composite,
 }

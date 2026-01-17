@@ -9,7 +9,8 @@ const strategies: { value: Strategy; label: string; description: string }[] = [
   { value: 'elo', label: 'ELO Rating', description: 'World Football ELO ratings' },
   { value: 'market_value', label: 'Market Value', description: 'Squad market values' },
   { value: 'fifa_ranking', label: 'FIFA Ranking', description: 'Official FIFA rankings' },
-  { value: 'composite', label: 'Composite', description: 'Weighted combination' },
+  { value: 'form', label: 'Form', description: 'Recent match performance (Sofascore)' },
+  { value: 'composite', label: 'Composite', description: 'Weighted combination of all factors' },
 ];
 
 export function StrategySelector({ value, onChange }: StrategySelectorProps) {

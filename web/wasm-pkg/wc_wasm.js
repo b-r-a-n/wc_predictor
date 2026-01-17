@@ -83,17 +83,19 @@ export class WcSimulator {
      * * `elo_weight` - Weight for ELO strategy (0.0 to 1.0)
      * * `market_weight` - Weight for market value strategy
      * * `fifa_weight` - Weight for FIFA ranking strategy
+     * * `form_weight` - Weight for form strategy (Sofascore)
      * * `iterations` - Number of simulations
      * * `seed` - Optional seed
      * @param {number} elo_weight
      * @param {number} market_weight
      * @param {number} fifa_weight
+     * @param {number} form_weight
      * @param {number} iterations
      * @param {bigint | null} [seed]
      * @returns {any}
      */
-    runCompositeSimulation(elo_weight, market_weight, fifa_weight, iterations, seed) {
-        const ret = wasm.wcsimulator_runCompositeSimulation(this.__wbg_ptr, elo_weight, market_weight, fifa_weight, iterations, !isLikeNone(seed), isLikeNone(seed) ? BigInt(0) : seed);
+    runCompositeSimulation(elo_weight, market_weight, fifa_weight, form_weight, iterations, seed) {
+        const ret = wasm.wcsimulator_runCompositeSimulation(this.__wbg_ptr, elo_weight, market_weight, fifa_weight, form_weight, iterations, !isLikeNone(seed), isLikeNone(seed) ? BigInt(0) : seed);
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }
@@ -124,6 +126,19 @@ export class WcSimulator {
      */
     runFifaRankingSimulation(iterations, seed) {
         const ret = wasm.wcsimulator_runFifaRankingSimulation(this.__wbg_ptr, iterations, !isLikeNone(seed), isLikeNone(seed) ? BigInt(0) : seed);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return takeFromExternrefTable0(ret[0]);
+    }
+    /**
+     * Run simulation using form-based predictions (Sofascore).
+     * @param {number} iterations
+     * @param {bigint | null} [seed]
+     * @returns {any}
+     */
+    runFormSimulation(iterations, seed) {
+        const ret = wasm.wcsimulator_runFormSimulation(this.__wbg_ptr, iterations, !isLikeNone(seed), isLikeNone(seed) ? BigInt(0) : seed);
         if (ret[2]) {
             throw takeFromExternrefTable0(ret[1]);
         }

@@ -45,10 +45,11 @@ export class WcSimulator {
      * * `elo_weight` - Weight for ELO strategy (0.0 to 1.0)
      * * `market_weight` - Weight for market value strategy
      * * `fifa_weight` - Weight for FIFA ranking strategy
+     * * `form_weight` - Weight for form strategy (Sofascore)
      * * `iterations` - Number of simulations
      * * `seed` - Optional seed
      */
-    runCompositeSimulation(elo_weight: number, market_weight: number, fifa_weight: number, iterations: number, seed?: bigint | null): any;
+    runCompositeSimulation(elo_weight: number, market_weight: number, fifa_weight: number, form_weight: number, iterations: number, seed?: bigint | null): any;
     /**
      * Run simulation using ELO-based predictions.
      *
@@ -61,6 +62,10 @@ export class WcSimulator {
      * Run simulation using FIFA ranking-based predictions.
      */
     runFifaRankingSimulation(iterations: number, seed?: bigint | null): any;
+    /**
+     * Run simulation using form-based predictions (Sofascore).
+     */
+    runFormSimulation(iterations: number, seed?: bigint | null): any;
     /**
      * Run simulation using market value-based predictions.
      */
@@ -143,9 +148,10 @@ export interface InitOutput {
     readonly wcsimulator_new: (a: any) => [number, number, number];
     readonly wcsimulator_numGroups: (a: number) => number;
     readonly wcsimulator_numTeams: (a: number) => number;
-    readonly wcsimulator_runCompositeSimulation: (a: number, b: number, c: number, d: number, e: number, f: number, g: bigint) => [number, number, number];
+    readonly wcsimulator_runCompositeSimulation: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: bigint) => [number, number, number];
     readonly wcsimulator_runEloSimulation: (a: number, b: number, c: number, d: bigint) => [number, number, number];
     readonly wcsimulator_runFifaRankingSimulation: (a: number, b: number, c: number, d: bigint) => [number, number, number];
+    readonly wcsimulator_runFormSimulation: (a: number, b: number, c: number, d: bigint) => [number, number, number];
     readonly wcsimulator_runMarketValueSimulation: (a: number, b: number, c: number, d: bigint) => [number, number, number];
     readonly init: () => void;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
