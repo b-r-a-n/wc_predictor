@@ -50,6 +50,9 @@ pub struct Team {
     pub fifa_ranking: u16,
     /// Number of World Cup titles won
     pub world_cup_wins: u8,
+    /// Sofascore form rating (average points per game, 0.0-3.0)
+    #[serde(default)]
+    pub sofascore_form: f64,
 }
 
 impl Team {
@@ -69,6 +72,7 @@ impl Team {
             market_value_millions: 0.0,
             fifa_ranking: 100,
             world_cup_wins: 0,
+            sofascore_form: 1.5,
         }
     }
 
@@ -93,6 +97,12 @@ impl Team {
     /// Builder method to set World Cup wins.
     pub fn with_world_cup_wins(mut self, wins: u8) -> Self {
         self.world_cup_wins = wins;
+        self
+    }
+
+    /// Builder method to set Sofascore form rating.
+    pub fn with_sofascore_form(mut self, form: f64) -> Self {
+        self.sofascore_form = form;
         self
     }
 }

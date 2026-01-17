@@ -19,7 +19,8 @@
         "elo": "Argentina",
         "transfermarkt": "argentinien",
         "transfermarkt_id": 3437,
-        "fifa": "Argentina"
+        "fifa": "Argentina",
+        "sofascore_id": 4819
       }
     },
     {
@@ -32,7 +33,8 @@
         "elo": "Australia",
         "transfermarkt": "australien",
         "transfermarkt_id": 3433,
-        "fifa": "Australia"
+        "fifa": "Australia",
+        "sofascore_id": 7410
       }
     },
     {
@@ -45,7 +47,8 @@
         "elo": "Austria",
         "transfermarkt": "osterreich",
         "transfermarkt_id": 3383,
-        "fifa": "Austria"
+        "fifa": "Austria",
+        "sofascore_id": 4718
       }
     },
     {
@@ -58,7 +61,8 @@
         "elo": "Algeria",
         "transfermarkt": "algerien",
         "transfermarkt_id": 3614,
-        "fifa": "Algeria"
+        "fifa": "Algeria",
+        "sofascore_id": 4691
       }
     },
     {
@@ -71,7 +75,8 @@
         "elo": "Belgium",
         "transfermarkt": "belgien",
         "transfermarkt_id": 3382,
-        "fifa": "Belgium"
+        "fifa": "Belgium",
+        "sofascore_id": 4717
       }
     },
     {
@@ -84,7 +89,8 @@
         "elo": "Brazil",
         "transfermarkt": "brasilien",
         "transfermarkt_id": 3439,
-        "fifa": "Brazil"
+        "fifa": "Brazil",
+        "sofascore_id": 4748
       }
     },
     {
@@ -97,7 +103,8 @@
         "elo": "Canada",
         "transfermarkt": "kanada",
         "transfermarkt_id": 3510,
-        "fifa": "Canada"
+        "fifa": "Canada",
+        "sofascore_id": 7412
       }
     },
     {
@@ -111,7 +118,8 @@
         "elo": "Cape Verde",
         "transfermarkt": "kap-verde",
         "transfermarkt_id": 4311,
-        "fifa": "Cape Verde"
+        "fifa": "Cape Verde",
+        "sofascore_id": 4753
       }
     },
     {
@@ -124,7 +132,8 @@
         "elo": "Colombia",
         "transfermarkt": "kolumbien",
         "transfermarkt_id": 3816,
-        "fifa": "Colombia"
+        "fifa": "Colombia",
+        "sofascore_id": 4820
       }
     },
     {
@@ -137,7 +146,8 @@
         "elo": "Croatia",
         "transfermarkt": "kroatien",
         "transfermarkt_id": 3556,
-        "fifa": "Croatia"
+        "fifa": "Croatia",
+        "sofascore_id": 4715
       }
     },
     {
@@ -151,7 +161,8 @@
         "elo": "Curacao",
         "transfermarkt": "curacao",
         "transfermarkt_id": 32364,
-        "fifa": "Curacao"
+        "fifa": "Curacao",
+        "sofascore_id": 55827
       }
     },
     {
@@ -164,7 +175,8 @@
         "elo": "Ecuador",
         "transfermarkt": "ecuador",
         "transfermarkt_id": 5750,
-        "fifa": "Ecuador"
+        "fifa": "Ecuador",
+        "sofascore_id": 4757
       }
     },
     {
@@ -177,7 +189,8 @@
         "elo": "Egypt",
         "transfermarkt": "agypten",
         "transfermarkt_id": 3672,
-        "fifa": "Egypt"
+        "fifa": "Egypt",
+        "sofascore_id": 4758
       }
     },
     {
@@ -190,7 +203,8 @@
         "elo": "England",
         "transfermarkt": "england",
         "transfermarkt_id": 3299,
-        "fifa": "England"
+        "fifa": "England",
+        "sofascore_id": 4713
       }
     },
     {
@@ -203,7 +217,8 @@
         "elo": "France",
         "transfermarkt": "frankreich",
         "transfermarkt_id": 3377,
-        "fifa": "France"
+        "fifa": "France",
+        "sofascore_id": 4481
       }
     },
     {
@@ -216,7 +231,8 @@
         "elo": "Germany",
         "transfermarkt": "deutschland",
         "transfermarkt_id": 3262,
-        "fifa": "Germany"
+        "fifa": "Germany",
+        "sofascore_id": 4711
       }
     },
     {
@@ -229,7 +245,8 @@
         "elo": "Ghana",
         "transfermarkt": "ghana",
         "transfermarkt_id": 3441,
-        "fifa": "Ghana"
+        "fifa": "Ghana",
+        "sofascore_id": 4764
       }
     },
     {
@@ -242,7 +259,8 @@
         "elo": "Haiti",
         "transfermarkt": "haiti",
         "transfermarkt_id": 14161,
-        "fifa": "Haiti"
+        "fifa": "Haiti",
+        "sofascore_id": 7229
       }
     },
     {
@@ -255,7 +273,8 @@
         "elo": "Iran",
         "transfermarkt": "iran",
         "transfermarkt_id": 3582,
-        "fifa": "IR Iran"
+        "fifa": "IR Iran",
+        "sofascore_id": 4766
       }
     },
     {
@@ -268,7 +287,8 @@
         "elo": "Ivory Coast",
         "transfermarkt": "elfenbeinkuste",
         "transfermarkt_id": 3591,
-        "fifa": "Cote d'Ivoire"
+        "fifa": "Cote d'Ivoire",
+        "sofascore_id": 4768
       }
     },
     {
@@ -281,7 +301,8 @@
         "elo": "Japan",
         "transfermarkt": "japan",
         "transfermarkt_id": 3435,
-        "fifa": "Japan"
+        "fifa": "Japan",
+        "sofascore_id": 4770
       }
     },
     {
@@ -295,7 +316,8 @@
         "elo": "Jordan",
         "transfermarkt": "jordanien",
         "transfermarkt_id": 15737,
-        "fifa": "Jordan"
+        "fifa": "Jordan",
+        "sofascore_id": 4771
       }
     },
     {
@@ -308,7 +330,8 @@
         "elo": "Mexico",
         "transfermarkt": "mexiko",
         "transfermarkt_id": 6303,
-        "fifa": "Mexico"
+        "fifa": "Mexico",
+        "sofascore_id": 4781
       }
     },
     {
@@ -321,7 +344,8 @@
         "elo": "Morocco",
         "transfermarkt": "marokko",
         "transfermarkt_id": 3575,
-        "fifa": "Morocco"
+        "fifa": "Morocco",
+        "sofascore_id": 4778
       }
     },
     {
@@ -334,7 +358,8 @@
         "elo": "Netherlands",
         "transfermarkt": "niederlande",
         "transfermarkt_id": 3379,
-        "fifa": "Netherlands"
+        "fifa": "Netherlands",
+        "sofascore_id": 4705
       }
     },
     {
@@ -347,7 +372,8 @@
         "elo": "New Zealand",
         "transfermarkt": "neuseeland",
         "transfermarkt_id": 9171,
-        "fifa": "New Zealand"
+        "fifa": "New Zealand",
+        "sofascore_id": 4784
       }
     },
     {
@@ -360,7 +386,8 @@
         "elo": "Norway",
         "transfermarkt": "norwegen",
         "transfermarkt_id": 3440,
-        "fifa": "Norway"
+        "fifa": "Norway",
+        "sofascore_id": 7422
       }
     },
     {
@@ -373,7 +400,8 @@
         "elo": "Panama",
         "transfermarkt": "panama",
         "transfermarkt_id": 3580,
-        "fifa": "Panama"
+        "fifa": "Panama",
+        "sofascore_id": 132954
       }
     },
     {
@@ -386,7 +414,8 @@
         "elo": "Paraguay",
         "transfermarkt": "paraguay",
         "transfermarkt_id": 3581,
-        "fifa": "Paraguay"
+        "fifa": "Paraguay",
+        "sofascore_id": 4789
       }
     },
     {
@@ -399,7 +428,8 @@
         "elo": "Portugal",
         "transfermarkt": "portugal",
         "transfermarkt_id": 3300,
-        "fifa": "Portugal"
+        "fifa": "Portugal",
+        "sofascore_id": 4704
       }
     },
     {
@@ -412,7 +442,8 @@
         "elo": "Qatar",
         "transfermarkt": "katar",
         "transfermarkt_id": 14162,
-        "fifa": "Qatar"
+        "fifa": "Qatar",
+        "sofascore_id": 4792
       }
     },
     {
@@ -425,7 +456,8 @@
         "elo": "Saudi Arabia",
         "transfermarkt": "saudi-arabien",
         "transfermarkt_id": 3807,
-        "fifa": "Saudi Arabia"
+        "fifa": "Saudi Arabia",
+        "sofascore_id": 4834
       }
     },
     {
@@ -438,7 +470,8 @@
         "elo": "Scotland",
         "transfermarkt": "schottland",
         "transfermarkt_id": 3380,
-        "fifa": "Scotland"
+        "fifa": "Scotland",
+        "sofascore_id": 37372
       }
     },
     {
@@ -451,7 +484,8 @@
         "elo": "Senegal",
         "transfermarkt": "senegal",
         "transfermarkt_id": 3499,
-        "fifa": "Senegal"
+        "fifa": "Senegal",
+        "sofascore_id": 4739
       }
     },
     {
@@ -464,7 +498,8 @@
         "elo": "South Africa",
         "transfermarkt": "sudafrika",
         "transfermarkt_id": 3806,
-        "fifa": "South Africa"
+        "fifa": "South Africa",
+        "sofascore_id": 65336
       }
     },
     {
@@ -477,7 +512,8 @@
         "elo": "South Korea",
         "transfermarkt": "sudkorea",
         "transfermarkt_id": 3589,
-        "fifa": "Korea Republic"
+        "fifa": "Korea Republic",
+        "sofascore_id": 4735
       }
     },
     {
@@ -490,7 +526,8 @@
         "elo": "Spain",
         "transfermarkt": "spanien",
         "transfermarkt_id": 3375,
-        "fifa": "Spain"
+        "fifa": "Spain",
+        "sofascore_id": 4698
       }
     },
     {
@@ -503,7 +540,8 @@
         "elo": "Switzerland",
         "transfermarkt": "schweiz",
         "transfermarkt_id": 3384,
-        "fifa": "Switzerland"
+        "fifa": "Switzerland",
+        "sofascore_id": 38103
       }
     },
     {
@@ -516,7 +554,8 @@
         "elo": "Tunisia",
         "transfermarkt": "tunesien",
         "transfermarkt_id": 3670,
-        "fifa": "Tunisia"
+        "fifa": "Tunisia",
+        "sofascore_id": 4729
       }
     },
     {
@@ -529,7 +568,8 @@
         "elo": "United States",
         "transfermarkt": "usa",
         "transfermarkt_id": 3505,
-        "fifa": "USA"
+        "fifa": "USA",
+        "sofascore_id": 4724
       }
     },
     {
@@ -542,7 +582,8 @@
         "elo": "Uruguay",
         "transfermarkt": "uruguay",
         "transfermarkt_id": 3449,
-        "fifa": "Uruguay"
+        "fifa": "Uruguay",
+        "sofascore_id": 4725
       }
     },
     {
@@ -556,7 +597,8 @@
         "elo": "Uzbekistan",
         "transfermarkt": "usbekistan",
         "transfermarkt_id": 3563,
-        "fifa": "Uzbekistan"
+        "fifa": "Uzbekistan",
+        "sofascore_id": 4723
       }
     },
     {
