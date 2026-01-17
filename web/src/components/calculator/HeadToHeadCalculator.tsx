@@ -78,6 +78,7 @@ export function HeadToHeadCalculator() {
               <div>
                 <div className="font-bold text-gray-900">{teamA.name}</div>
                 <div className="text-sm text-gray-500">ELO: {teamA.elo_rating}</div>
+                <div className="text-sm text-gray-500">Form: {teamA.sofascore_form.toFixed(2)}</div>
               </div>
             </div>
             <div className="text-2xl font-bold text-gray-400">vs</div>
@@ -85,6 +86,7 @@ export function HeadToHeadCalculator() {
               <div className="text-right">
                 <div className="font-bold text-gray-900">{teamB.name}</div>
                 <div className="text-sm text-gray-500">ELO: {teamB.elo_rating}</div>
+                <div className="text-sm text-gray-500">Form: {teamB.sofascore_form.toFixed(2)}</div>
               </div>
               <span className="text-3xl">{getFlagEmoji(teamB.code)}</span>
             </div>

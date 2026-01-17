@@ -81,7 +81,7 @@ export function TeamSelector({
                 <span className="text-lg">{getFlagEmoji(team.code)}</span>
                 <span className="font-medium">{team.name}</span>
                 <span className="text-xs text-gray-500 ml-auto">
-                  ELO: {team.elo_rating}
+                  ELO: {team.elo_rating} | Form: {team.sofascore_form.toFixed(1)}
                 </span>
               </div>
             ))}

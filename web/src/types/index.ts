@@ -11,6 +11,7 @@ export interface Team {
   market_value_millions: number;
   fifa_ranking: number;
   world_cup_wins: number;
+  sofascore_form: number;
 }
 
 export interface Group {

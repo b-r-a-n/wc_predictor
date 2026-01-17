@@ -4,7 +4,7 @@ import { getFlagEmoji } from '../../utils/formatting';
 import { Button } from '../common/Button';
 import type { Team, Confederation, TeamPreset } from '../../types';
 
-type SortKey = 'name' | 'elo' | 'market' | 'fifa' | 'group' | 'confederation';
+type SortKey = 'name' | 'elo' | 'market' | 'fifa' | 'form' | 'group' | 'confederation';
 type SortDirection = 'asc' | 'desc';
 type FilterConfederation = Confederation | 'all';
 
@@ -114,6 +114,9 @@ export function TeamDataEditor() {
           break;
         case 'fifa':
           comparison = a.fifa_ranking - b.fifa_ranking;
+          break;
+        case 'form':
+          comparison = a.sofascore_form - b.sofascore_form;
           break;
         case 'group':
           comparison = (teamGroupMap.get(a.id) || '').localeCompare(teamGroupMap.get(b.id) || '');
@@ -352,6 +355,13 @@ export function TeamDataEditor() {
                   sortDirection={sortDirection}
                   onSort={handleSort}
                 />
+                <SortHeader
+                  column="form"
+                  label="Form"
+                  currentSortKey={sortKey}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
                   Actions
                 </th>
@@ -403,14 +413,14 @@ interface TeamRowProps {
 function TeamRow({ team, originalTeam, groupId, isEdited, onUpdate, onReset }: TeamRowProps) {
   const [editingField, setEditingField] = useState<string | null>(null);
 
-  const handleFieldChange = (field: 'elo_rating' | 'market_value_millions' | 'fifa_ranking', value: string) => {
+  const handleFieldChange = (field: 'elo_rating' | 'market_value_millions' | 'fifa_ranking' | 'sofascore_form', value: string) => {
     const numValue = parseFloat(value);
     if (!isNaN(numValue) && numValue >= 0) {
       onUpdate(team.id, field, numValue);
     }
   };
 
-  const getFieldDiff = (field: 'elo_rating' | 'market_value_millions' | 'fifa_ranking'): string | null => {
+  const getFieldDiff = (field: 'elo_rating' | 'market_value_millions' | 'fifa_ranking' | 'sofascore_form'): string | null => {
     if (!originalTeam || !isEdited) return null;
     const diff = team[field] - originalTeam[field];
     if (Math.abs(diff) < 0.01) return null;
@@ -492,6 +502,22 @@ function TeamRow({ team, originalTeam, groupId, isEdited, onUpdate, onReset }: T
           max={200}
           step={1}
           invertDiffColor
+        />
+      </td>
+
+      {/* Form */}
+      <td className="px-3 py-2 whitespace-nowrap">
+        <EditableCell
+          value={team.sofascore_form}
+          isEditing={editingField === 'form'}
+          diff={getFieldDiff('sofascore_form')}
+          onStartEdit={() => setEditingField('form')}
+          onEndEdit={() => setEditingField(null)}
+          onChange={(value) => handleFieldChange('sofascore_form', value)}
+          formatValue={(v) => v.toFixed(2)}
+          min={0}
+          max={3}
+          step={0.1}
         />
       </td>
 
