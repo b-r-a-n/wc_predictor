@@ -2,9 +2,7 @@ import { useEffect } from 'react';
 import { Layout } from './components/layout';
 import { WinProbabilityTable } from './components/results';
 import { GroupStageView } from './components/groups';
-import { KnockoutBracket } from './components/bracket';
 import { TournamentPaths } from './components/paths';
-import { HeadToHeadCalculator } from './components/calculator';
 import { TeamDataEditor } from './components/editor';
 import { LoadingSpinner } from './components/common';
 import { useWasm } from './hooks/useWasm';
@@ -57,9 +55,7 @@ function App() {
     <Layout>
       {activeTab === 'results' && <WinProbabilityTable />}
       {activeTab === 'groups' && <GroupStageView />}
-      {activeTab === 'bracket' && <KnockoutBracket />}
-      {activeTab === 'paths' && <TournamentPaths />}
-      {activeTab === 'calculator' && <HeadToHeadCalculator />}
+      {activeTab === 'bracket' && <TournamentPaths />}
       {activeTab === 'editor' && <TeamDataEditor />}
     </Layout>
   );

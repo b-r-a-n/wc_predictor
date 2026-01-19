@@ -6,6 +6,34 @@ import { getFlagEmoji, formatPercent } from '../../utils/formatting';
 type SortKey = 'rank' | 'name' | 'win' | 'final' | 'semi' | 'knockout';
 type SortDirection = 'asc' | 'desc';
 
+function SortHeader({
+  column,
+  label,
+  className = '',
+  sortKey,
+  sortDirection,
+  onSort,
+}: {
+  column: SortKey;
+  label: string;
+  className?: string;
+  sortKey: SortKey;
+  sortDirection: SortDirection;
+  onSort: (key: SortKey) => void;
+}) {
+  return (
+    <th
+      className={`px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 ${className}`}
+      onClick={() => onSort(column)}
+    >
+      <div className="flex items-center gap-1">
+        {label}
+        {sortKey === column && <span>{sortDirection === 'asc' ? '\u25B2' : '\u25BC'}</span>}
+      </div>
+    </th>
+  );
+}
+
 export function WinProbabilityTable() {
   const { results, teams } = useSimulatorStore();
   const [sortKey, setSortKey] = useState<SortKey>('win');
@@ -60,26 +88,6 @@ export function WinProbabilityTable() {
     }
   };
 
-  const SortHeader = ({
-    column,
-    label,
-    className = '',
-  }: {
-    column: SortKey;
-    label: string;
-    className?: string;
-  }) => (
-    <th
-      className={`px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 ${className}`}
-      onClick={() => handleSort(column)}
-    >
-      <div className="flex items-center gap-1">
-        {label}
-        {sortKey === column && <span>{sortDirection === 'asc' ? '\u25B2' : '\u25BC'}</span>}
-      </div>
-    </th>
-  );
-
   if (!results) {
     return (
       <div className="flex items-center justify-center h-64 text-gray-500">
@@ -93,12 +101,12 @@ export function WinProbabilityTable() {
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
-            <SortHeader column="rank" label="#" className="w-12" />
-            <SortHeader column="name" label="Team" />
-            <SortHeader column="win" label="Win %" />
-            <SortHeader column="final" label="Final %" />
-            <SortHeader column="semi" label="Semi %" />
-            <SortHeader column="knockout" label="R32 %" />
+            <SortHeader column="rank" label="#" className="w-12" sortKey={sortKey} sortDirection={sortDirection} onSort={handleSort} />
+            <SortHeader column="name" label="Team" sortKey={sortKey} sortDirection={sortDirection} onSort={handleSort} />
+            <SortHeader column="win" label="Win %" sortKey={sortKey} sortDirection={sortDirection} onSort={handleSort} />
+            <SortHeader column="final" label="Final %" sortKey={sortKey} sortDirection={sortDirection} onSort={handleSort} />
+            <SortHeader column="semi" label="Semi %" sortKey={sortKey} sortDirection={sortDirection} onSort={handleSort} />
+            <SortHeader column="knockout" label="R32 %" sortKey={sortKey} sortDirection={sortDirection} onSort={handleSort} />
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">

@@ -30,6 +30,7 @@ export function CompositeWeights({ value, onChange }: CompositeWeightsProps) {
     { key: 'elo', label: 'ELO Rating' },
     { key: 'market', label: 'Market Value' },
     { key: 'fifa', label: 'FIFA Ranking' },
+    { key: 'form', label: 'Form' },
   ];
 
   return (

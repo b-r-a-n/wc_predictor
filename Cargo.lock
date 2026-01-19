@@ -805,7 +805,7 @@ checksum = "a8145dd1593bf0fb137dbfa85b8be79ec560a447298955877804640e40c2d6ea"
 
 [[package]]
 name = "wc-cli"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "clap",
  "comfy-table",
@@ -821,7 +821,7 @@ dependencies = [
 
 [[package]]
 name = "wc-core"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "serde",
  "thiserror",
@@ -829,7 +829,7 @@ dependencies = [
 
 [[package]]
 name = "wc-simulation"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "rand",
  "rand_chacha",
@@ -842,7 +842,7 @@ dependencies = [
 
 [[package]]
 name = "wc-strategies"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "rand",
  "rand_chacha",
@@ -852,7 +852,7 @@ dependencies = [
 
 [[package]]
 name = "wc-wasm"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "console_error_panic_hook",
  "getrandom",

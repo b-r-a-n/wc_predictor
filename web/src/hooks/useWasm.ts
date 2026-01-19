@@ -93,6 +93,9 @@ export function useWasm(): { status: WasmStatus; api: WasmApi | null; error: str
               team_stats: Map<number, unknown> | Record<string, unknown>;
               most_likely_winner: number;
               most_likely_final: [number, number];
+              path_stats?: Map<number, unknown> | Record<string, unknown>;
+              bracket_slot_stats?: Map<number, unknown> | Record<string, unknown>;
+              slot_opponent_stats?: Map<number, unknown> | Record<string, unknown>;
             };
 
             // If team_stats is a Map, convert it to a plain object
@@ -108,7 +111,7 @@ export function useWasm(): { status: WasmStatus; api: WasmApi | null; error: str
 
             // Get path_stats if available (may be a Map that needs conversion)
             let pathStats: Record<string, unknown> | undefined;
-            const rawPathStats = (rawResult as any).path_stats;
+            const rawPathStats = result.path_stats;
             if (rawPathStats instanceof Map) {
               pathStats = {};
               rawPathStats.forEach((value: unknown, key: number) => {
@@ -120,7 +123,7 @@ export function useWasm(): { status: WasmStatus; api: WasmApi | null; error: str
 
             // Get bracket_slot_stats if available (may be a Map that needs conversion)
             let bracketSlotStats: Record<string, unknown> | undefined;
-            const rawBracketSlotStats = (rawResult as any).bracket_slot_stats;
+            const rawBracketSlotStats = result.bracket_slot_stats;
             if (rawBracketSlotStats instanceof Map) {
               bracketSlotStats = {};
               rawBracketSlotStats.forEach((value: unknown, key: number) => {
@@ -132,7 +135,7 @@ export function useWasm(): { status: WasmStatus; api: WasmApi | null; error: str
 
             // Get slot_opponent_stats if available (nested Maps that need deep conversion)
             let slotOpponentStats: Record<string, unknown> | undefined;
-            const rawSlotOpponentStats = (rawResult as any).slot_opponent_stats;
+            const rawSlotOpponentStats = result.slot_opponent_stats;
             if (rawSlotOpponentStats instanceof Map) {
               slotOpponentStats = {};
               rawSlotOpponentStats.forEach((teamStats: unknown, teamId: number) => {
