@@ -3,6 +3,7 @@ import { Layout } from './components/layout';
 import { WinProbabilityTable } from './components/results';
 import { GroupStageView } from './components/groups';
 import { TournamentPaths } from './components/paths';
+import { VenuesView } from './components/venues';
 import { TeamDataEditor } from './components/editor';
 import { LoadingSpinner } from './components/common';
 import { useWasm } from './hooks/useWasm';
@@ -56,6 +57,7 @@ function App() {
       {activeTab === 'results' && <WinProbabilityTable />}
       {activeTab === 'groups' && <GroupStageView />}
       {activeTab === 'bracket' && <TournamentPaths />}
+      {activeTab === 'venues' && <VenuesView />}
       {activeTab === 'editor' && <TeamDataEditor />}
     </Layout>
   );

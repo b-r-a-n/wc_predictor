@@ -85,7 +85,7 @@ export interface CompositeWeights {
 
 // UI state types
 export type WasmStatus = 'loading' | 'ready' | 'error';
-export type TabId = 'results' | 'groups' | 'bracket' | 'editor';
+export type TabId = 'results' | 'groups' | 'bracket' | 'editor' | 'venues';
 
 // Knockout round types
 export type KnockoutRoundType =
@@ -182,4 +182,32 @@ export interface TeamPreset {
   name: string;
   teams: Team[];
   createdAt: number;  // timestamp
+}
+
+// Schedule types for FIFA World Cup 2026 match schedule
+export interface ScheduledMatch {
+  matchNumber: number;
+  date: string;              // "2026-06-11"
+  time: string;              // "13:00"
+  venueId: string;
+  round: 'group_stage' | KnockoutRoundType;
+  groupId?: string;          // For group stage matches
+  knockoutSlot?: number;     // For knockout matches
+  homeTeamId?: number;       // Actual team ID if known
+  awayTeamId?: number;       // Actual team ID if known
+  homePlaceholder?: string;  // "A1", "1A", "W1", etc.
+  awayPlaceholder?: string;
+}
+
+export interface MatchScheduleData {
+  matches: ScheduledMatch[];
+  lastUpdated: string;
+  source?: string;
+  tournament?: string;
+}
+
+// Team probability for displaying candidates in knockout matches
+export interface TeamProbability {
+  team: Team;
+  probability: number;
 }

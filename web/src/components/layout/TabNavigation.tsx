@@ -5,6 +5,7 @@ const tabs: { id: TabId; label: string; icon: string }[] = [
   { id: 'results', label: 'Results', icon: '\uD83C\uDFC6' },
   { id: 'groups', label: 'Groups', icon: '\uD83D\uDCCA' },
   { id: 'bracket', label: 'Bracket', icon: '\uD83C\uDF33' },
+  { id: 'venues', label: 'Venues', icon: '\uD83C\uDFDF\uFE0F' },
   { id: 'editor', label: 'Teams', icon: '\u270F\uFE0F' },
 ];
 

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Team, Group, AggregatedResults, Strategy, CompositeWeights, TabId, WasmStatus, TeamPreset, Venue, VenueData } from '../types';
+import type { Team, Group, AggregatedResults, Strategy, CompositeWeights, TabId, WasmStatus, TeamPreset, Venue, VenueData, MatchScheduleData } from '../types';
 import type { WasmApi } from '../hooks/useWasm';
 
 // LocalStorage keys
@@ -40,6 +40,9 @@ interface SimulatorState {
   venues: Venue[] | null;
   venueMapping: Record<string, Record<string, string>> | null;
 
+  // Schedule state
+  schedule: MatchScheduleData | null;
+
   // Actions
   setWasmStatus: (status: WasmStatus, error?: string | null) => void;
   setWasmApi: (api: WasmApi) => void;
@@ -52,6 +55,7 @@ interface SimulatorState {
   // Path visualization actions
   setSelectedTeamForPaths: (teamId: number | null) => void;
   loadVenues: () => Promise<void>;
+  loadSchedule: () => Promise<void>;
 
   // Team editing actions
   updateTeam: (teamId: number, field: keyof Team, value: number) => void;
@@ -102,11 +106,14 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
   venues: null,
   venueMapping: null,
 
+  // Initial schedule state
+  schedule: null,
+
   // Actions
   setWasmStatus: (status, error = null) => set({ wasmStatus: status, wasmError: error }),
 
   setWasmApi: (api) => {
-    const { originalTeams, loadCurrentEditsFromStorage, loadPresetsFromStorage, loadVenues } = get();
+    const { originalTeams, loadCurrentEditsFromStorage, loadPresetsFromStorage, loadVenues, loadSchedule } = get();
     // Only set originalTeams if it's empty (first initialization)
     const newOriginalTeams = originalTeams.length === 0
       ? api.teams.map(t => ({ ...t }))
@@ -126,6 +133,9 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
 
     // Load venue data for path visualization
     loadVenues();
+
+    // Load match schedule data
+    loadSchedule();
   },
 
   setStrategy: (strategy) => set({ strategy }),
@@ -149,6 +159,16 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
       });
     } catch (error) {
       console.error('Failed to load venues:', error);
+    }
+  },
+
+  loadSchedule: async () => {
+    try {
+      const response = await fetch(`${import.meta.env.BASE_URL}data/schedule.json`);
+      const data: MatchScheduleData = await response.json();
+      set({ schedule: data });
+    } catch (error) {
+      console.error('Failed to load schedule:', error);
     }
   },
 
