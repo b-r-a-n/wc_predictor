@@ -1,13 +1,15 @@
 import { useMemo, useCallback, useState } from 'react';
 import { useSimulatorStore } from '../../store/simulatorStore';
 import { getFlagEmoji, formatNumber } from '../../utils/formatting';
+import { computeMostLikelyBracket, computeWinnerPathHighlights } from '../../utils/bracketUtils';
 import { BracketSlot } from './BracketSlot';
+import { MostLikelyBracketSlot } from './MostLikelyBracketSlot';
 import { BracketConnectors } from './BracketConnectors';
 import {
   calculateSlotPositions,
   calculateBracketDimensions,
 } from './bracketLayout';
-import type { Team, Venue, BracketSlotStats, KnockoutRoundType, PathStatistics, SlotOpponentStats } from '../../types';
+import type { Team, Venue, BracketSlotStats, KnockoutRoundType, PathStatistics, SlotOpponentStats, MostLikelyBracket } from '../../types';
 
 // Round configuration for the bracket
 const ROUNDS: {
@@ -125,6 +127,18 @@ export function TournamentPaths() {
 
     return highlighted;
   }, [bracketStats, results]);
+
+  // Compute most likely bracket when no team is selected
+  const mostLikelyBracket = useMemo((): MostLikelyBracket | null => {
+    if (selectedTeamForPaths !== null || !results) return null;
+    return computeMostLikelyBracket(results, teamMap);
+  }, [selectedTeamForPaths, results, teamMap]);
+
+  // Compute winner path highlights for most likely bracket
+  const winnerPathHighlights = useMemo(() => {
+    if (!mostLikelyBracket) return new Set<string>();
+    return computeWinnerPathHighlights(mostLikelyBracket);
+  }, [mostLikelyBracket]);
 
   // Get probability for a specific slot
   const getSlotProbability = useCallback((
@@ -250,6 +264,11 @@ export function TournamentPaths() {
     setExpandedSlot(null);  // Reset expanded slot when team changes
   }, [setSelectedTeamForPaths]);
 
+  const handleTeamClick = useCallback((teamId: number) => {
+    setSelectedTeamForPaths(teamId);
+    setExpandedSlot(null);
+  }, [setSelectedTeamForPaths]);
+
   const handleToggleExpand = useCallback((slotKey: string) => {
     setExpandedSlot((prev) => (prev === slotKey ? null : slotKey));
   }, []);
@@ -318,8 +337,145 @@ export function TournamentPaths() {
         </div>
       )}
 
-      {/* No team selected state */}
-      {selectedTeamForPaths === null && (
+      {/* Most likely bracket when no team selected */}
+      {selectedTeamForPaths === null && mostLikelyBracket && (
+        <>
+          {/* Header with predicted champion */}
+          <div className="bg-gradient-to-r from-amber-500 to-amber-600 rounded-lg p-4 text-white">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">&#127942;</span>
+              <div>
+                <h3 className="text-xl font-bold">Most Likely Tournament Outcome</h3>
+                {mostLikelyBracket.champion && (
+                  <p className="text-amber-100 text-sm">
+                    Predicted Champion: {getFlagEmoji(mostLikelyBracket.champion.team.code)} {mostLikelyBracket.champion.team.name} ({(mostLikelyBracket.champion.probability * 100).toFixed(1)}%)
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Summary */}
+          <div className="text-sm text-gray-500">
+            Based on {formatNumber(results.total_simulations)} simulations - Click any team to view their detailed bracket
+          </div>
+
+          {/* Most likely bracket visualization */}
+          <div className="bg-white rounded-lg border border-gray-200 p-4 overflow-x-auto">
+            <div
+              className="relative"
+              style={{
+                width: bracketDimensions.width,
+                height: bracketDimensions.height,
+                minWidth: '900px',
+              }}
+            >
+              {/* Round headers */}
+              {ROUNDS.map((round, idx) => {
+                const roundPositions = slotPositions.filter(p => p.round === idx);
+                if (roundPositions.length === 0) return null;
+                const firstPos = roundPositions[0];
+
+                return (
+                  <div
+                    key={round.key}
+                    className="absolute text-center font-semibold text-gray-700 text-sm py-2 bg-gray-100 rounded-md"
+                    style={{
+                      left: firstPos.x,
+                      top: 0,
+                      width: firstPos.width,
+                    }}
+                  >
+                    {round.displayName}
+                  </div>
+                );
+              })}
+
+              {/* SVG Connectors - use winner path for highlighting */}
+              <BracketConnectors
+                positions={slotPositions}
+                width={bracketDimensions.width}
+                height={bracketDimensions.height}
+                highlightedSlots={winnerPathHighlights}
+              />
+
+              {/* Most likely bracket slots */}
+              {slotPositions.map((pos) => {
+                const round = ROUNDS[pos.round];
+                if (!round) return null;
+
+                const slotKey = `${pos.round}-${pos.slot}`;
+                const venue = getSlotVenue(round.mappingKey, pos.slot);
+                const isWinnerPath = winnerPathHighlights.has(slotKey);
+
+                // Get the most likely team for this slot
+                let slotData = null;
+                if (round.key === 'final_match') {
+                  slotData = mostLikelyBracket.final_match;
+                } else {
+                  const roundData = mostLikelyBracket[round.key as keyof typeof mostLikelyBracket] as Record<string, unknown>;
+                  slotData = roundData?.[String(pos.slot)] ?? null;
+                }
+
+                return (
+                  <div
+                    key={`ml-${slotKey}`}
+                    className="absolute"
+                    style={{
+                      left: pos.x,
+                      top: pos.y,
+                      width: pos.width,
+                      zIndex: 10,
+                    }}
+                  >
+                    <MostLikelyBracketSlot
+                      round={round.key}
+                      slotIndex={pos.slot}
+                      slotData={slotData as import('../../types').MostLikelySlotData | null}
+                      venue={venue}
+                      isWinnerPath={isWinnerPath}
+                      onTeamClick={handleTeamClick}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Legend for most likely bracket */}
+          <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
+            <h4 className="text-sm font-semibold text-gray-700 mb-3">Legend</h4>
+            <div className="flex flex-wrap gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded bg-amber-400 ring-2 ring-amber-500"></div>
+                <span className="text-sm text-gray-600">Predicted Champion's Path</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded bg-blue-500"></div>
+                <span className="text-sm text-gray-600">&gt;20%</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded bg-blue-300"></div>
+                <span className="text-sm text-gray-600">10-20%</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded bg-blue-200"></div>
+                <span className="text-sm text-gray-600">5-10%</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded bg-gray-200"></div>
+                <span className="text-sm text-gray-600">&lt;5%</span>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mt-3">
+              Showing the most probable team in each bracket position. Click any team to view their detailed bracket.
+            </p>
+          </div>
+        </>
+      )}
+
+      {/* No bracket data available when no team selected */}
+      {selectedTeamForPaths === null && !mostLikelyBracket && (
         <div className="flex items-center justify-center h-48 text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
           <div className="text-center">
             <span className="text-4xl block mb-2">&#127942;</span>

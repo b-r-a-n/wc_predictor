@@ -211,3 +211,21 @@ export interface TeamProbability {
   team: Team;
   probability: number;
 }
+
+// Most likely bracket slot data - the most probable team for a specific slot
+export interface MostLikelySlotData {
+  teamId: number;
+  team: Team;
+  count: number;
+  probability: number;
+}
+
+// Most likely bracket across all slots
+export interface MostLikelyBracket {
+  round_of_32: Record<string, MostLikelySlotData>;
+  round_of_16: Record<string, MostLikelySlotData>;
+  quarter_finals: Record<string, MostLikelySlotData>;
+  semi_finals: Record<string, MostLikelySlotData>;
+  final_match: MostLikelySlotData | null;
+  champion: MostLikelySlotData | null;
+}
