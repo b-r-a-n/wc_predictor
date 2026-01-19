@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use wc_core::{MatchResult, TeamId, Tournament, TournamentResult};
 
-use crate::path_tracker::{BracketSlotStats, PathStatistics};
+use crate::path_tracker::{BracketSlotStats, PathStatistics, SlotOpponentStats};
 
 /// Aggregated statistics from multiple tournament simulations.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -23,6 +23,8 @@ pub struct AggregatedResults {
     pub path_stats: HashMap<TeamId, PathStatistics>,
     /// Bracket slot statistics for each team (which positions they play in)
     pub bracket_slot_stats: HashMap<TeamId, BracketSlotStats>,
+    /// Slot-specific opponent statistics (who did they face in each specific slot)
+    pub slot_opponent_stats: HashMap<TeamId, SlotOpponentStats>,
 }
 
 /// Statistics for a single team across all simulations.
@@ -85,6 +87,8 @@ impl AggregatedResults {
         let mut path_stats: HashMap<TeamId, PathStatistics> = HashMap::new();
         let mut bracket_slot_stats: HashMap<TeamId, BracketSlotStats> = HashMap::new();
 
+        let mut slot_opponent_stats: HashMap<TeamId, SlotOpponentStats> = HashMap::new();
+
         // Initialize stats for all teams
         for team in &tournament.teams {
             team_stats.insert(
@@ -97,6 +101,7 @@ impl AggregatedResults {
             );
             path_stats.insert(team.id, PathStatistics::new(team.id));
             bracket_slot_stats.insert(team.id, BracketSlotStats::new());
+            slot_opponent_stats.insert(team.id, SlotOpponentStats::new());
         }
 
         // Aggregate results
@@ -240,41 +245,73 @@ impl AggregatedResults {
             // Track bracket slot positions for each round
             // Round of 32: slots 0-15
             for (slot, m) in result.knockout_bracket.round_of_32.iter().enumerate() {
+                let slot_u8 = slot as u8;
                 if let Some(stats) = bracket_slot_stats.get_mut(&m.home_team) {
-                    stats.record_slot("round_of_32", slot as u8);
+                    stats.record_slot("round_of_32", slot_u8);
                 }
                 if let Some(stats) = bracket_slot_stats.get_mut(&m.away_team) {
-                    stats.record_slot("round_of_32", slot as u8);
+                    stats.record_slot("round_of_32", slot_u8);
+                }
+                // Track slot-specific opponents
+                if let Some(stats) = slot_opponent_stats.get_mut(&m.home_team) {
+                    stats.record_opponent("round_of_32", slot_u8, m.away_team);
+                }
+                if let Some(stats) = slot_opponent_stats.get_mut(&m.away_team) {
+                    stats.record_opponent("round_of_32", slot_u8, m.home_team);
                 }
             }
 
             // Round of 16: slots 0-7
             for (slot, m) in result.knockout_bracket.round_of_16.iter().enumerate() {
+                let slot_u8 = slot as u8;
                 if let Some(stats) = bracket_slot_stats.get_mut(&m.home_team) {
-                    stats.record_slot("round_of_16", slot as u8);
+                    stats.record_slot("round_of_16", slot_u8);
                 }
                 if let Some(stats) = bracket_slot_stats.get_mut(&m.away_team) {
-                    stats.record_slot("round_of_16", slot as u8);
+                    stats.record_slot("round_of_16", slot_u8);
+                }
+                // Track slot-specific opponents
+                if let Some(stats) = slot_opponent_stats.get_mut(&m.home_team) {
+                    stats.record_opponent("round_of_16", slot_u8, m.away_team);
+                }
+                if let Some(stats) = slot_opponent_stats.get_mut(&m.away_team) {
+                    stats.record_opponent("round_of_16", slot_u8, m.home_team);
                 }
             }
 
             // Quarter-finals: slots 0-3
             for (slot, m) in result.knockout_bracket.quarter_finals.iter().enumerate() {
+                let slot_u8 = slot as u8;
                 if let Some(stats) = bracket_slot_stats.get_mut(&m.home_team) {
-                    stats.record_slot("quarter_finals", slot as u8);
+                    stats.record_slot("quarter_finals", slot_u8);
                 }
                 if let Some(stats) = bracket_slot_stats.get_mut(&m.away_team) {
-                    stats.record_slot("quarter_finals", slot as u8);
+                    stats.record_slot("quarter_finals", slot_u8);
+                }
+                // Track slot-specific opponents
+                if let Some(stats) = slot_opponent_stats.get_mut(&m.home_team) {
+                    stats.record_opponent("quarter_finals", slot_u8, m.away_team);
+                }
+                if let Some(stats) = slot_opponent_stats.get_mut(&m.away_team) {
+                    stats.record_opponent("quarter_finals", slot_u8, m.home_team);
                 }
             }
 
             // Semi-finals: slots 0-1
             for (slot, m) in result.knockout_bracket.semi_finals.iter().enumerate() {
+                let slot_u8 = slot as u8;
                 if let Some(stats) = bracket_slot_stats.get_mut(&m.home_team) {
-                    stats.record_slot("semi_finals", slot as u8);
+                    stats.record_slot("semi_finals", slot_u8);
                 }
                 if let Some(stats) = bracket_slot_stats.get_mut(&m.away_team) {
-                    stats.record_slot("semi_finals", slot as u8);
+                    stats.record_slot("semi_finals", slot_u8);
+                }
+                // Track slot-specific opponents
+                if let Some(stats) = slot_opponent_stats.get_mut(&m.home_team) {
+                    stats.record_opponent("semi_finals", slot_u8, m.away_team);
+                }
+                if let Some(stats) = slot_opponent_stats.get_mut(&m.away_team) {
+                    stats.record_opponent("semi_finals", slot_u8, m.home_team);
                 }
             }
 
@@ -286,6 +323,13 @@ impl AggregatedResults {
                 }
                 if let Some(stats) = bracket_slot_stats.get_mut(&m.away_team) {
                     stats.record_slot("final", 0);
+                }
+                // Track slot-specific opponents for final
+                if let Some(stats) = slot_opponent_stats.get_mut(&m.home_team) {
+                    stats.record_final_opponent(m.away_team);
+                }
+                if let Some(stats) = slot_opponent_stats.get_mut(&m.away_team) {
+                    stats.record_final_opponent(m.home_team);
                 }
             }
 
@@ -346,6 +390,7 @@ impl AggregatedResults {
             most_likely_final,
             path_stats,
             bracket_slot_stats,
+            slot_opponent_stats,
         }
     }
 

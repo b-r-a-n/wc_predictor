@@ -43,6 +43,47 @@ impl BracketSlotStats {
     }
 }
 
+/// Track opponents faced by team in specific bracket slots per round.
+/// This enables per-slot opponent statistics (e.g., who did the team face
+/// specifically in R32 slot #2, not just "anywhere in R32").
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct SlotOpponentStats {
+    /// R32: slot (0-15) -> opponent -> count
+    pub round_of_32: HashMap<u8, HashMap<TeamId, u32>>,
+    /// R16: slot (0-7) -> opponent -> count
+    pub round_of_16: HashMap<u8, HashMap<TeamId, u32>>,
+    /// QF: slot (0-3) -> opponent -> count
+    pub quarter_finals: HashMap<u8, HashMap<TeamId, u32>>,
+    /// SF: slot (0-1) -> opponent -> count
+    pub semi_finals: HashMap<u8, HashMap<TeamId, u32>>,
+    /// Final: opponent -> count (single slot)
+    pub final_match: HashMap<TeamId, u32>,
+}
+
+impl SlotOpponentStats {
+    /// Create new empty slot opponent stats.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Record an opponent faced at a specific slot in a round.
+    pub fn record_opponent(&mut self, round: &str, slot: u8, opponent: TeamId) {
+        let slot_map = match round {
+            "round_of_32" => &mut self.round_of_32,
+            "round_of_16" => &mut self.round_of_16,
+            "quarter_finals" => &mut self.quarter_finals,
+            "semi_finals" => &mut self.semi_finals,
+            _ => return,
+        };
+        *slot_map.entry(slot).or_default().entry(opponent).or_insert(0) += 1;
+    }
+
+    /// Record an opponent faced in the final.
+    pub fn record_final_opponent(&mut self, opponent: TeamId) {
+        *self.final_match.entry(opponent).or_insert(0) += 1;
+    }
+}
+
 /// Tracks opponent frequencies at a specific knockout round.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct RoundMatchups {

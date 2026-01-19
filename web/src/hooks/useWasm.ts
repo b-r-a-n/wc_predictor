@@ -130,6 +130,50 @@ export function useWasm(): { status: WasmStatus; api: WasmApi | null; error: str
               bracketSlotStats = rawBracketSlotStats as Record<string, unknown>;
             }
 
+            // Get slot_opponent_stats if available (nested Maps that need deep conversion)
+            let slotOpponentStats: Record<string, unknown> | undefined;
+            const rawSlotOpponentStats = (rawResult as any).slot_opponent_stats;
+            if (rawSlotOpponentStats instanceof Map) {
+              slotOpponentStats = {};
+              rawSlotOpponentStats.forEach((teamStats: unknown, teamId: number) => {
+                // teamStats is a SlotOpponentStats object with Map fields
+                const converted: Record<string, unknown> = {};
+                const stats = teamStats as Record<string, unknown>;
+
+                // Convert each round's slot->opponent Map
+                for (const roundKey of ['round_of_32', 'round_of_16', 'quarter_finals', 'semi_finals']) {
+                  const roundData = stats[roundKey];
+                  if (roundData instanceof Map) {
+                    const roundConverted: Record<string, Record<string, number>> = {};
+                    roundData.forEach((opponentMap: unknown, slot: number) => {
+                      if (opponentMap instanceof Map) {
+                        const opponentConverted: Record<string, number> = {};
+                        (opponentMap as Map<number, number>).forEach((count, oppId) => {
+                          opponentConverted[String(oppId)] = count;
+                        });
+                        roundConverted[String(slot)] = opponentConverted;
+                      }
+                    });
+                    converted[roundKey] = roundConverted;
+                  }
+                }
+
+                // Convert final_match (direct opponent->count Map, no slot nesting)
+                const finalData = stats.final_match;
+                if (finalData instanceof Map) {
+                  const finalConverted: Record<string, number> = {};
+                  (finalData as Map<number, number>).forEach((count, oppId) => {
+                    finalConverted[String(oppId)] = count;
+                  });
+                  converted.final_match = finalConverted;
+                }
+
+                slotOpponentStats![String(teamId)] = converted;
+              });
+            } else if (rawSlotOpponentStats) {
+              slotOpponentStats = rawSlotOpponentStats as Record<string, unknown>;
+            }
+
             return {
               total_simulations: result.total_simulations,
               team_stats: teamStats,
@@ -137,6 +181,7 @@ export function useWasm(): { status: WasmStatus; api: WasmApi | null; error: str
               most_likely_final: result.most_likely_final,
               path_stats: pathStats,
               bracket_slot_stats: bracketSlotStats,
+              slot_opponent_stats: slotOpponentStats,
             } as AggregatedResults;
           },
           calculateMatchProbability: (teamAElo, teamBElo, isKnockout) => {

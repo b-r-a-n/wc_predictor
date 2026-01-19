@@ -63,6 +63,7 @@ export interface AggregatedResults {
   most_likely_final: [number, number];
   path_stats?: Record<string, PathStatistics>;  // Path statistics for each team (keys are stringified TeamIds)
   bracket_slot_stats?: Record<string, BracketSlotStats>;  // Bracket slot statistics for each team (keys are stringified TeamIds)
+  slot_opponent_stats?: Record<string, SlotOpponentStats>;  // Slot-specific opponent statistics (keys are stringified TeamIds)
 }
 
 // Match probability types
@@ -133,6 +134,15 @@ export interface BracketSlotStats {
   quarter_finals: Record<string, number>; // slot "0"-"3" -> count
   semi_finals: Record<string, number>;    // slot "0"-"1" -> count
   final_match: number;
+}
+
+// Slot-specific opponent statistics - tracks which opponents were faced in each specific bracket slot
+export interface SlotOpponentStats {
+  round_of_32: Record<string, Record<string, number>>;  // slot -> opponent_id -> count
+  round_of_16: Record<string, Record<string, number>>;
+  quarter_finals: Record<string, Record<string, number>>;
+  semi_finals: Record<string, Record<string, number>>;
+  final_match: Record<string, number>;  // opponent_id -> count (single slot)
 }
 
 // Result from getTopPathsForTeam WASM function
