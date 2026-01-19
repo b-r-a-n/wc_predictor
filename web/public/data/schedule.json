@@ -27,7 +27,7 @@
       "round": "group_stage",
       "groupId": "B",
       "homePlaceholder": "B1",
-      "awayPlaceholder": "B4",
+      "awayPlaceholder": "B2",
       "matchNumber": 3
     },
     {
@@ -37,7 +37,7 @@
       "round": "group_stage",
       "groupId": "D",
       "homePlaceholder": "D1",
-      "awayPlaceholder": "D3",
+      "awayPlaceholder": "D2",
       "matchNumber": 4
     },
     {
@@ -46,8 +46,8 @@
       "venueId": "gillette",
       "round": "group_stage",
       "groupId": "C",
-      "homePlaceholder": "C4",
-      "awayPlaceholder": "C3",
+      "homePlaceholder": "C3",
+      "awayPlaceholder": "C4",
       "matchNumber": 5
     },
     {
@@ -67,7 +67,7 @@
       "round": "group_stage",
       "groupId": "B",
       "homePlaceholder": "B3",
-      "awayPlaceholder": "B2",
+      "awayPlaceholder": "B4",
       "matchNumber": 7
     },
     {
@@ -76,7 +76,7 @@
       "venueId": "bc_place",
       "round": "group_stage",
       "groupId": "D",
-      "homePlaceholder": "D2",
+      "homePlaceholder": "D3",
       "awayPlaceholder": "D4",
       "matchNumber": 8
     },
@@ -87,7 +87,7 @@
       "round": "group_stage",
       "groupId": "E",
       "homePlaceholder": "E1",
-      "awayPlaceholder": "E4",
+      "awayPlaceholder": "E2",
       "matchNumber": 9
     },
     {
@@ -96,8 +96,8 @@
       "venueId": "lincoln_financial",
       "round": "group_stage",
       "groupId": "E",
-      "homePlaceholder": "E2",
-      "awayPlaceholder": "E3",
+      "homePlaceholder": "E3",
+      "awayPlaceholder": "E4",
       "matchNumber": 10
     },
     {
@@ -127,7 +127,7 @@
       "round": "group_stage",
       "groupId": "H",
       "homePlaceholder": "H1",
-      "awayPlaceholder": "H4",
+      "awayPlaceholder": "H2",
       "matchNumber": 13
     },
     {
@@ -136,8 +136,8 @@
       "venueId": "hard_rock",
       "round": "group_stage",
       "groupId": "H",
-      "homePlaceholder": "H2",
-      "awayPlaceholder": "H3",
+      "homePlaceholder": "H3",
+      "awayPlaceholder": "H4",
       "matchNumber": 14
     },
     {
@@ -206,7 +206,7 @@
       "venueId": "azteca",
       "round": "group_stage",
       "groupId": "K",
-      "homePlaceholder": "K3",
+      "homePlaceholder": "K1",
       "awayPlaceholder": "K2",
       "matchNumber": 21
     },
@@ -216,7 +216,7 @@
       "venueId": "nrg",
       "round": "group_stage",
       "groupId": "K",
-      "homePlaceholder": "K1",
+      "homePlaceholder": "K3",
       "awayPlaceholder": "K4",
       "matchNumber": 22
     },
@@ -286,7 +286,7 @@
       "venueId": "gillette",
       "round": "group_stage",
       "groupId": "C",
-      "homePlaceholder": "C3",
+      "homePlaceholder": "C4",
       "awayPlaceholder": "C2",
       "matchNumber": 29
     },
@@ -297,7 +297,7 @@
       "round": "group_stage",
       "groupId": "C",
       "homePlaceholder": "C1",
-      "awayPlaceholder": "C4",
+      "awayPlaceholder": "C3",
       "matchNumber": 30
     },
     {
@@ -307,7 +307,7 @@
       "round": "group_stage",
       "groupId": "D",
       "homePlaceholder": "D1",
-      "awayPlaceholder": "D2",
+      "awayPlaceholder": "D3",
       "matchNumber": 31
     },
     {
@@ -317,7 +317,7 @@
       "round": "group_stage",
       "groupId": "D",
       "homePlaceholder": "D4",
-      "awayPlaceholder": "D3",
+      "awayPlaceholder": "D2",
       "matchNumber": 32
     },
     {
@@ -326,8 +326,8 @@
       "venueId": "arrowhead",
       "round": "group_stage",
       "groupId": "E",
-      "homePlaceholder": "E3",
-      "awayPlaceholder": "E4",
+      "homePlaceholder": "E4",
+      "awayPlaceholder": "E2",
       "matchNumber": 33
     },
     {
@@ -337,7 +337,7 @@
       "round": "group_stage",
       "groupId": "E",
       "homePlaceholder": "E1",
-      "awayPlaceholder": "E2",
+      "awayPlaceholder": "E3",
       "matchNumber": 34
     },
     {
@@ -346,7 +346,7 @@
       "venueId": "att",
       "round": "group_stage",
       "groupId": "F",
-      "homePlaceholder": "F2",
+      "homePlaceholder": "F1",
       "awayPlaceholder": "F3",
       "matchNumber": 35
     },
@@ -356,8 +356,8 @@
       "venueId": "nrg",
       "round": "group_stage",
       "groupId": "F",
-      "homePlaceholder": "F1",
-      "awayPlaceholder": "F4",
+      "homePlaceholder": "F4",
+      "awayPlaceholder": "F2",
       "matchNumber": 36
     },
     {
@@ -367,7 +367,7 @@
       "round": "group_stage",
       "groupId": "H",
       "homePlaceholder": "H1",
-      "awayPlaceholder": "H2",
+      "awayPlaceholder": "H3",
       "matchNumber": 37
     },
     {
@@ -376,8 +376,8 @@
       "venueId": "hard_rock",
       "round": "group_stage",
       "groupId": "H",
-      "homePlaceholder": "H3",
-      "awayPlaceholder": "H4",
+      "homePlaceholder": "H4",
+      "awayPlaceholder": "H2",
       "matchNumber": 38
     },
     {
@@ -407,7 +407,7 @@
       "round": "group_stage",
       "groupId": "I",
       "homePlaceholder": "I1",
-      "awayPlaceholder": "I4",
+      "awayPlaceholder": "I3",
       "matchNumber": 41
     },
     {
@@ -416,7 +416,7 @@
       "venueId": "metlife",
       "round": "group_stage",
       "groupId": "I",
-      "homePlaceholder": "I3",
+      "homePlaceholder": "I4",
       "awayPlaceholder": "I2",
       "matchNumber": 42
     },
@@ -456,8 +456,8 @@
       "venueId": "akron",
       "round": "group_stage",
       "groupId": "K",
-      "homePlaceholder": "K2",
-      "awayPlaceholder": "K4",
+      "homePlaceholder": "K4",
+      "awayPlaceholder": "K2",
       "matchNumber": 46
     },
     {
@@ -487,7 +487,7 @@
       "round": "group_stage",
       "groupId": "C",
       "homePlaceholder": "C2",
-      "awayPlaceholder": "C4",
+      "awayPlaceholder": "C3",
       "matchNumber": 49
     },
     {
@@ -496,7 +496,7 @@
       "venueId": "hard_rock",
       "round": "group_stage",
       "groupId": "C",
-      "homePlaceholder": "C3",
+      "homePlaceholder": "C4",
       "awayPlaceholder": "C1",
       "matchNumber": 50
     },
@@ -522,22 +522,22 @@
     },
     {
       "date": "2026-06-24",
-      "time": "21:00",
-      "venueId": "sofi",
+      "time": "18:00",
+      "venueId": "lumen",
       "round": "group_stage",
       "groupId": "B",
-      "homePlaceholder": "B4",
-      "awayPlaceholder": "B3",
+      "homePlaceholder": "B3",
+      "awayPlaceholder": "B2",
       "matchNumber": 53
     },
     {
       "date": "2026-06-24",
-      "time": "21:00",
+      "time": "18:00",
       "venueId": "bc_place",
       "round": "group_stage",
       "groupId": "B",
-      "homePlaceholder": "B2",
-      "awayPlaceholder": "B1",
+      "homePlaceholder": "B1",
+      "awayPlaceholder": "B4",
       "matchNumber": 54
     },
     {
@@ -546,7 +546,7 @@
       "venueId": "metlife",
       "round": "group_stage",
       "groupId": "E",
-      "homePlaceholder": "E3",
+      "homePlaceholder": "E4",
       "awayPlaceholder": "E1",
       "matchNumber": 55
     },
@@ -556,8 +556,8 @@
       "venueId": "lincoln_financial",
       "round": "group_stage",
       "groupId": "E",
-      "homePlaceholder": "E4",
-      "awayPlaceholder": "E2",
+      "homePlaceholder": "E2",
+      "awayPlaceholder": "E3",
       "matchNumber": 56
     },
     {
@@ -586,8 +586,8 @@
       "venueId": "att",
       "round": "group_stage",
       "groupId": "F",
-      "homePlaceholder": "F2",
-      "awayPlaceholder": "F4",
+      "homePlaceholder": "F4",
+      "awayPlaceholder": "F1",
       "matchNumber": 59
     },
     {
@@ -596,8 +596,8 @@
       "venueId": "arrowhead",
       "round": "group_stage",
       "groupId": "F",
-      "homePlaceholder": "F3",
-      "awayPlaceholder": "F1",
+      "homePlaceholder": "F2",
+      "awayPlaceholder": "F3",
       "matchNumber": 60
     },
     {
@@ -606,8 +606,8 @@
       "venueId": "bmo",
       "round": "group_stage",
       "groupId": "I",
-      "homePlaceholder": "I2",
-      "awayPlaceholder": "I4",
+      "homePlaceholder": "I4",
+      "awayPlaceholder": "I1",
       "matchNumber": 61
     },
     {
@@ -616,8 +616,8 @@
       "venueId": "hard_rock",
       "round": "group_stage",
       "groupId": "I",
-      "homePlaceholder": "I3",
-      "awayPlaceholder": "I1",
+      "homePlaceholder": "I2",
+      "awayPlaceholder": "I3",
       "matchNumber": 62
     },
     {
@@ -646,7 +646,7 @@
       "venueId": "akron",
       "round": "group_stage",
       "groupId": "H",
-      "homePlaceholder": "H3",
+      "homePlaceholder": "H4",
       "awayPlaceholder": "H1",
       "matchNumber": 65
     },
@@ -656,8 +656,8 @@
       "venueId": "nrg",
       "round": "group_stage",
       "groupId": "H",
-      "homePlaceholder": "H4",
-      "awayPlaceholder": "H2",
+      "homePlaceholder": "H2",
+      "awayPlaceholder": "H3",
       "matchNumber": 66
     },
     {
@@ -667,7 +667,7 @@
       "round": "group_stage",
       "groupId": "K",
       "homePlaceholder": "K4",
-      "awayPlaceholder": "K3",
+      "awayPlaceholder": "K1",
       "matchNumber": 67
     },
     {
@@ -676,8 +676,8 @@
       "venueId": "hard_rock",
       "round": "group_stage",
       "groupId": "K",
-      "homePlaceholder": "K2",
-      "awayPlaceholder": "K1",
+      "homePlaceholder": "K3",
+      "awayPlaceholder": "K2",
       "matchNumber": 68
     },
     {
@@ -934,7 +934,7 @@
       "matchNumber": 94,
       "date": "2026-07-06",
       "time": "20:00",
-      "venueId": "nrg",
+      "venueId": "lumen",
       "round": "round_of_16",
       "knockoutSlot": 5,
       "homePlaceholder": "W11",

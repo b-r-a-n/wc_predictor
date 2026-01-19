@@ -68,21 +68,22 @@ export function BracketSlot({
 
   const slotContent = (
     <div
-      className={`rounded-md p-2 text-center flex flex-col justify-center cursor-pointer transition-all hover:ring-2 hover:ring-blue-400 ${colorClass} ${
+      className={`rounded-md p-2 text-center flex flex-col justify-center cursor-pointer transition-all hover:ring-2 hover:ring-blue-400 overflow-hidden ${colorClass} ${
         isExpanded ? 'ring-2 ring-blue-500' : ''
       }`}
       style={{
-        minHeight: isExpanded ? 'auto' : '60px',
+        height: isExpanded ? 'auto' : '70px',
+        minHeight: isExpanded ? '70px' : undefined,
         ...style,
       }}
       onClick={onToggleExpand}
     >
-      <div className={`font-semibold text-sm ${isMuted ? 'text-gray-400' : ''}`}>
+      <div className={`font-semibold text-xs ${isMuted ? 'text-gray-400' : ''}`}>
         {formatPercent(probability)}
       </div>
       {venue && (
-        <div className={`text-xs mt-1 ${isMuted ? 'text-gray-300' : 'opacity-75'}`}>
-          <div className="truncate">{venue.city}</div>
+        <div className={`text-[10px] leading-tight ${isMuted ? 'text-gray-300' : 'opacity-75'} truncate`}>
+          {venue.city}
         </div>
       )}
 

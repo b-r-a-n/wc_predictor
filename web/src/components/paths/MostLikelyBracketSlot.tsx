@@ -71,31 +71,31 @@ export function MostLikelyBracketSlot({
 
   const slotContent = (
     <div
-      className={`rounded-md p-2 text-center flex flex-col justify-center transition-all ${colorClass} ${
+      className={`rounded-md p-2 text-center flex flex-col justify-center overflow-hidden transition-all ${colorClass} ${
         slotData ? 'cursor-pointer hover:ring-2 hover:ring-blue-400' : ''
       }`}
       style={{
-        minHeight: '60px',
+        height: '70px',
         ...style,
       }}
       onClick={handleClick}
     >
       {slotData ? (
         <>
-          {/* Team flag and name */}
-          <div className="flex items-center justify-center gap-1.5">
-            <span className="text-base">{getFlagEmoji(slotData.team.code)}</span>
-            <span className="font-semibold text-sm truncate max-w-[80px]">
+          {/* Team flag and name - no wrap */}
+          <div className="flex items-center justify-center gap-1 flex-nowrap min-w-0">
+            <span className="text-xs flex-shrink-0">{getFlagEmoji(slotData.team.code)}</span>
+            <span className="font-semibold text-xs truncate whitespace-nowrap">
               {slotData.team.name}
             </span>
           </div>
           {/* Probability */}
-          <div className={`text-xs mt-0.5 ${isWinnerPath ? 'text-amber-800' : 'opacity-75'}`}>
+          <div className={`text-[10px] leading-tight ${isWinnerPath ? 'text-amber-800' : 'opacity-75'}`}>
             {formatPercent(probability)}
           </div>
           {/* Venue */}
           {venue && (
-            <div className={`text-xs mt-0.5 ${isWinnerPath ? 'text-amber-700' : 'opacity-60'} truncate`}>
+            <div className={`text-[10px] leading-tight ${isWinnerPath ? 'text-amber-700' : 'opacity-60'} truncate`}>
               {venue.city}
             </div>
           )}

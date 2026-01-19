@@ -30,7 +30,7 @@ export interface LayoutConfig {
 
 const DEFAULT_CONFIG: LayoutConfig = {
   slotWidth: 130,
-  slotHeight: 60,
+  slotHeight: 70,        // Increased from 60 to fit flag+name+probability+venue
   roundGap: 40,
   verticalPadding: 20,
   baseSlotGap: 12,       // Increased from 8 to prevent overlap
