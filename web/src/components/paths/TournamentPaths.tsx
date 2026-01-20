@@ -1,7 +1,7 @@
 import { useMemo, useCallback, useState } from 'react';
 import { useSimulatorStore } from '../../store/simulatorStore';
 import { getFlagEmoji, formatNumber } from '../../utils/formatting';
-import { computeMostLikelyBracket, computeWinnerPathHighlights } from '../../utils/bracketUtils';
+import { computeOptimalBracket, type OptimalBracketDisplay } from '../../utils/bracketUtils';
 import { BracketSlot } from './BracketSlot';
 import { MostLikelyBracketSlot } from './MostLikelyBracketSlot';
 import { BracketConnectors } from './BracketConnectors';
@@ -9,7 +9,7 @@ import {
   calculateSlotPositions,
   calculateBracketDimensions,
 } from './bracketLayout';
-import type { Team, Venue, BracketSlotStats, KnockoutRoundType, PathStatistics, SlotOpponentStats, MostLikelyBracket } from '../../types';
+import type { Team, Venue, BracketSlotStats, KnockoutRoundType, PathStatistics, SlotOpponentStats, MostLikelySlotData } from '../../types';
 
 // Round configuration for the bracket
 const ROUNDS: {
@@ -128,17 +128,47 @@ export function TournamentPaths() {
     return highlighted;
   }, [bracketStats, results]);
 
-  // Compute most likely bracket when no team is selected
-  const mostLikelyBracket = useMemo((): MostLikelyBracket | null => {
+  // Compute optimal bracket when no team is selected
+  const optimalBracket = useMemo((): OptimalBracketDisplay | null => {
     if (selectedTeamForPaths !== null || !results) return null;
-    return computeMostLikelyBracket(results, teamMap);
+    return computeOptimalBracket(results, teamMap);
   }, [selectedTeamForPaths, results, teamMap]);
 
-  // Compute winner path highlights for most likely bracket
+  // Compute winner path highlights for optimal bracket
   const winnerPathHighlights = useMemo(() => {
-    if (!mostLikelyBracket) return new Set<string>();
-    return computeWinnerPathHighlights(mostLikelyBracket);
-  }, [mostLikelyBracket]);
+    if (!optimalBracket || !optimalBracket.champion) return new Set<string>();
+
+    const highlights = new Set<string>();
+    const championId = optimalBracket.champion.teamId;
+
+    // Check R32 matches
+    for (const match of optimalBracket.round_of_32) {
+      if (match.winnerId === championId) {
+        highlights.add(`0-${match.slot}`);
+      }
+    }
+
+    // Check R16/QF/SF rounds
+    const rounds: { key: keyof OptimalBracketDisplay; roundIndex: number }[] = [
+      { key: 'round_of_16', roundIndex: 1 },
+      { key: 'quarter_finals', roundIndex: 2 },
+      { key: 'semi_finals', roundIndex: 3 },
+    ];
+
+    for (const { key, roundIndex } of rounds) {
+      const roundData = optimalBracket[key] as Record<string, MostLikelySlotData>;
+      for (const [slotStr, slotData] of Object.entries(roundData)) {
+        if (slotData.teamId === championId) {
+          highlights.add(`${roundIndex}-${slotStr}`);
+        }
+      }
+    }
+
+    // Add final if champion is predicted
+    highlights.add('4-0');
+
+    return highlights;
+  }, [optimalBracket]);
 
   // Get probability for a specific slot
   const getSlotProbability = useCallback((
@@ -355,8 +385,8 @@ export function TournamentPaths() {
         </div>
       )}
 
-      {/* Most likely bracket when no team selected */}
-      {selectedTeamForPaths === null && mostLikelyBracket && (
+      {/* Optimal bracket when no team selected */}
+      {selectedTeamForPaths === null && optimalBracket && (
         <>
           {/* Header with predicted champion */}
           <div className="bg-gradient-to-r from-amber-500 to-amber-600 rounded-lg p-4 text-white">
@@ -364,9 +394,9 @@ export function TournamentPaths() {
               <span className="text-3xl">&#127942;</span>
               <div>
                 <h3 className="text-xl font-bold">Most Likely Tournament Outcome</h3>
-                {mostLikelyBracket.champion && (
+                {optimalBracket.champion && (
                   <p className="text-amber-100 text-sm">
-                    Predicted Champion: {getFlagEmoji(mostLikelyBracket.champion.team.code)} {mostLikelyBracket.champion.team.name} ({(mostLikelyBracket.champion.probability * 100).toFixed(1)}%)
+                    Predicted Champion: {getFlagEmoji(optimalBracket.champion.team.code)} {optimalBracket.champion.team.name} ({(optimalBracket.champion.probability * 100).toFixed(1)}%)
                   </p>
                 )}
               </div>
@@ -426,12 +456,19 @@ export function TournamentPaths() {
                 const venue = getSlotVenue(round.mappingKey, pos.slot);
                 const isWinnerPath = winnerPathHighlights.has(slotKey);
 
-                // Get the most likely team for this slot
-                let slotData = null;
+                // Get the optimal team for this slot
+                let slotData: MostLikelySlotData | null = null;
                 if (round.key === 'final_match') {
-                  slotData = mostLikelyBracket.final_match;
+                  slotData = optimalBracket.champion;
+                } else if (round.key === 'round_of_32') {
+                  // R32 is an array of matches - find the match for this slot
+                  const match = optimalBracket.round_of_32.find(m => m.slot === pos.slot);
+                  if (match) {
+                    // Display the winner's data
+                    slotData = match.winnerId === match.teamA.teamId ? match.teamA : match.teamB;
+                  }
                 } else {
-                  const roundData = mostLikelyBracket[round.key as keyof typeof mostLikelyBracket] as Record<string, unknown>;
+                  const roundData = optimalBracket[round.key as keyof typeof optimalBracket] as Record<string, MostLikelySlotData>;
                   slotData = roundData?.[String(pos.slot)] ?? null;
                 }
 
@@ -449,7 +486,7 @@ export function TournamentPaths() {
                     <MostLikelyBracketSlot
                       round={round.key}
                       slotIndex={pos.slot}
-                      slotData={slotData as import('../../types').MostLikelySlotData | null}
+                      slotData={slotData}
                       venue={venue}
                       isWinnerPath={isWinnerPath}
                       onTeamClick={handleTeamClick}
@@ -493,7 +530,7 @@ export function TournamentPaths() {
       )}
 
       {/* No bracket data available when no team selected */}
-      {selectedTeamForPaths === null && !mostLikelyBracket && (
+      {selectedTeamForPaths === null && !optimalBracket && (
         <div className="flex items-center justify-center h-48 text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
           <div className="text-center">
             <span className="text-4xl block mb-2">&#127942;</span>

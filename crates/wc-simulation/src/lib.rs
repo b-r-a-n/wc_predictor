@@ -15,5 +15,5 @@ pub mod runner;
 pub use aggregator::{AggregatedResults, TeamStatistics};
 pub use engine::SimulationEngine;
 pub use optimal_bracket::compute_optimal_bracket;
-pub use path_tracker::{BracketSlotStats, BracketSlotWinStats, MostLikelyBracket, MostLikelyBracketSlot, OptimalBracket, OptimalR32Match, PathStatistics, RoundMatchups, SlotOpponentStats};
+pub use path_tracker::{BracketSlotStats, BracketSlotWinStats, MostLikelyBracketSlot, OptimalBracket, OptimalR32Match, PathStatistics, RoundMatchups, SlotOpponentStats};
 pub use runner::{SimulationConfig, SimulationRunner};

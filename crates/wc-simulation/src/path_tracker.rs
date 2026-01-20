@@ -9,27 +9,7 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use wc_core::TeamId;
 
-/// Represents the most frequently occurring complete bracket outcome across all simulations.
-/// This ensures each team appears at most once in the bracket (unlike per-slot independent picks).
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MostFrequentBracket {
-    /// Number of times this exact bracket occurred
-    pub count: u32,
-    /// Probability of this bracket (count / total_simulations)
-    pub probability: f64,
-    /// Winners of Round of 32 (16 team IDs, one per match)
-    pub round_of_32_winners: Vec<TeamId>,
-    /// Winners of Round of 16 (8 team IDs, one per match)
-    pub round_of_16_winners: Vec<TeamId>,
-    /// Winners of Quarter-finals (4 team IDs, one per match)
-    pub quarter_final_winners: Vec<TeamId>,
-    /// Winners of Semi-finals (2 team IDs, one per match)
-    pub semi_final_winners: Vec<TeamId>,
-    /// Tournament champion
-    pub champion: TeamId,
-}
-
-/// Slot data for most likely bracket display.
+/// Slot data for bracket display.
 /// Contains the team assigned to a slot along with count and probability.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MostLikelyBracketSlot {
@@ -39,24 +19,6 @@ pub struct MostLikelyBracketSlot {
     pub count: u32,
     /// Probability (count / total_simulations)
     pub probability: f64,
-}
-
-/// The most likely bracket computed via greedy algorithm.
-/// Ensures each team appears at most once and follows bracket structure.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MostLikelyBracket {
-    /// Round of 32 slot assignments (slot 0-15 -> team data)
-    pub round_of_32: HashMap<u8, MostLikelyBracketSlot>,
-    /// Round of 16 slot assignments (slot 0-7 -> team data)
-    pub round_of_16: HashMap<u8, MostLikelyBracketSlot>,
-    /// Quarter-finals slot assignments (slot 0-3 -> team data)
-    pub quarter_finals: HashMap<u8, MostLikelyBracketSlot>,
-    /// Semi-finals slot assignments (slot 0-1 -> team data)
-    pub semi_finals: HashMap<u8, MostLikelyBracketSlot>,
-    /// Final winner
-    pub final_match: Option<MostLikelyBracketSlot>,
-    /// Tournament champion (same as final_match winner)
-    pub champion: Option<MostLikelyBracketSlot>,
 }
 
 /// A single R32 match in the optimal bracket, showing both teams and winner.

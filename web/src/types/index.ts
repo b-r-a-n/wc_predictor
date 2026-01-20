@@ -56,34 +56,11 @@ export interface TeamStatistics {
   knockout_probability: number;
 }
 
-// Most frequent complete bracket outcome from Rust aggregation
-// This ensures each team appears at most once (unlike per-slot picks)
-export interface RustMostFrequentBracket {
-  count: number;
-  probability: number;
-  round_of_32_winners: number[];  // 16 team IDs (one per R32 match)
-  round_of_16_winners: number[];  // 8 team IDs (one per R16 match)
-  quarter_final_winners: number[]; // 4 team IDs (one per QF match)
-  semi_final_winners: number[];   // 2 team IDs (one per SF match)
-  champion: number;
-}
-
-// Slot data from Rust greedy bracket algorithm
+// Slot data from Rust bracket algorithm
 export interface RustMostLikelyBracketSlot {
   team_id: number;
   count: number;
   probability: number;
-}
-
-// Most likely bracket computed via greedy algorithm from Rust
-// Ensures each team appears at most once and follows bracket structure
-export interface RustMostLikelyBracket {
-  round_of_32: Record<string, RustMostLikelyBracketSlot>;
-  round_of_16: Record<string, RustMostLikelyBracketSlot>;
-  quarter_finals: Record<string, RustMostLikelyBracketSlot>;
-  semi_finals: Record<string, RustMostLikelyBracketSlot>;
-  final_match: RustMostLikelyBracketSlot | null;
-  champion: RustMostLikelyBracketSlot | null;
 }
 
 // Single R32 match in the optimal bracket with both teams and winner
@@ -115,8 +92,6 @@ export interface AggregatedResults {
   bracket_slot_stats?: Record<string, BracketSlotStats>;  // Bracket slot statistics for each team (keys are stringified TeamIds)
   bracket_slot_win_stats?: Record<string, BracketSlotWinStats>;  // Bracket slot WIN statistics (only winners, not participants)
   slot_opponent_stats?: Record<string, SlotOpponentStats>;  // Slot-specific opponent statistics (keys are stringified TeamIds)
-  most_frequent_bracket?: RustMostFrequentBracket;  // Most frequent complete bracket outcome
-  most_likely_bracket?: RustMostLikelyBracket;  // Greedy bracket from Rust (unique teams, structurally valid)
   optimal_bracket?: RustOptimalBracket;  // Hungarian algorithm bracket (exactly 32 unique teams)
 }
 

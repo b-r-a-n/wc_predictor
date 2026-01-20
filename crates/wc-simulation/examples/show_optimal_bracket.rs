@@ -153,20 +153,6 @@ fn main() {
         }
     }
 
-    // Compare with greedy bracket
-    println!("\n════════════════════════════════════════════════════════════════════════════════");
-    println!("                  COMPARISON WITH GREEDY BRACKET");
-    println!("════════════════════════════════════════════════════════════════════════════════\n");
-
-    let greedy = &results.most_likely_bracket;
-    let greedy_teams: HashSet<_> = greedy.round_of_32.values().map(|s| s.team_id).collect();
-
-    println!("  Greedy bracket R32 unique teams: {}", greedy_teams.len());
-    println!("  Optimal bracket R32 unique teams: {}", all_teams.len());
-
-    if greedy_teams.len() < 16 {
-        println!("\n  ⚠️  Greedy bracket has missing slots (expected 16 R32 winners)");
-    }
     if all_teams.len() < 32 {
         println!("\n  ⚠️  Optimal bracket has fewer than 32 teams (assignment failed for some slots)");
     }

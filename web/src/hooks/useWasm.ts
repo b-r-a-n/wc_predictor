@@ -97,23 +97,7 @@ export function useWasm(): { status: WasmStatus; api: WasmApi | null; error: str
               bracket_slot_stats?: Map<number, unknown> | Record<string, unknown>;
               bracket_slot_win_stats?: Map<number, unknown> | Record<string, unknown>;
               slot_opponent_stats?: Map<number, unknown> | Record<string, unknown>;
-              most_frequent_bracket?: {
-                count: number;
-                probability: number;
-                round_of_32_winners: number[];
-                round_of_16_winners: number[];
-                quarter_final_winners: number[];
-                semi_final_winners: number[];
-                champion: number;
-              };
-              most_likely_bracket?: {
-                round_of_32: Map<number, unknown> | Record<string, unknown>;
-                round_of_16: Map<number, unknown> | Record<string, unknown>;
-                quarter_finals: Map<number, unknown> | Record<string, unknown>;
-                semi_finals: Map<number, unknown> | Record<string, unknown>;
-                final_match: unknown;
-                champion: unknown;
-              };
+              optimal_bracket?: unknown;
             };
 
             // If team_stats is a Map, convert it to a plain object
@@ -207,32 +191,6 @@ export function useWasm(): { status: WasmStatus; api: WasmApi | null; error: str
               slotOpponentStats = rawSlotOpponentStats as Record<string, unknown>;
             }
 
-            // Get most_likely_bracket if available (HashMap<u8, ...> needs conversion)
-            let mostLikelyBracket: Record<string, unknown> | undefined;
-            const rawMostLikelyBracket = result.most_likely_bracket;
-            if (rawMostLikelyBracket) {
-              const convertRoundMap = (roundData: Map<number, unknown> | Record<string, unknown> | undefined): Record<string, unknown> => {
-                if (!roundData) return {};
-                if (roundData instanceof Map) {
-                  const converted: Record<string, unknown> = {};
-                  roundData.forEach((value: unknown, key: number) => {
-                    converted[String(key)] = value;
-                  });
-                  return converted;
-                }
-                return roundData as Record<string, unknown>;
-              };
-
-              mostLikelyBracket = {
-                round_of_32: convertRoundMap(rawMostLikelyBracket.round_of_32),
-                round_of_16: convertRoundMap(rawMostLikelyBracket.round_of_16),
-                quarter_finals: convertRoundMap(rawMostLikelyBracket.quarter_finals),
-                semi_finals: convertRoundMap(rawMostLikelyBracket.semi_finals),
-                final_match: rawMostLikelyBracket.final_match,
-                champion: rawMostLikelyBracket.champion,
-              };
-            }
-
             return {
               total_simulations: result.total_simulations,
               team_stats: teamStats,
@@ -242,8 +200,7 @@ export function useWasm(): { status: WasmStatus; api: WasmApi | null; error: str
               bracket_slot_stats: bracketSlotStats,
               bracket_slot_win_stats: bracketSlotWinStats,
               slot_opponent_stats: slotOpponentStats,
-              most_frequent_bracket: result.most_frequent_bracket,
-              most_likely_bracket: mostLikelyBracket,
+              optimal_bracket: result.optimal_bracket,
             } as AggregatedResults;
           },
           calculateMatchProbability: (teamAElo, teamBElo, isKnockout) => {
