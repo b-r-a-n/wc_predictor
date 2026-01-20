@@ -68,6 +68,24 @@ export interface RustMostFrequentBracket {
   champion: number;
 }
 
+// Slot data from Rust greedy bracket algorithm
+export interface RustMostLikelyBracketSlot {
+  team_id: number;
+  count: number;
+  probability: number;
+}
+
+// Most likely bracket computed via greedy algorithm from Rust
+// Ensures each team appears at most once and follows bracket structure
+export interface RustMostLikelyBracket {
+  round_of_32: Record<string, RustMostLikelyBracketSlot>;
+  round_of_16: Record<string, RustMostLikelyBracketSlot>;
+  quarter_finals: Record<string, RustMostLikelyBracketSlot>;
+  semi_finals: Record<string, RustMostLikelyBracketSlot>;
+  final_match: RustMostLikelyBracketSlot | null;
+  champion: RustMostLikelyBracketSlot | null;
+}
+
 export interface AggregatedResults {
   total_simulations: number;
   team_stats: Record<string, TeamStatistics>;  // Keys are stringified numbers due to JSON serialization
@@ -78,6 +96,7 @@ export interface AggregatedResults {
   bracket_slot_win_stats?: Record<string, BracketSlotWinStats>;  // Bracket slot WIN statistics (only winners, not participants)
   slot_opponent_stats?: Record<string, SlotOpponentStats>;  // Slot-specific opponent statistics (keys are stringified TeamIds)
   most_frequent_bracket?: RustMostFrequentBracket;  // Most frequent complete bracket outcome
+  most_likely_bracket?: RustMostLikelyBracket;  // Greedy bracket from Rust (unique teams, structurally valid)
 }
 
 // Match probability types

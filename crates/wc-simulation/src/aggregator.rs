@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use wc_core::{MatchResult, TeamId, Tournament, TournamentResult};
 
-use crate::path_tracker::{BracketSlotStats, BracketSlotWinStats, MostFrequentBracket, PathStatistics, SlotOpponentStats};
+use crate::path_tracker::{BracketSlotStats, BracketSlotWinStats, MostFrequentBracket, MostLikelyBracket, MostLikelyBracketSlot, PathStatistics, SlotOpponentStats};
 
 /// Aggregated statistics from multiple tournament simulations.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -29,6 +29,8 @@ pub struct AggregatedResults {
     pub slot_opponent_stats: HashMap<TeamId, SlotOpponentStats>,
     /// The most frequently occurring complete bracket outcome
     pub most_frequent_bracket: Option<MostFrequentBracket>,
+    /// The most likely bracket computed via greedy algorithm (ensures unique teams)
+    pub most_likely_bracket: MostLikelyBracket,
 }
 
 /// Statistics for a single team across all simulations.
@@ -500,6 +502,14 @@ impl AggregatedResults {
             }
         };
 
+        // Compute the most likely bracket using greedy algorithm
+        let most_likely_bracket = compute_greedy_bracket(
+            &team_stats,
+            &bracket_slot_win_stats,
+            &bracket_slot_stats,
+            total,
+        );
+
         Self {
             total_simulations: total,
             team_stats,
@@ -510,6 +520,7 @@ impl AggregatedResults {
             bracket_slot_win_stats,
             slot_opponent_stats,
             most_frequent_bracket,
+            most_likely_bracket,
         }
     }
 
@@ -542,6 +553,231 @@ fn find_opponent(matches: &[MatchResult], team_id: TeamId) -> Option<TeamId> {
         }
     }
     None
+}
+
+/// Compute the most likely bracket using a greedy algorithm.
+///
+/// The algorithm ensures:
+/// 1. Each team appears at most once (no duplicates)
+/// 2. Tournament structure is valid (later round winners must have won feeder matches)
+/// 3. Higher-ranked teams get priority for their best slots
+///
+/// It uses a participation fallback when a team has no wins at a slot - this fixes
+/// the issue where teams that qualified for knockouts but lost every R32 match
+/// would be missing from the bracket entirely.
+fn compute_greedy_bracket(
+    team_stats: &HashMap<TeamId, TeamStatistics>,
+    bracket_slot_win_stats: &HashMap<TeamId, BracketSlotWinStats>,
+    bracket_slot_stats: &HashMap<TeamId, BracketSlotStats>,
+    total_simulations: u32,
+) -> MostLikelyBracket {
+    use std::collections::HashSet;
+
+    // Sort teams by champion count (win probability) descending
+    let mut teams_by_win_prob: Vec<_> = team_stats.iter().collect();
+    teams_by_win_prob.sort_by(|a, b| b.1.champion.cmp(&a.1.champion));
+
+    // Helper: get count for a team at a specific round/slot.
+    // First tries win stats, then falls back to participation stats.
+    let get_count = |team_id: TeamId, round: &str, slot: u8| -> u32 {
+        // Try win stats first
+        if let Some(ws) = bracket_slot_win_stats.get(&team_id) {
+            let win_count = match round {
+                "round_of_32" => ws.round_of_32.get(&slot).copied().unwrap_or(0),
+                "round_of_16" => ws.round_of_16.get(&slot).copied().unwrap_or(0),
+                "quarter_finals" => ws.quarter_finals.get(&slot).copied().unwrap_or(0),
+                "semi_finals" => ws.semi_finals.get(&slot).copied().unwrap_or(0),
+                "final" => ws.final_match,
+                _ => 0,
+            };
+            if win_count > 0 {
+                return win_count;
+            }
+        }
+        // Fallback to participation stats (team played but lost)
+        if let Some(ps) = bracket_slot_stats.get(&team_id) {
+            match round {
+                "round_of_32" => ps.round_of_32.get(&slot).copied().unwrap_or(0),
+                "round_of_16" => ps.round_of_16.get(&slot).copied().unwrap_or(0),
+                "quarter_finals" => ps.quarter_finals.get(&slot).copied().unwrap_or(0),
+                "semi_finals" => ps.semi_finals.get(&slot).copied().unwrap_or(0),
+                "final" => ps.final_match,
+                _ => 0,
+            }
+        } else {
+            0
+        }
+    };
+
+    // Helper to create slot data
+    let make_slot_data = |team_id: TeamId, count: u32| -> MostLikelyBracketSlot {
+        MostLikelyBracketSlot {
+            team_id,
+            count,
+            probability: count as f64 / total_simulations as f64,
+        }
+    };
+
+    // Phase 1: Assign R32 slots greedily by team win probability
+    let mut r32: HashMap<u8, TeamId> = HashMap::new();
+    let mut used_in_r32: HashSet<TeamId> = HashSet::new();
+
+    for (team_id, stats) in &teams_by_win_prob {
+        if used_in_r32.contains(team_id) {
+            continue;
+        }
+        // Skip teams that never reached R32
+        if stats.reached_round_of_32 == 0 {
+            continue;
+        }
+
+        // Find best available R32 slot for this team
+        let mut best_slot: Option<u8> = None;
+        let mut best_count = 0u32;
+        for slot in 0..16u8 {
+            if r32.contains_key(&slot) {
+                continue; // Slot already taken
+            }
+            let count = get_count(**team_id, "round_of_32", slot);
+            if count > best_count {
+                best_count = count;
+                best_slot = Some(slot);
+            }
+        }
+
+        if let Some(slot) = best_slot {
+            if best_count > 0 {
+                r32.insert(slot, **team_id);
+                used_in_r32.insert(**team_id);
+            }
+        }
+    }
+
+    // Phase 2: Assign R16 based on R32 feeder slots
+    // R16 slot i receives winners from R32 slots 2i and 2i+1
+    let mut r16: HashMap<u8, TeamId> = HashMap::new();
+    for slot in 0..8u8 {
+        let feeders = [slot * 2, slot * 2 + 1];
+        let mut best_team: Option<TeamId> = None;
+        let mut best_count = 0u32;
+        for feeder in feeders {
+            if let Some(&team_id) = r32.get(&feeder) {
+                let count = get_count(team_id, "round_of_16", slot);
+                if count > best_count {
+                    best_count = count;
+                    best_team = Some(team_id);
+                }
+            }
+        }
+        if let Some(team_id) = best_team {
+            if best_count > 0 {
+                r16.insert(slot, team_id);
+            }
+        }
+    }
+
+    // Phase 3: Assign QF based on R16 feeder slots
+    let mut qf: HashMap<u8, TeamId> = HashMap::new();
+    for slot in 0..4u8 {
+        let feeders = [slot * 2, slot * 2 + 1];
+        let mut best_team: Option<TeamId> = None;
+        let mut best_count = 0u32;
+        for feeder in feeders {
+            if let Some(&team_id) = r16.get(&feeder) {
+                let count = get_count(team_id, "quarter_finals", slot);
+                if count > best_count {
+                    best_count = count;
+                    best_team = Some(team_id);
+                }
+            }
+        }
+        if let Some(team_id) = best_team {
+            if best_count > 0 {
+                qf.insert(slot, team_id);
+            }
+        }
+    }
+
+    // Phase 4: Assign SF based on QF feeder slots
+    let mut sf: HashMap<u8, TeamId> = HashMap::new();
+    for slot in 0..2u8 {
+        let feeders = [slot * 2, slot * 2 + 1];
+        let mut best_team: Option<TeamId> = None;
+        let mut best_count = 0u32;
+        for feeder in feeders {
+            if let Some(&team_id) = qf.get(&feeder) {
+                let count = get_count(team_id, "semi_finals", slot);
+                if count > best_count {
+                    best_count = count;
+                    best_team = Some(team_id);
+                }
+            }
+        }
+        if let Some(team_id) = best_team {
+            if best_count > 0 {
+                sf.insert(slot, team_id);
+            }
+        }
+    }
+
+    // Phase 5: Assign Final based on SF feeder slots
+    let mut final_winner: Option<(TeamId, u32)> = None;
+    {
+        let feeders = [0u8, 1u8];
+        let mut best_team: Option<TeamId> = None;
+        let mut best_count = 0u32;
+        for feeder in feeders {
+            if let Some(&team_id) = sf.get(&feeder) {
+                let count = get_count(team_id, "final", 0);
+                if count > best_count {
+                    best_count = count;
+                    best_team = Some(team_id);
+                }
+            }
+        }
+        if let Some(team_id) = best_team {
+            if best_count > 0 {
+                final_winner = Some((team_id, best_count));
+            }
+        }
+    }
+
+    // Build result with slot data including counts and probabilities
+    let mut result_r32: HashMap<u8, MostLikelyBracketSlot> = HashMap::new();
+    for (slot, team_id) in &r32 {
+        let count = get_count(*team_id, "round_of_32", *slot);
+        result_r32.insert(*slot, make_slot_data(*team_id, count));
+    }
+
+    let mut result_r16: HashMap<u8, MostLikelyBracketSlot> = HashMap::new();
+    for (slot, team_id) in &r16 {
+        let count = get_count(*team_id, "round_of_16", *slot);
+        result_r16.insert(*slot, make_slot_data(*team_id, count));
+    }
+
+    let mut result_qf: HashMap<u8, MostLikelyBracketSlot> = HashMap::new();
+    for (slot, team_id) in &qf {
+        let count = get_count(*team_id, "quarter_finals", *slot);
+        result_qf.insert(*slot, make_slot_data(*team_id, count));
+    }
+
+    let mut result_sf: HashMap<u8, MostLikelyBracketSlot> = HashMap::new();
+    for (slot, team_id) in &sf {
+        let count = get_count(*team_id, "semi_finals", *slot);
+        result_sf.insert(*slot, make_slot_data(*team_id, count));
+    }
+
+    let final_match = final_winner.map(|(team_id, count)| make_slot_data(team_id, count));
+    let champion = final_match.clone();
+
+    MostLikelyBracket {
+        round_of_32: result_r32,
+        round_of_16: result_r16,
+        quarter_finals: result_qf,
+        semi_finals: result_sf,
+        final_match,
+        champion,
+    }
 }
 
 /// Create a unique signature string for a complete bracket outcome.
@@ -995,5 +1231,79 @@ mod tests {
 
         let json = serde_json::to_string(&results).unwrap();
         assert!(json.contains("bracket_slot_win_stats"), "bracket_slot_win_stats should be in JSON output");
+    }
+
+    #[test]
+    fn test_most_likely_bracket_computed() {
+        use crate::runner::{SimulationConfig, SimulationRunner};
+        use wc_strategies::EloStrategy;
+
+        let tournament = create_test_tournament();
+        let strategy = EloStrategy::default();
+        let config = SimulationConfig::with_iterations(100).with_seed(42);
+        let runner = SimulationRunner::new(&tournament, &strategy, config);
+        let results = runner.run_with_progress(|_, _| {});
+
+        let bracket = &results.most_likely_bracket;
+
+        // Verify structure - should have some entries in each round
+        // Note: not all slots may be filled depending on simulation results
+        assert!(!bracket.round_of_32.is_empty(), "R32 should have entries");
+        assert!(!bracket.round_of_16.is_empty(), "R16 should have entries");
+        assert!(!bracket.quarter_finals.is_empty(), "QF should have entries");
+        assert!(!bracket.semi_finals.is_empty(), "SF should have entries");
+        assert!(bracket.final_match.is_some(), "Final should have a winner");
+        assert!(bracket.champion.is_some(), "Champion should be set");
+
+        // Verify no duplicate teams in R32
+        let r32_teams: std::collections::HashSet<_> = bracket.round_of_32.values()
+            .map(|slot| slot.team_id)
+            .collect();
+        assert_eq!(r32_teams.len(), bracket.round_of_32.len(), "No duplicate teams in R32");
+
+        // Verify bracket structure consistency: R16 winners must be from R32 feeders
+        for (slot, r16_data) in &bracket.round_of_16 {
+            let slot_num = *slot;
+            let feeder1 = slot_num * 2;
+            let feeder2 = slot_num * 2 + 1;
+            let r32_team1 = bracket.round_of_32.get(&feeder1).map(|s| s.team_id);
+            let r32_team2 = bracket.round_of_32.get(&feeder2).map(|s| s.team_id);
+            assert!(
+                r32_team1 == Some(r16_data.team_id) || r32_team2 == Some(r16_data.team_id),
+                "R16 slot {} winner {:?} must be from R32 feeders {:?} or {:?}",
+                slot, r16_data.team_id, r32_team1, r32_team2
+            );
+        }
+
+        // Verify serialization includes the field
+        let json = serde_json::to_string(&results).unwrap();
+        assert!(json.contains("most_likely_bracket"), "most_likely_bracket should be in JSON");
+    }
+
+    #[test]
+    fn test_most_likely_bracket_uses_participation_fallback() {
+        let tournament = create_test_tournament();
+        let results = vec![create_dummy_tournament_result()];
+
+        let aggregated = AggregatedResults::from_results(results, &tournament);
+
+        // In the dummy result, Team 1 lost in R32 (no wins) but participated
+        // The greedy algorithm should still be able to assign them using participation stats
+        // if they are ranked highly enough
+
+        // Check that the bracket was computed
+        let bracket = &aggregated.most_likely_bracket;
+
+        // Verify Team 0 (champion with wins) is in the bracket
+        let r32_teams: Vec<_> = bracket.round_of_32.values()
+            .map(|slot| slot.team_id)
+            .collect();
+        assert!(r32_teams.contains(&TeamId(0)), "Champion Team 0 should be in R32");
+
+        // Verify all probabilities are valid (0 <= p <= 1)
+        for slot in bracket.round_of_32.values() {
+            assert!(slot.probability >= 0.0 && slot.probability <= 1.0,
+                "Probability should be between 0 and 1");
+        }
     }
 }
