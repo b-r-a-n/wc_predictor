@@ -137,7 +137,7 @@ export interface Venue {
 // Venue data file structure
 export interface VenueData {
   venues: Venue[];
-  bracketVenueMapping: Record<KnockoutRoundType, Record<string, string>>;
+  // Note: bracketVenueMapping removed - use schedule.json with matchMapping.ts for venue lookup
 }
 
 // Matchup frequencies at a specific round (matches Rust RoundMatchups)
@@ -230,7 +230,7 @@ export interface ScheduledMatch {
   venueId: string;
   round: 'group_stage' | KnockoutRoundType;
   groupId?: string;          // For group stage matches
-  knockoutSlot?: number;     // For knockout matches
+  // Note: knockoutSlot removed - derive from matchNumber using utils/matchMapping.ts
   homeTeamId?: number;       // Actual team ID if known
   awayTeamId?: number;       // Actual team ID if known
   homePlaceholder?: string;  // "A1", "1A", "W1", etc.

@@ -368,35 +368,34 @@ class ScheduleScraper(BaseScraper):
         match_num = start_match_number
 
         # Round of 32 - June 29-July 2, 2026
+        # Note: Match numbers define bracket slot via matchMapping.ts
+        # Match numbers are assigned in chronological order starting from 73
         r32_matches = [
-            # Slot 0-7: Left side of bracket
-            {"date": "2026-06-29", "time": "13:00", "venueId": "gillette", "slot": 0, "home": "1A", "away": "3C/D/E"},
-            {"date": "2026-06-29", "time": "16:00", "venueId": "metlife", "slot": 1, "home": "2B", "away": "2A"},
-            {"date": "2026-06-29", "time": "19:00", "venueId": "bbva", "slot": 2, "home": "1C", "away": "3A/B/F"},
-            {"date": "2026-06-29", "time": "22:00", "venueId": "nrg", "slot": 3, "home": "2D", "away": "2C"},
-            {"date": "2026-06-30", "time": "13:00", "venueId": "azteca", "slot": 4, "home": "1E", "away": "3G/H/I"},
-            {"date": "2026-06-30", "time": "16:00", "venueId": "mercedes_benz", "slot": 5, "home": "2F", "away": "2E"},
-            {"date": "2026-06-30", "time": "19:00", "venueId": "sofi", "slot": 6, "home": "1G", "away": "3J/K/L"},
-            {"date": "2026-06-30", "time": "22:00", "venueId": "att", "slot": 7, "home": "2H", "away": "2G"},
-            # Slot 8-15: Right side of bracket
-            {"date": "2026-07-01", "time": "13:00", "venueId": "levis", "slot": 8, "home": "1B", "away": "3A/C/D"},
-            {"date": "2026-07-01", "time": "16:00", "venueId": "lumen", "slot": 9, "home": "2A", "away": "2B"},
-            {"date": "2026-07-01", "time": "19:00", "venueId": "sofi", "slot": 10, "home": "1D", "away": "3B/E/F"},
-            {"date": "2026-07-01", "time": "22:00", "venueId": "hard_rock", "slot": 11, "home": "2C", "away": "2D"},
-            {"date": "2026-07-02", "time": "13:00", "venueId": "bc_place", "slot": 12, "home": "1F", "away": "3H/I/J"},
-            {"date": "2026-07-02", "time": "16:00", "venueId": "arrowhead", "slot": 13, "home": "2E", "away": "2F"},
-            {"date": "2026-07-02", "time": "19:00", "venueId": "bmo", "slot": 14, "home": "1H", "away": "3G/K/L"},
-            {"date": "2026-07-02", "time": "22:00", "venueId": "att", "slot": 15, "home": "2G", "away": "2H"},
+            {"date": "2026-06-29", "time": "13:00", "venueId": "gillette", "home": "1A", "away": "3C/D/E"},
+            {"date": "2026-06-29", "time": "16:00", "venueId": "metlife", "home": "2B", "away": "2A"},
+            {"date": "2026-06-29", "time": "19:00", "venueId": "bbva", "home": "1C", "away": "3A/B/F"},
+            {"date": "2026-06-29", "time": "22:00", "venueId": "nrg", "home": "2D", "away": "2C"},
+            {"date": "2026-06-30", "time": "13:00", "venueId": "azteca", "home": "1E", "away": "3G/H/I"},
+            {"date": "2026-06-30", "time": "16:00", "venueId": "mercedes_benz", "home": "2F", "away": "2E"},
+            {"date": "2026-06-30", "time": "19:00", "venueId": "sofi", "home": "1G", "away": "3J/K/L"},
+            {"date": "2026-06-30", "time": "22:00", "venueId": "att", "home": "2H", "away": "2G"},
+            {"date": "2026-07-01", "time": "13:00", "venueId": "levis", "home": "1B", "away": "3A/C/D"},
+            {"date": "2026-07-01", "time": "16:00", "venueId": "lumen", "home": "2A", "away": "2B"},
+            {"date": "2026-07-01", "time": "19:00", "venueId": "sofi", "home": "1D", "away": "3B/E/F"},
+            {"date": "2026-07-01", "time": "22:00", "venueId": "hard_rock", "home": "2C", "away": "2D"},
+            {"date": "2026-07-02", "time": "13:00", "venueId": "bc_place", "home": "1F", "away": "3H/I/J"},
+            {"date": "2026-07-02", "time": "16:00", "venueId": "arrowhead", "home": "2E", "away": "2F"},
+            {"date": "2026-07-02", "time": "19:00", "venueId": "bmo", "home": "1H", "away": "3G/K/L"},
+            {"date": "2026-07-02", "time": "22:00", "venueId": "att", "home": "2G", "away": "2H"},
         ]
 
-        for m in r32_matches:
+        for i, m in enumerate(r32_matches):
             matches.append({
                 "matchNumber": match_num,
                 "date": m["date"],
                 "time": m["time"],
                 "venueId": m["venueId"],
                 "round": "round_of_32",
-                "knockoutSlot": m["slot"],
                 "homePlaceholder": m["home"],
                 "awayPlaceholder": m["away"],
             })
@@ -404,66 +403,63 @@ class ScheduleScraper(BaseScraper):
 
         # Round of 16 - July 4-7, 2026
         r16_matches = [
-            {"date": "2026-07-04", "time": "16:00", "venueId": "metlife", "slot": 0},
-            {"date": "2026-07-04", "time": "20:00", "venueId": "att", "slot": 1},
-            {"date": "2026-07-05", "time": "16:00", "venueId": "mercedes_benz", "slot": 2},
-            {"date": "2026-07-05", "time": "20:00", "venueId": "hard_rock", "slot": 3},
-            {"date": "2026-07-06", "time": "16:00", "venueId": "sofi", "slot": 4},
-            {"date": "2026-07-06", "time": "20:00", "venueId": "nrg", "slot": 5},
-            {"date": "2026-07-07", "time": "16:00", "venueId": "lincoln_financial", "slot": 6},
-            {"date": "2026-07-07", "time": "20:00", "venueId": "azteca", "slot": 7},
+            {"date": "2026-07-04", "time": "16:00", "venueId": "metlife"},
+            {"date": "2026-07-04", "time": "20:00", "venueId": "att"},
+            {"date": "2026-07-05", "time": "16:00", "venueId": "mercedes_benz"},
+            {"date": "2026-07-05", "time": "20:00", "venueId": "hard_rock"},
+            {"date": "2026-07-06", "time": "16:00", "venueId": "sofi"},
+            {"date": "2026-07-06", "time": "20:00", "venueId": "nrg"},
+            {"date": "2026-07-07", "time": "16:00", "venueId": "lincoln_financial"},
+            {"date": "2026-07-07", "time": "20:00", "venueId": "azteca"},
         ]
 
-        for m in r16_matches:
+        for i, m in enumerate(r16_matches):
             matches.append({
                 "matchNumber": match_num,
                 "date": m["date"],
                 "time": m["time"],
                 "venueId": m["venueId"],
                 "round": "round_of_16",
-                "knockoutSlot": m["slot"],
-                "homePlaceholder": f"W{m['slot'] * 2 + 1}",
-                "awayPlaceholder": f"W{m['slot'] * 2 + 2}",
+                "homePlaceholder": f"W{i * 2 + 1}",
+                "awayPlaceholder": f"W{i * 2 + 2}",
             })
             match_num += 1
 
         # Quarter-finals - July 10-11, 2026
         qf_matches = [
-            {"date": "2026-07-10", "time": "16:00", "venueId": "metlife", "slot": 0},
-            {"date": "2026-07-10", "time": "20:00", "venueId": "sofi", "slot": 1},
-            {"date": "2026-07-11", "time": "16:00", "venueId": "hard_rock", "slot": 2},
-            {"date": "2026-07-11", "time": "20:00", "venueId": "arrowhead", "slot": 3},
+            {"date": "2026-07-10", "time": "16:00", "venueId": "metlife"},
+            {"date": "2026-07-10", "time": "20:00", "venueId": "sofi"},
+            {"date": "2026-07-11", "time": "16:00", "venueId": "hard_rock"},
+            {"date": "2026-07-11", "time": "20:00", "venueId": "arrowhead"},
         ]
 
-        for m in qf_matches:
+        for i, m in enumerate(qf_matches):
             matches.append({
                 "matchNumber": match_num,
                 "date": m["date"],
                 "time": m["time"],
                 "venueId": m["venueId"],
                 "round": "quarter_finals",
-                "knockoutSlot": m["slot"],
-                "homePlaceholder": f"WQF{m['slot'] * 2 + 1}",
-                "awayPlaceholder": f"WQF{m['slot'] * 2 + 2}",
+                "homePlaceholder": f"WQF{i * 2 + 1}",
+                "awayPlaceholder": f"WQF{i * 2 + 2}",
             })
             match_num += 1
 
         # Semi-finals - July 14-15, 2026
         sf_matches = [
-            {"date": "2026-07-14", "time": "20:00", "venueId": "att", "slot": 0},
-            {"date": "2026-07-15", "time": "20:00", "venueId": "mercedes_benz", "slot": 1},
+            {"date": "2026-07-14", "time": "20:00", "venueId": "att"},
+            {"date": "2026-07-15", "time": "20:00", "venueId": "mercedes_benz"},
         ]
 
-        for m in sf_matches:
+        for i, m in enumerate(sf_matches):
             matches.append({
                 "matchNumber": match_num,
                 "date": m["date"],
                 "time": m["time"],
                 "venueId": m["venueId"],
                 "round": "semi_finals",
-                "knockoutSlot": m["slot"],
-                "homePlaceholder": f"WSF{m['slot'] * 2 + 1}",
-                "awayPlaceholder": f"WSF{m['slot'] * 2 + 2}",
+                "homePlaceholder": f"WSF{i * 2 + 1}",
+                "awayPlaceholder": f"WSF{i * 2 + 2}",
             })
             match_num += 1
 
@@ -474,7 +470,6 @@ class ScheduleScraper(BaseScraper):
             "time": "16:00",
             "venueId": "hard_rock",
             "round": "third_place",
-            "knockoutSlot": 0,
             "homePlaceholder": "LSF1",
             "awayPlaceholder": "LSF2",
         })
@@ -487,7 +482,6 @@ class ScheduleScraper(BaseScraper):
             "time": "16:00",
             "venueId": "metlife",
             "round": "final",
-            "knockoutSlot": 0,
             "homePlaceholder": "WSF1",
             "awayPlaceholder": "WSF2",
         })

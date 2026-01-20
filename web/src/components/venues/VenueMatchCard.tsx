@@ -2,6 +2,7 @@ import type { ScheduledMatch, Team, AggregatedResults, Group } from '../../types
 import type { KnockoutPairing } from '../../utils/venueUtils';
 import { getFlagEmoji, formatPercent } from '../../utils/formatting';
 import { getRoundDisplayName, formatMatchDate, formatMatchTime, resolveKnockoutMatchPairings } from '../../utils/venueUtils';
+import { getSlotForMatch } from '../../utils/matchMapping';
 
 interface VenueMatchCardProps {
   match: ScheduledMatch;
@@ -105,7 +106,8 @@ export function VenueMatchCard({ match, teams, groups, results }: VenueMatchCard
     );
   } else {
     // Knockout match - show actual pairings from simulation results
-    const knockoutSlot = match.knockoutSlot ?? 0;
+    // Derive slot from match number using the mapping utility
+    const knockoutSlot = getSlotForMatch(match.matchNumber) ?? 0;
 
     // Get pairings for this specific knockout position
     const pairings = resolveKnockoutMatchPairings(

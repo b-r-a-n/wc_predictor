@@ -2,6 +2,7 @@ import { useMemo, useCallback, useState } from 'react';
 import { useSimulatorStore } from '../../store/simulatorStore';
 import { getFlagEmoji, formatNumber } from '../../utils/formatting';
 import { computeOptimalBracket, type OptimalBracketDisplay } from '../../utils/bracketUtils';
+import { getMatchForSlot } from '../../utils/matchMapping';
 import { BracketSlot } from './BracketSlot';
 import { MostLikelyBracketSlot } from './MostLikelyBracketSlot';
 import { BracketConnectors } from './BracketConnectors';
@@ -40,7 +41,7 @@ export function TournamentPaths() {
     results,
     teams,
     venues,
-    venueMapping,
+    schedule,
     selectedTeamForPaths,
     setSelectedTeamForPaths
   } = useSimulatorStore();
@@ -189,21 +190,23 @@ export function TournamentPaths() {
     return count / results.total_simulations;
   }, [bracketStats, results]);
 
-  // Get venue for a specific slot
+  // Get venue for a specific slot by looking up the match in the schedule
   const getSlotVenue = useCallback((
     mappingKey: KnockoutRoundType,
     slotIndex: number
   ): Venue | undefined => {
-    if (!venueMapping) return undefined;
+    if (!schedule) return undefined;
 
-    const roundMapping = venueMapping[mappingKey];
-    if (!roundMapping) return undefined;
+    // Get the match number for this round/slot
+    const matchNum = getMatchForSlot(mappingKey, slotIndex);
+    if (!matchNum) return undefined;
 
-    const venueId = roundMapping[String(slotIndex)];
-    if (!venueId) return undefined;
+    // Find the match in the schedule
+    const match = schedule.matches.find(m => m.matchNumber === matchNum);
+    if (!match) return undefined;
 
-    return venueMap.get(venueId);
-  }, [venueMapping, venueMap]);
+    return venueMap.get(match.venueId);
+  }, [schedule, venueMap]);
 
   // Get top opponents for a specific slot based on slot-specific stats
   // Falls back to round-level stats if slot-specific data is unavailable

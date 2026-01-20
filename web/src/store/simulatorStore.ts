@@ -38,7 +38,6 @@ interface SimulatorState {
   // Path visualization state
   selectedTeamForPaths: number | null;
   venues: Venue[] | null;
-  venueMapping: Record<string, Record<string, string>> | null;
 
   // Schedule state
   schedule: MatchScheduleData | null;
@@ -104,7 +103,6 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
   // Initial path visualization state
   selectedTeamForPaths: null,
   venues: null,
-  venueMapping: null,
 
   // Initial schedule state
   schedule: null,
@@ -153,10 +151,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
     try {
       const response = await fetch(`${import.meta.env.BASE_URL}data/venues.json`);
       const data: VenueData = await response.json();
-      set({
-        venues: data.venues,
-        venueMapping: data.bracketVenueMapping
-      });
+      set({ venues: data.venues });
     } catch (error) {
       console.error('Failed to load venues:', error);
     }

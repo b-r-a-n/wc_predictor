@@ -726,7 +726,6 @@
       "time": "15:00",
       "venueId": "sofi",
       "round": "round_of_32",
-      "knockoutSlot": 2,
       "homePlaceholder": "2A",
       "awayPlaceholder": "2B"
     },
@@ -736,7 +735,6 @@
       "time": "16:30",
       "venueId": "gillette",
       "round": "round_of_32",
-      "knockoutSlot": 0,
       "homePlaceholder": "1E",
       "awayPlaceholder": "3A/B/C/D/F"
     },
@@ -746,7 +744,6 @@
       "time": "21:00",
       "venueId": "bbva",
       "round": "round_of_32",
-      "knockoutSlot": 3,
       "homePlaceholder": "1F",
       "awayPlaceholder": "2C"
     },
@@ -756,7 +753,6 @@
       "time": "13:00",
       "venueId": "nrg",
       "round": "round_of_32",
-      "knockoutSlot": 4,
       "homePlaceholder": "1C",
       "awayPlaceholder": "2F"
     },
@@ -766,7 +762,6 @@
       "time": "17:00",
       "venueId": "metlife",
       "round": "round_of_32",
-      "knockoutSlot": 1,
       "homePlaceholder": "1I",
       "awayPlaceholder": "3C/D/F/G/H"
     },
@@ -776,7 +771,6 @@
       "time": "13:00",
       "venueId": "att",
       "round": "round_of_32",
-      "knockoutSlot": 5,
       "homePlaceholder": "2E",
       "awayPlaceholder": "2I"
     },
@@ -786,7 +780,6 @@
       "time": "21:00",
       "venueId": "azteca",
       "round": "round_of_32",
-      "knockoutSlot": 6,
       "homePlaceholder": "1A",
       "awayPlaceholder": "3C/E/F/H/I"
     },
@@ -796,7 +789,6 @@
       "time": "12:00",
       "venueId": "mercedes_benz",
       "round": "round_of_32",
-      "knockoutSlot": 7,
       "homePlaceholder": "1L",
       "awayPlaceholder": "3E/H/I/J/K"
     },
@@ -806,7 +798,6 @@
       "time": "20:00",
       "venueId": "levis",
       "round": "round_of_32",
-      "knockoutSlot": 10,
       "homePlaceholder": "1D",
       "awayPlaceholder": "3B/E/F/I/J"
     },
@@ -816,7 +807,6 @@
       "time": "16:00",
       "venueId": "lumen",
       "round": "round_of_32",
-      "knockoutSlot": 11,
       "homePlaceholder": "1G",
       "awayPlaceholder": "3A/E/H/I/J"
     },
@@ -826,7 +816,6 @@
       "time": "19:00",
       "venueId": "bmo",
       "round": "round_of_32",
-      "knockoutSlot": 8,
       "homePlaceholder": "2K",
       "awayPlaceholder": "2L"
     },
@@ -836,7 +825,6 @@
       "time": "15:00",
       "venueId": "sofi",
       "round": "round_of_32",
-      "knockoutSlot": 9,
       "homePlaceholder": "1H",
       "awayPlaceholder": "2J"
     },
@@ -846,7 +834,6 @@
       "time": "23:00",
       "venueId": "bc_place",
       "round": "round_of_32",
-      "knockoutSlot": 14,
       "homePlaceholder": "1B",
       "awayPlaceholder": "3E/F/G/I/J"
     },
@@ -856,7 +843,6 @@
       "time": "18:00",
       "venueId": "hard_rock",
       "round": "round_of_32",
-      "knockoutSlot": 12,
       "homePlaceholder": "1J",
       "awayPlaceholder": "2H"
     },
@@ -866,7 +852,6 @@
       "time": "21:30",
       "venueId": "arrowhead",
       "round": "round_of_32",
-      "knockoutSlot": 15,
       "homePlaceholder": "1K",
       "awayPlaceholder": "3D/E/I/J/L"
     },
@@ -876,7 +861,6 @@
       "time": "14:00",
       "venueId": "att",
       "round": "round_of_32",
-      "knockoutSlot": 13,
       "homePlaceholder": "2D",
       "awayPlaceholder": "2G"
     },
@@ -886,7 +870,6 @@
       "time": "13:00",
       "venueId": "nrg",
       "round": "round_of_16",
-      "knockoutSlot": 0,
       "homePlaceholder": "W1",
       "awayPlaceholder": "W2"
     },
@@ -896,7 +879,6 @@
       "time": "17:00",
       "venueId": "lincoln_financial",
       "round": "round_of_16",
-      "knockoutSlot": 1,
       "homePlaceholder": "W3",
       "awayPlaceholder": "W4"
     },
@@ -906,7 +888,6 @@
       "time": "16:00",
       "venueId": "metlife",
       "round": "round_of_16",
-      "knockoutSlot": 2,
       "homePlaceholder": "W5",
       "awayPlaceholder": "W6"
     },
@@ -916,7 +897,6 @@
       "time": "20:00",
       "venueId": "azteca",
       "round": "round_of_16",
-      "knockoutSlot": 3,
       "homePlaceholder": "W7",
       "awayPlaceholder": "W8"
     },
@@ -926,7 +906,6 @@
       "time": "15:00",
       "venueId": "att",
       "round": "round_of_16",
-      "knockoutSlot": 4,
       "homePlaceholder": "W9",
       "awayPlaceholder": "W10"
     },
@@ -936,7 +915,6 @@
       "time": "20:00",
       "venueId": "lumen",
       "round": "round_of_16",
-      "knockoutSlot": 5,
       "homePlaceholder": "W11",
       "awayPlaceholder": "W12"
     },
@@ -946,7 +924,6 @@
       "time": "12:00",
       "venueId": "mercedes_benz",
       "round": "round_of_16",
-      "knockoutSlot": 6,
       "homePlaceholder": "W13",
       "awayPlaceholder": "W14"
     },
@@ -956,7 +933,6 @@
       "time": "16:00",
       "venueId": "bc_place",
       "round": "round_of_16",
-      "knockoutSlot": 7,
       "homePlaceholder": "W15",
       "awayPlaceholder": "W16"
     },
@@ -966,7 +942,6 @@
       "time": "16:00",
       "venueId": "gillette",
       "round": "quarter_finals",
-      "knockoutSlot": 0,
       "homePlaceholder": "WQF1",
       "awayPlaceholder": "WQF2"
     },
@@ -976,7 +951,6 @@
       "time": "15:00",
       "venueId": "sofi",
       "round": "quarter_finals",
-      "knockoutSlot": 1,
       "homePlaceholder": "WQF3",
       "awayPlaceholder": "WQF4"
     },
@@ -986,7 +960,6 @@
       "time": "17:00",
       "venueId": "hard_rock",
       "round": "quarter_finals",
-      "knockoutSlot": 2,
       "homePlaceholder": "WQF5",
       "awayPlaceholder": "WQF6"
     },
@@ -996,7 +969,6 @@
       "time": "21:00",
       "venueId": "arrowhead",
       "round": "quarter_finals",
-      "knockoutSlot": 3,
       "homePlaceholder": "WQF7",
       "awayPlaceholder": "WQF8"
     },
@@ -1006,7 +978,6 @@
       "time": "15:00",
       "venueId": "att",
       "round": "semi_finals",
-      "knockoutSlot": 0,
       "homePlaceholder": "WSF1",
       "awayPlaceholder": "WSF2"
     },
@@ -1016,7 +987,6 @@
       "time": "15:00",
       "venueId": "mercedes_benz",
       "round": "semi_finals",
-      "knockoutSlot": 1,
       "homePlaceholder": "WSF3",
       "awayPlaceholder": "WSF4"
     },
@@ -1026,7 +996,6 @@
       "time": "17:00",
       "venueId": "hard_rock",
       "round": "third_place",
-      "knockoutSlot": 0,
       "homePlaceholder": "LSF1",
       "awayPlaceholder": "LSF2"
     },
@@ -1036,7 +1005,6 @@
       "time": "15:00",
       "venueId": "metlife",
       "round": "final",
-      "knockoutSlot": 0,
       "homePlaceholder": "WSF1",
       "awayPlaceholder": "WSF2"
     }
