@@ -1,15 +1,96 @@
-import type { Team, AggregatedResults, MostLikelyBracket, MostLikelySlotData, BracketSlotStats } from '../types';
+import type { Team, AggregatedResults, MostLikelyBracket, MostLikelySlotData, BracketSlotStats, RustMostFrequentBracket } from '../types';
 
 type RoundKey = 'round_of_32' | 'round_of_16' | 'quarter_finals' | 'semi_finals';
 
 /**
- * Compute the most likely bracket by finding the most probable team for each slot.
- * Aggregates bracket_slot_stats across all teams to find winners.
+ * Build MostLikelyBracket from the Rust-computed most_frequent_bracket data.
+ * This ensures each team appears at most once in the bracket.
+ */
+function buildFromMostFrequentBracket(
+  rustBracket: RustMostFrequentBracket,
+  teamMap: Map<number, Team>
+): MostLikelyBracket {
+  const bracket: MostLikelyBracket = {
+    round_of_32: {},
+    round_of_16: {},
+    quarter_finals: {},
+    semi_finals: {},
+    final_match: null,
+    champion: null,
+  };
+
+  const { count, probability } = rustBracket;
+
+  // Helper to create slot data
+  const makeSlotData = (teamId: number): MostLikelySlotData | null => {
+    const team = teamMap.get(teamId);
+    if (!team) return null;
+    return { teamId, team, count, probability };
+  };
+
+  // R32 winners (16 matches) - each winner goes to corresponding R16 slot
+  for (let i = 0; i < rustBracket.round_of_32_winners.length; i++) {
+    const teamId = rustBracket.round_of_32_winners[i];
+    const slotData = makeSlotData(teamId);
+    if (slotData) {
+      bracket.round_of_32[String(i)] = slotData;
+    }
+  }
+
+  // R16 winners (8 matches)
+  for (let i = 0; i < rustBracket.round_of_16_winners.length; i++) {
+    const teamId = rustBracket.round_of_16_winners[i];
+    const slotData = makeSlotData(teamId);
+    if (slotData) {
+      bracket.round_of_16[String(i)] = slotData;
+    }
+  }
+
+  // QF winners (4 matches)
+  for (let i = 0; i < rustBracket.quarter_final_winners.length; i++) {
+    const teamId = rustBracket.quarter_final_winners[i];
+    const slotData = makeSlotData(teamId);
+    if (slotData) {
+      bracket.quarter_finals[String(i)] = slotData;
+    }
+  }
+
+  // SF winners (2 matches)
+  for (let i = 0; i < rustBracket.semi_final_winners.length; i++) {
+    const teamId = rustBracket.semi_final_winners[i];
+    const slotData = makeSlotData(teamId);
+    if (slotData) {
+      bracket.semi_finals[String(i)] = slotData;
+    }
+  }
+
+  // Final: show the champion in the final slot
+  const championSlotData = makeSlotData(rustBracket.champion);
+  if (championSlotData) {
+    bracket.final_match = championSlotData;
+    bracket.champion = championSlotData;
+  }
+
+  return bracket;
+}
+
+/**
+ * Compute the most likely bracket.
+ *
+ * If results.most_frequent_bracket is available (from Rust aggregation),
+ * uses that to ensure each team appears exactly once (complete bracket outcome).
+ * Otherwise, falls back to per-slot independent selection (legacy behavior).
  */
 export function computeMostLikelyBracket(
   results: AggregatedResults,
   teamMap: Map<number, Team>
 ): MostLikelyBracket | null {
+  // Prefer the Rust-computed most frequent bracket (ensures uniqueness)
+  if (results.most_frequent_bracket) {
+    return buildFromMostFrequentBracket(results.most_frequent_bracket, teamMap);
+  }
+
+  // Fallback: per-slot independent selection (may have duplicates)
   const bracketSlotStats = results.bracket_slot_stats;
   if (!bracketSlotStats) return null;
 

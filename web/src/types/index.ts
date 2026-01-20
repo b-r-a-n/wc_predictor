@@ -56,6 +56,18 @@ export interface TeamStatistics {
   knockout_probability: number;
 }
 
+// Most frequent complete bracket outcome from Rust aggregation
+// This ensures each team appears at most once (unlike per-slot picks)
+export interface RustMostFrequentBracket {
+  count: number;
+  probability: number;
+  round_of_32_winners: number[];  // 16 team IDs (one per R32 match)
+  round_of_16_winners: number[];  // 8 team IDs (one per R16 match)
+  quarter_final_winners: number[]; // 4 team IDs (one per QF match)
+  semi_final_winners: number[];   // 2 team IDs (one per SF match)
+  champion: number;
+}
+
 export interface AggregatedResults {
   total_simulations: number;
   team_stats: Record<string, TeamStatistics>;  // Keys are stringified numbers due to JSON serialization
@@ -64,6 +76,7 @@ export interface AggregatedResults {
   path_stats?: Record<string, PathStatistics>;  // Path statistics for each team (keys are stringified TeamIds)
   bracket_slot_stats?: Record<string, BracketSlotStats>;  // Bracket slot statistics for each team (keys are stringified TeamIds)
   slot_opponent_stats?: Record<string, SlotOpponentStats>;  // Slot-specific opponent statistics (keys are stringified TeamIds)
+  most_frequent_bracket?: RustMostFrequentBracket;  // Most frequent complete bracket outcome
 }
 
 // Match probability types

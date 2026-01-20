@@ -9,6 +9,26 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use wc_core::TeamId;
 
+/// Represents the most frequently occurring complete bracket outcome across all simulations.
+/// This ensures each team appears at most once in the bracket (unlike per-slot independent picks).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MostFrequentBracket {
+    /// Number of times this exact bracket occurred
+    pub count: u32,
+    /// Probability of this bracket (count / total_simulations)
+    pub probability: f64,
+    /// Winners of Round of 32 (16 team IDs, one per match)
+    pub round_of_32_winners: Vec<TeamId>,
+    /// Winners of Round of 16 (8 team IDs, one per match)
+    pub round_of_16_winners: Vec<TeamId>,
+    /// Winners of Quarter-finals (4 team IDs, one per match)
+    pub quarter_final_winners: Vec<TeamId>,
+    /// Winners of Semi-finals (2 team IDs, one per match)
+    pub semi_final_winners: Vec<TeamId>,
+    /// Tournament champion
+    pub champion: TeamId,
+}
+
 /// Tracks which bracket slots (positions) a team plays in at each knockout round.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct BracketSlotStats {

@@ -325,14 +325,32 @@ export function TournamentPaths() {
       {/* Selected team header */}
       {selectedTeam && (
         <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-4 text-white">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">{getFlagEmoji(selectedTeam.code)}</span>
-            <div>
-              <h3 className="text-xl font-bold">{selectedTeam.name}</h3>
-              <p className="text-blue-100 text-sm">
-                Bracket position probabilities - hover for match info, click for opponents
-              </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">{getFlagEmoji(selectedTeam.code)}</span>
+              <div>
+                <h3 className="text-xl font-bold">{selectedTeam.name}</h3>
+                <p className="text-blue-100 text-sm">
+                  Bracket position probabilities - hover for match info, click for opponents
+                </p>
+              </div>
             </div>
+            <button
+              onClick={() => setSelectedTeamForPaths(null)}
+              className="p-2 hover:bg-blue-400/30 rounded-full transition-colors"
+              title="Clear selection"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         </div>
       )}

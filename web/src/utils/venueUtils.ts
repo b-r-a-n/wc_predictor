@@ -1,6 +1,16 @@
 // Venue utility functions for resolving match participants
 
-import type { Team, TeamProbability, AggregatedResults, BracketSlotStats, KnockoutRoundType } from '../types';
+import type { Team, TeamProbability, AggregatedResults, BracketSlotStats, KnockoutRoundType, SlotOpponentStats } from '../types';
+
+/**
+ * Represents a specific knockout pairing (two teams that face each other)
+ */
+export interface KnockoutPairing {
+  teamA: Team;
+  teamB: Team;
+  probability: number;
+  count: number;
+}
 
 /**
  * Threshold for displaying a team as a candidate (5%)
@@ -138,4 +148,112 @@ export function formatMatchTime(timeStr: string): string {
   const period = hours >= 12 ? 'PM' : 'AM';
   const displayHours = hours % 12 || 12;
   return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+}
+
+/**
+ * Resolves the most likely pairings (actual matchups) for a knockout match slot.
+ * Uses slot_opponent_stats to find which teams faced each other in a specific slot.
+ *
+ * @param round - The knockout round type
+ * @param slot - The slot index within the round
+ * @param results - Aggregated simulation results
+ * @param teams - Array of all teams
+ * @param maxPairings - Maximum number of pairings to return (default 5)
+ * @returns Array of pairings sorted by probability descending
+ */
+export function resolveKnockoutMatchPairings(
+  round: KnockoutRoundType,
+  slot: number,
+  results: AggregatedResults | null,
+  teams: Team[],
+  maxPairings: number = 5
+): KnockoutPairing[] {
+  if (!results || !results.slot_opponent_stats) {
+    return [];
+  }
+
+  const totalSimulations = results.total_simulations;
+  if (totalSimulations === 0) {
+    return [];
+  }
+
+  // Create team lookup
+  const teamMap = new Map<number, Team>();
+  for (const team of teams) {
+    teamMap.set(team.id, team);
+  }
+
+  // Aggregate pairings using canonical key (smaller ID first) to avoid double-counting
+  const pairingCounts = new Map<string, { teamAId: number; teamBId: number; count: number }>();
+
+  const roundKey = getRoundKey(round);
+
+  // Iterate through all teams' slot opponent stats
+  for (const [teamIdStr, stats] of Object.entries(results.slot_opponent_stats)) {
+    const teamId = parseInt(teamIdStr, 10);
+    const slotStats = stats as SlotOpponentStats;
+
+    // For final, use final_match directly (single slot)
+    if (roundKey === 'final_match') {
+      const opponents = slotStats.final_match;
+      if (opponents) {
+        for (const [oppIdStr, count] of Object.entries(opponents)) {
+          const oppId = parseInt(oppIdStr, 10);
+          // Use canonical key (smaller ID first)
+          const [idA, idB] = teamId < oppId ? [teamId, oppId] : [oppId, teamId];
+          const key = `${idA}-${idB}`;
+
+          if (!pairingCounts.has(key)) {
+            pairingCounts.set(key, { teamAId: idA, teamBId: idB, count: 0 });
+          }
+          // Each pairing is recorded twice (once by each team), so we only add half
+          // But since we're iterating through all teams, we'll just track the max
+          const existing = pairingCounts.get(key)!;
+          // Take the count from one side (they should be equal)
+          existing.count = Math.max(existing.count, count);
+        }
+      }
+    } else {
+      // For other rounds, get slot-specific opponent data
+      const roundData = slotStats[roundKey as keyof Omit<SlotOpponentStats, 'final_match'>] as Record<string, Record<string, number>> | undefined;
+      if (!roundData) continue;
+
+      const slotData = roundData[String(slot)];
+      if (!slotData) continue;
+
+      for (const [oppIdStr, count] of Object.entries(slotData)) {
+        const oppId = parseInt(oppIdStr, 10);
+        // Use canonical key (smaller ID first)
+        const [idA, idB] = teamId < oppId ? [teamId, oppId] : [oppId, teamId];
+        const key = `${idA}-${idB}`;
+
+        if (!pairingCounts.has(key)) {
+          pairingCounts.set(key, { teamAId: idA, teamBId: idB, count: 0 });
+        }
+        const existing = pairingCounts.get(key)!;
+        existing.count = Math.max(existing.count, count);
+      }
+    }
+  }
+
+  // Convert to array and sort by count
+  const pairingsArray = Array.from(pairingCounts.values())
+    .sort((a, b) => b.count - a.count)
+    .slice(0, maxPairings);
+
+  // Map to KnockoutPairing objects
+  return pairingsArray
+    .map(({ teamAId, teamBId, count }) => {
+      const teamA = teamMap.get(teamAId);
+      const teamB = teamMap.get(teamBId);
+      if (!teamA || !teamB) return null;
+
+      return {
+        teamA,
+        teamB,
+        count,
+        probability: count / totalSimulations,
+      };
+    })
+    .filter((p): p is KnockoutPairing => p !== null);
 }

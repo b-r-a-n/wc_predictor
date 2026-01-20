@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use wc_core::{MatchResult, TeamId, Tournament, TournamentResult};
 
-use crate::path_tracker::{BracketSlotStats, PathStatistics, SlotOpponentStats};
+use crate::path_tracker::{BracketSlotStats, MostFrequentBracket, PathStatistics, SlotOpponentStats};
 
 /// Aggregated statistics from multiple tournament simulations.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -25,6 +25,8 @@ pub struct AggregatedResults {
     pub bracket_slot_stats: HashMap<TeamId, BracketSlotStats>,
     /// Slot-specific opponent statistics (who did they face in each specific slot)
     pub slot_opponent_stats: HashMap<TeamId, SlotOpponentStats>,
+    /// The most frequently occurring complete bracket outcome
+    pub most_frequent_bracket: Option<MostFrequentBracket>,
 }
 
 /// Statistics for a single team across all simulations.
@@ -88,6 +90,11 @@ impl AggregatedResults {
         let mut bracket_slot_stats: HashMap<TeamId, BracketSlotStats> = HashMap::new();
 
         let mut slot_opponent_stats: HashMap<TeamId, SlotOpponentStats> = HashMap::new();
+
+        // Track complete bracket outcomes for finding the most frequent bracket
+        // Key: signature string of winner IDs, Value: (count, first KnockoutBracket that produced it)
+        let mut bracket_outcomes: HashMap<String, (u32, wc_core::KnockoutBracket)> = HashMap::new();
+        const MAX_UNIQUE_BRACKETS: usize = 1000; // Limit memory usage
 
         // Initialize stats for all teams
         for team in &tournament.teams {
@@ -209,6 +216,16 @@ impl AggregatedResults {
                         stats.reached_round_of_32 += 1;
                     }
                 }
+            }
+
+            // Track complete bracket outcome
+            // Create signature from all match winners
+            let bracket_sig = create_bracket_signature(&result.knockout_bracket);
+            if bracket_outcomes.len() < MAX_UNIQUE_BRACKETS || bracket_outcomes.contains_key(&bracket_sig) {
+                bracket_outcomes
+                    .entry(bracket_sig)
+                    .and_modify(|(count, _)| *count += 1)
+                    .or_insert((1, result.knockout_bracket.clone()));
             }
 
             // Track later rounds from knockout bracket results
@@ -383,6 +400,47 @@ impl AggregatedResults {
             .map(|(teams, _)| teams)
             .unwrap_or((TeamId(0), TeamId(1)));
 
+        // Find the most frequent complete bracket outcome
+        let most_frequent_bracket = if let Some((_, (count, bracket))) = bracket_outcomes
+            .into_iter()
+            .max_by_key(|(_, (count, _))| *count)
+        {
+            // Extract winner IDs from each round
+            let r32_winners: Vec<TeamId> = bracket
+                .round_of_32
+                .iter()
+                .filter_map(|m| m.winner())
+                .collect();
+            let r16_winners: Vec<TeamId> = bracket
+                .round_of_16
+                .iter()
+                .filter_map(|m| m.winner())
+                .collect();
+            let qf_winners: Vec<TeamId> = bracket
+                .quarter_finals
+                .iter()
+                .filter_map(|m| m.winner())
+                .collect();
+            let sf_winners: Vec<TeamId> = bracket
+                .semi_finals
+                .iter()
+                .filter_map(|m| m.winner())
+                .collect();
+            let champion = bracket.final_match.winner().unwrap_or(TeamId(0));
+
+            Some(MostFrequentBracket {
+                count,
+                probability: count as f64 / total as f64,
+                round_of_32_winners: r32_winners,
+                round_of_16_winners: r16_winners,
+                quarter_final_winners: qf_winners,
+                semi_final_winners: sf_winners,
+                champion,
+            })
+        } else {
+            None
+        };
+
         Self {
             total_simulations: total,
             team_stats,
@@ -391,6 +449,7 @@ impl AggregatedResults {
             path_stats,
             bracket_slot_stats,
             slot_opponent_stats,
+            most_frequent_bracket,
         }
     }
 
@@ -423,6 +482,47 @@ fn find_opponent(matches: &[MatchResult], team_id: TeamId) -> Option<TeamId> {
         }
     }
     None
+}
+
+/// Create a unique signature string for a complete bracket outcome.
+/// The signature is based on all match winners in order.
+fn create_bracket_signature(bracket: &wc_core::KnockoutBracket) -> String {
+    let mut parts = Vec::new();
+
+    // R32 winners (16 matches)
+    for m in &bracket.round_of_32 {
+        if let Some(winner) = m.winner() {
+            parts.push(winner.0.to_string());
+        }
+    }
+
+    // R16 winners (8 matches)
+    for m in &bracket.round_of_16 {
+        if let Some(winner) = m.winner() {
+            parts.push(winner.0.to_string());
+        }
+    }
+
+    // QF winners (4 matches)
+    for m in &bracket.quarter_finals {
+        if let Some(winner) = m.winner() {
+            parts.push(winner.0.to_string());
+        }
+    }
+
+    // SF winners (2 matches)
+    for m in &bracket.semi_finals {
+        if let Some(winner) = m.winner() {
+            parts.push(winner.0.to_string());
+        }
+    }
+
+    // Final winner (champion)
+    if let Some(champion) = bracket.final_match.winner() {
+        parts.push(champion.0.to_string());
+    }
+
+    parts.join("-")
 }
 
 #[cfg(test)]
