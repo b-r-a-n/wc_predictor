@@ -47,9 +47,15 @@ pub struct R32Match {
 /// - R32[0] winner vs R32[1] winner -> R16[0]
 /// - R32[2] winner vs R32[3] winner -> R16[1]
 /// - etc.
+///
+/// FIFA R16 pairings (from regulations):
+///   M89: W74 vs W77    M93: W83 vs W84
+///   M90: W73 vs W75    M94: W81 vs W82
+///   M91: W76 vs W78    M95: W86 vs W88
+///   M92: W79 vs W80    M96: W85 vs W87
 pub const R32_BRACKET: [R32Match; 16] = [
-    // Bracket Half 1 (matches feeding into one side of the bracket)
-    // R16 Match 89: M74 winner vs M77 winner
+    // Bracket Half 1 (feeds into QF A and QF C)
+    // R16 Match 89: W74 vs W77
     R32Match {
         match_num: 74,
         team_a: SlotSource::GroupTeam { group: 'E', position: GroupPosition::Winner },
@@ -60,18 +66,29 @@ pub const R32_BRACKET: [R32Match; 16] = [
         team_a: SlotSource::GroupTeam { group: 'I', position: GroupPosition::Winner },
         team_b: SlotSource::ThirdPlacePool { slot_index: 1 }, // 3(C/D/F/G/H)
     },
-    // R16 Match 90: M75 winner vs M76 winner
+    // R16 Match 90: W73 vs W75
+    R32Match {
+        match_num: 73,
+        team_a: SlotSource::GroupTeam { group: 'A', position: GroupPosition::RunnerUp },
+        team_b: SlotSource::GroupTeam { group: 'B', position: GroupPosition::RunnerUp },
+    },
     R32Match {
         match_num: 75,
         team_a: SlotSource::GroupTeam { group: 'F', position: GroupPosition::Winner },
         team_b: SlotSource::GroupTeam { group: 'C', position: GroupPosition::RunnerUp },
     },
+    // R16 Match 91: W76 vs W78
     R32Match {
         match_num: 76,
         team_a: SlotSource::GroupTeam { group: 'C', position: GroupPosition::Winner },
         team_b: SlotSource::GroupTeam { group: 'F', position: GroupPosition::RunnerUp },
     },
-    // R16 Match 91: M79 winner vs M80 winner
+    R32Match {
+        match_num: 78,
+        team_a: SlotSource::GroupTeam { group: 'E', position: GroupPosition::RunnerUp },
+        team_b: SlotSource::GroupTeam { group: 'I', position: GroupPosition::RunnerUp },
+    },
+    // R16 Match 92: W79 vs W80
     R32Match {
         match_num: 79,
         team_a: SlotSource::GroupTeam { group: 'A', position: GroupPosition::Winner },
@@ -82,20 +99,20 @@ pub const R32_BRACKET: [R32Match; 16] = [
         team_a: SlotSource::GroupTeam { group: 'L', position: GroupPosition::Winner },
         team_b: SlotSource::ThirdPlacePool { slot_index: 3 }, // 3(E/H/I/J/K)
     },
-    // R16 Match 92: M73 winner vs M78 winner
-    R32Match {
-        match_num: 73,
-        team_a: SlotSource::GroupTeam { group: 'A', position: GroupPosition::RunnerUp },
-        team_b: SlotSource::GroupTeam { group: 'B', position: GroupPosition::RunnerUp },
-    },
-    R32Match {
-        match_num: 78,
-        team_a: SlotSource::GroupTeam { group: 'E', position: GroupPosition::RunnerUp },
-        team_b: SlotSource::GroupTeam { group: 'I', position: GroupPosition::RunnerUp },
-    },
 
-    // Bracket Half 2 (matches feeding into other side of the bracket)
-    // R16 Match 93: M81 winner vs M82 winner
+    // Bracket Half 2 (feeds into QF B and QF D)
+    // R16 Match 93: W83 vs W84
+    R32Match {
+        match_num: 83,
+        team_a: SlotSource::GroupTeam { group: 'K', position: GroupPosition::RunnerUp },
+        team_b: SlotSource::GroupTeam { group: 'L', position: GroupPosition::RunnerUp },
+    },
+    R32Match {
+        match_num: 84,
+        team_a: SlotSource::GroupTeam { group: 'H', position: GroupPosition::Winner },
+        team_b: SlotSource::GroupTeam { group: 'J', position: GroupPosition::RunnerUp },
+    },
+    // R16 Match 94: W81 vs W82
     R32Match {
         match_num: 81,
         team_a: SlotSource::GroupTeam { group: 'D', position: GroupPosition::Winner },
@@ -106,18 +123,18 @@ pub const R32_BRACKET: [R32Match; 16] = [
         team_a: SlotSource::GroupTeam { group: 'G', position: GroupPosition::Winner },
         team_b: SlotSource::ThirdPlacePool { slot_index: 5 }, // 3(A/E/H/I/J)
     },
-    // R16 Match 94: M84 winner vs M86 winner
-    R32Match {
-        match_num: 84,
-        team_a: SlotSource::GroupTeam { group: 'H', position: GroupPosition::Winner },
-        team_b: SlotSource::GroupTeam { group: 'J', position: GroupPosition::RunnerUp },
-    },
+    // R16 Match 95: W86 vs W88
     R32Match {
         match_num: 86,
         team_a: SlotSource::GroupTeam { group: 'J', position: GroupPosition::Winner },
         team_b: SlotSource::GroupTeam { group: 'H', position: GroupPosition::RunnerUp },
     },
-    // R16 Match 95: M85 winner vs M87 winner
+    R32Match {
+        match_num: 88,
+        team_a: SlotSource::GroupTeam { group: 'D', position: GroupPosition::RunnerUp },
+        team_b: SlotSource::GroupTeam { group: 'G', position: GroupPosition::RunnerUp },
+    },
+    // R16 Match 96: W85 vs W87
     R32Match {
         match_num: 85,
         team_a: SlotSource::GroupTeam { group: 'B', position: GroupPosition::Winner },
@@ -127,17 +144,6 @@ pub const R32_BRACKET: [R32Match; 16] = [
         match_num: 87,
         team_a: SlotSource::GroupTeam { group: 'K', position: GroupPosition::Winner },
         team_b: SlotSource::ThirdPlacePool { slot_index: 7 }, // 3(D/E/I/J/L)
-    },
-    // R16 Match 96: M83 winner vs M88 winner
-    R32Match {
-        match_num: 83,
-        team_a: SlotSource::GroupTeam { group: 'K', position: GroupPosition::RunnerUp },
-        team_b: SlotSource::GroupTeam { group: 'L', position: GroupPosition::RunnerUp },
-    },
-    R32Match {
-        match_num: 88,
-        team_a: SlotSource::GroupTeam { group: 'D', position: GroupPosition::RunnerUp },
-        team_b: SlotSource::GroupTeam { group: 'G', position: GroupPosition::RunnerUp },
     },
 ];
 

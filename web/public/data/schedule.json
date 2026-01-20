@@ -721,24 +721,24 @@
       "matchNumber": 72
     },
     {
-      "matchNumber": 73,
+      "matchNumber": 74,
       "date": "2026-06-29",
       "time": "13:00",
       "venueId": "gillette",
       "round": "round_of_32",
       "knockoutSlot": 0,
-      "homePlaceholder": "1A",
-      "awayPlaceholder": "3C/D/E"
+      "homePlaceholder": "1E",
+      "awayPlaceholder": "3A/B/C/D/F"
     },
     {
-      "matchNumber": 74,
+      "matchNumber": 77,
       "date": "2026-06-29",
       "time": "16:00",
       "venueId": "metlife",
       "round": "round_of_32",
       "knockoutSlot": 1,
-      "homePlaceholder": "2B",
-      "awayPlaceholder": "2A"
+      "homePlaceholder": "1I",
+      "awayPlaceholder": "3C/D/F/G/H"
     },
     {
       "matchNumber": 75,
@@ -746,9 +746,9 @@
       "time": "19:00",
       "venueId": "bbva",
       "round": "round_of_32",
-      "knockoutSlot": 2,
-      "homePlaceholder": "1C",
-      "awayPlaceholder": "3A/B/F"
+      "knockoutSlot": 3,
+      "homePlaceholder": "1F",
+      "awayPlaceholder": "2C"
     },
     {
       "matchNumber": 76,
@@ -756,49 +756,49 @@
       "time": "22:00",
       "venueId": "nrg",
       "round": "round_of_32",
-      "knockoutSlot": 3,
-      "homePlaceholder": "2D",
-      "awayPlaceholder": "2C"
-    },
-    {
-      "matchNumber": 77,
-      "date": "2026-06-30",
-      "time": "13:00",
-      "venueId": "azteca",
-      "round": "round_of_32",
       "knockoutSlot": 4,
-      "homePlaceholder": "1E",
-      "awayPlaceholder": "3G/H/I"
-    },
-    {
-      "matchNumber": 78,
-      "date": "2026-06-30",
-      "time": "16:00",
-      "venueId": "mercedes_benz",
-      "round": "round_of_32",
-      "knockoutSlot": 5,
-      "homePlaceholder": "2F",
-      "awayPlaceholder": "2E"
+      "homePlaceholder": "1C",
+      "awayPlaceholder": "2F"
     },
     {
       "matchNumber": 79,
       "date": "2026-06-30",
-      "time": "19:00",
-      "venueId": "sofi",
+      "time": "13:00",
+      "venueId": "azteca",
       "round": "round_of_32",
       "knockoutSlot": 6,
-      "homePlaceholder": "1G",
-      "awayPlaceholder": "3J/K/L"
+      "homePlaceholder": "1A",
+      "awayPlaceholder": "3C/E/F/H/I"
     },
     {
       "matchNumber": 80,
       "date": "2026-06-30",
+      "time": "16:00",
+      "venueId": "mercedes_benz",
+      "round": "round_of_32",
+      "knockoutSlot": 7,
+      "homePlaceholder": "1L",
+      "awayPlaceholder": "3E/H/I/J/K"
+    },
+    {
+      "matchNumber": 73,
+      "date": "2026-06-30",
+      "time": "19:00",
+      "venueId": "sofi",
+      "round": "round_of_32",
+      "knockoutSlot": 2,
+      "homePlaceholder": "2A",
+      "awayPlaceholder": "2B"
+    },
+    {
+      "matchNumber": 78,
+      "date": "2026-06-30",
       "time": "22:00",
       "venueId": "att",
       "round": "round_of_32",
-      "knockoutSlot": 7,
-      "homePlaceholder": "2H",
-      "awayPlaceholder": "2G"
+      "knockoutSlot": 5,
+      "homePlaceholder": "2E",
+      "awayPlaceholder": "2I"
     },
     {
       "matchNumber": 81,
@@ -806,9 +806,9 @@
       "time": "13:00",
       "venueId": "levis",
       "round": "round_of_32",
-      "knockoutSlot": 8,
-      "homePlaceholder": "1B",
-      "awayPlaceholder": "3A/C/D"
+      "knockoutSlot": 10,
+      "homePlaceholder": "1D",
+      "awayPlaceholder": "3B/E/F/I/J"
     },
     {
       "matchNumber": 82,
@@ -816,29 +816,29 @@
       "time": "16:00",
       "venueId": "lumen",
       "round": "round_of_32",
-      "knockoutSlot": 9,
-      "homePlaceholder": "2A",
-      "awayPlaceholder": "2B"
-    },
-    {
-      "matchNumber": 83,
-      "date": "2026-07-01",
-      "time": "19:00",
-      "venueId": "sofi",
-      "round": "round_of_32",
-      "knockoutSlot": 10,
-      "homePlaceholder": "1D",
-      "awayPlaceholder": "3B/E/F"
+      "knockoutSlot": 11,
+      "homePlaceholder": "1G",
+      "awayPlaceholder": "3A/E/H/I/J"
     },
     {
       "matchNumber": 84,
       "date": "2026-07-01",
+      "time": "19:00",
+      "venueId": "sofi",
+      "round": "round_of_32",
+      "knockoutSlot": 9,
+      "homePlaceholder": "1H",
+      "awayPlaceholder": "2J"
+    },
+    {
+      "matchNumber": 86,
+      "date": "2026-07-01",
       "time": "22:00",
       "venueId": "hard_rock",
       "round": "round_of_32",
-      "knockoutSlot": 11,
-      "homePlaceholder": "2C",
-      "awayPlaceholder": "2D"
+      "knockoutSlot": 12,
+      "homePlaceholder": "1J",
+      "awayPlaceholder": "2H"
     },
     {
       "matchNumber": 85,
@@ -846,29 +846,29 @@
       "time": "13:00",
       "venueId": "bc_place",
       "round": "round_of_32",
-      "knockoutSlot": 12,
-      "homePlaceholder": "1F",
-      "awayPlaceholder": "3H/I/J"
-    },
-    {
-      "matchNumber": 86,
-      "date": "2026-07-02",
-      "time": "16:00",
-      "venueId": "arrowhead",
-      "round": "round_of_32",
-      "knockoutSlot": 13,
-      "homePlaceholder": "2E",
-      "awayPlaceholder": "2F"
+      "knockoutSlot": 14,
+      "homePlaceholder": "1B",
+      "awayPlaceholder": "3E/F/G/I/J"
     },
     {
       "matchNumber": 87,
       "date": "2026-07-02",
+      "time": "16:00",
+      "venueId": "arrowhead",
+      "round": "round_of_32",
+      "knockoutSlot": 15,
+      "homePlaceholder": "1K",
+      "awayPlaceholder": "3D/E/I/J/L"
+    },
+    {
+      "matchNumber": 83,
+      "date": "2026-07-02",
       "time": "19:00",
       "venueId": "bmo",
       "round": "round_of_32",
-      "knockoutSlot": 14,
-      "homePlaceholder": "1H",
-      "awayPlaceholder": "3G/K/L"
+      "knockoutSlot": 8,
+      "homePlaceholder": "2K",
+      "awayPlaceholder": "2L"
     },
     {
       "matchNumber": 88,
@@ -876,9 +876,9 @@
       "time": "22:00",
       "venueId": "att",
       "round": "round_of_32",
-      "knockoutSlot": 15,
-      "homePlaceholder": "2G",
-      "awayPlaceholder": "2H"
+      "knockoutSlot": 13,
+      "homePlaceholder": "2D",
+      "awayPlaceholder": "2G"
     },
     {
       "matchNumber": 89,

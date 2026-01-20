@@ -325,9 +325,9 @@ mod tests {
         let winner_a = group_a.winner();
         let runner_up_a = group_a.runner_up();
 
-        // Find Match 79 in R32 (slot 4 in our bracket ordering)
-        // According to R32_BRACKET, slot 4 is Match 79: 1A vs 3(C/E/F/H/I)
-        let match_79 = &result.knockout_bracket.round_of_32[4];
+        // Find Match 79 in R32 (slot 6 in our bracket ordering)
+        // According to R32_BRACKET, slot 6 is Match 79: 1A vs 3(C/E/F/H/I)
+        let match_79 = &result.knockout_bracket.round_of_32[6];
 
         // One of the teams in match 79 should be Winner A
         let has_winner_a = match_79.home_team == winner_a || match_79.away_team == winner_a;
