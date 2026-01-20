@@ -95,7 +95,17 @@ export function useWasm(): { status: WasmStatus; api: WasmApi | null; error: str
               most_likely_final: [number, number];
               path_stats?: Map<number, unknown> | Record<string, unknown>;
               bracket_slot_stats?: Map<number, unknown> | Record<string, unknown>;
+              bracket_slot_win_stats?: Map<number, unknown> | Record<string, unknown>;
               slot_opponent_stats?: Map<number, unknown> | Record<string, unknown>;
+              most_frequent_bracket?: {
+                count: number;
+                probability: number;
+                round_of_32_winners: number[];
+                round_of_16_winners: number[];
+                quarter_final_winners: number[];
+                semi_final_winners: number[];
+                champion: number;
+              };
             };
 
             // If team_stats is a Map, convert it to a plain object
@@ -131,6 +141,18 @@ export function useWasm(): { status: WasmStatus; api: WasmApi | null; error: str
               });
             } else if (rawBracketSlotStats) {
               bracketSlotStats = rawBracketSlotStats as Record<string, unknown>;
+            }
+
+            // Get bracket_slot_win_stats if available (may be a Map that needs conversion)
+            let bracketSlotWinStats: Record<string, unknown> | undefined;
+            const rawBracketSlotWinStats = result.bracket_slot_win_stats;
+            if (rawBracketSlotWinStats instanceof Map) {
+              bracketSlotWinStats = {};
+              rawBracketSlotWinStats.forEach((value: unknown, key: number) => {
+                bracketSlotWinStats![String(key)] = value;
+              });
+            } else if (rawBracketSlotWinStats) {
+              bracketSlotWinStats = rawBracketSlotWinStats as Record<string, unknown>;
             }
 
             // Get slot_opponent_stats if available (nested Maps that need deep conversion)
@@ -184,7 +206,9 @@ export function useWasm(): { status: WasmStatus; api: WasmApi | null; error: str
               most_likely_final: result.most_likely_final,
               path_stats: pathStats,
               bracket_slot_stats: bracketSlotStats,
+              bracket_slot_win_stats: bracketSlotWinStats,
               slot_opponent_stats: slotOpponentStats,
+              most_frequent_bracket: result.most_frequent_bracket,
             } as AggregatedResults;
           },
           calculateMatchProbability: (teamAElo, teamBElo, isKnockout) => {

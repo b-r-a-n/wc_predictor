@@ -13,5 +13,5 @@ pub mod runner;
 
 pub use aggregator::{AggregatedResults, TeamStatistics};
 pub use engine::SimulationEngine;
-pub use path_tracker::{BracketSlotStats, PathStatistics, RoundMatchups, SlotOpponentStats};
+pub use path_tracker::{BracketSlotStats, BracketSlotWinStats, PathStatistics, RoundMatchups, SlotOpponentStats};
 pub use runner::{SimulationConfig, SimulationRunner};

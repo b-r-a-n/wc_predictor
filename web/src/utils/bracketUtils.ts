@@ -1,14 +1,17 @@
-import type { Team, AggregatedResults, MostLikelyBracket, MostLikelySlotData, BracketSlotStats, RustMostFrequentBracket } from '../types';
+import type { Team, AggregatedResults, MostLikelyBracket, MostLikelySlotData, BracketSlotStats, BracketSlotWinStats, RustMostFrequentBracket } from '../types';
 
 type RoundKey = 'round_of_32' | 'round_of_16' | 'quarter_finals' | 'semi_finals';
 
 /**
  * Build MostLikelyBracket from the Rust-computed most_frequent_bracket data.
  * This ensures each team appears at most once in the bracket.
+ * Uses bracket_slot_win_stats for per-slot WIN probabilities (not participation).
  */
 function buildFromMostFrequentBracket(
   rustBracket: RustMostFrequentBracket,
-  teamMap: Map<number, Team>
+  teamMap: Map<number, Team>,
+  bracketSlotWinStats: Record<string, unknown>,
+  totalSimulations: number
 ): MostLikelyBracket {
   const bracket: MostLikelyBracket = {
     round_of_32: {},
@@ -19,19 +22,35 @@ function buildFromMostFrequentBracket(
     champion: null,
   };
 
-  const { count, probability } = rustBracket;
+  // Helper to get a team's WIN probability for a specific round/slot from bracket_slot_win_stats
+  const getSlotWinProbability = (teamId: number, roundKey: RoundKey | 'final_match', slotIndex: number): { count: number; probability: number } => {
+    const teamStats = bracketSlotWinStats[String(teamId)] as BracketSlotWinStats | undefined;
+    if (!teamStats) return { count: 0, probability: 0 };
 
-  // Helper to create slot data
-  const makeSlotData = (teamId: number): MostLikelySlotData | null => {
+    if (roundKey === 'final_match') {
+      const count = teamStats.final_match || 0;
+      return { count, probability: count / totalSimulations };
+    }
+
+    const roundData = teamStats[roundKey] as Record<string, number> | undefined;
+    if (!roundData) return { count: 0, probability: 0 };
+
+    const count = roundData[String(slotIndex)] || 0;
+    return { count, probability: count / totalSimulations };
+  };
+
+  // Helper to create slot data with proper per-slot WIN probability
+  const makeSlotData = (teamId: number, roundKey: RoundKey | 'final_match', slotIndex: number): MostLikelySlotData | null => {
     const team = teamMap.get(teamId);
     if (!team) return null;
+    const { count, probability } = getSlotWinProbability(teamId, roundKey, slotIndex);
     return { teamId, team, count, probability };
   };
 
   // R32 winners (16 matches) - each winner goes to corresponding R16 slot
   for (let i = 0; i < rustBracket.round_of_32_winners.length; i++) {
     const teamId = rustBracket.round_of_32_winners[i];
-    const slotData = makeSlotData(teamId);
+    const slotData = makeSlotData(teamId, 'round_of_32', i);
     if (slotData) {
       bracket.round_of_32[String(i)] = slotData;
     }
@@ -40,7 +59,7 @@ function buildFromMostFrequentBracket(
   // R16 winners (8 matches)
   for (let i = 0; i < rustBracket.round_of_16_winners.length; i++) {
     const teamId = rustBracket.round_of_16_winners[i];
-    const slotData = makeSlotData(teamId);
+    const slotData = makeSlotData(teamId, 'round_of_16', i);
     if (slotData) {
       bracket.round_of_16[String(i)] = slotData;
     }
@@ -49,7 +68,7 @@ function buildFromMostFrequentBracket(
   // QF winners (4 matches)
   for (let i = 0; i < rustBracket.quarter_final_winners.length; i++) {
     const teamId = rustBracket.quarter_final_winners[i];
-    const slotData = makeSlotData(teamId);
+    const slotData = makeSlotData(teamId, 'quarter_finals', i);
     if (slotData) {
       bracket.quarter_finals[String(i)] = slotData;
     }
@@ -58,14 +77,14 @@ function buildFromMostFrequentBracket(
   // SF winners (2 matches)
   for (let i = 0; i < rustBracket.semi_final_winners.length; i++) {
     const teamId = rustBracket.semi_final_winners[i];
-    const slotData = makeSlotData(teamId);
+    const slotData = makeSlotData(teamId, 'semi_finals', i);
     if (slotData) {
       bracket.semi_finals[String(i)] = slotData;
     }
   }
 
   // Final: show the champion in the final slot
-  const championSlotData = makeSlotData(rustBracket.champion);
+  const championSlotData = makeSlotData(rustBracket.champion, 'final_match', 0);
   if (championSlotData) {
     bracket.final_match = championSlotData;
     bracket.champion = championSlotData;
@@ -80,23 +99,34 @@ function buildFromMostFrequentBracket(
  * If results.most_frequent_bracket is available (from Rust aggregation),
  * uses that to ensure each team appears exactly once (complete bracket outcome).
  * Otherwise, falls back to per-slot independent selection (legacy behavior).
+ *
+ * Probabilities are based on WIN statistics (not participation).
  */
 export function computeMostLikelyBracket(
   results: AggregatedResults,
   teamMap: Map<number, Team>
 ): MostLikelyBracket | null {
-  // Prefer the Rust-computed most frequent bracket (ensures uniqueness)
-  if (results.most_frequent_bracket) {
-    return buildFromMostFrequentBracket(results.most_frequent_bracket, teamMap);
+  // Use the Rust-computed most frequent bracket (ensures uniqueness and correct champion)
+  // Prefer bracket_slot_win_stats for probabilities (WIN rate, not participation rate)
+  const bracketSlotWinStats = results.bracket_slot_win_stats;
+  const bracketSlotStats = results.bracket_slot_stats;
+  if (results.most_frequent_bracket && bracketSlotWinStats) {
+    return buildFromMostFrequentBracket(
+      results.most_frequent_bracket,
+      teamMap,
+      bracketSlotWinStats,
+      results.total_simulations
+    );
   }
 
   // Fallback: per-slot independent selection (may have duplicates)
-  const bracketSlotStats = results.bracket_slot_stats;
-  if (!bracketSlotStats) return null;
+  // Use win stats if available, otherwise fall back to participation stats
+  const statsToUse = bracketSlotWinStats || bracketSlotStats;
+  if (!statsToUse) return null;
 
   const totalSimulations = results.total_simulations;
 
-  // Helper to find the most likely team for a specific slot in a round
+  // Helper to find the most likely team for a specific slot in a round (by WIN count)
   const findMostLikelyForSlot = (
     roundKey: RoundKey,
     slotIndex: string
@@ -104,9 +134,9 @@ export function computeMostLikelyBracket(
     let bestTeamId: number | null = null;
     let bestCount = 0;
 
-    // Iterate through all teams' bracket stats
-    for (const [teamIdStr, stats] of Object.entries(bracketSlotStats)) {
-      const teamStats = stats as BracketSlotStats;
+    // Iterate through all teams' bracket stats (win stats preferred)
+    for (const [teamIdStr, stats] of Object.entries(statsToUse)) {
+      const teamStats = stats as BracketSlotWinStats | BracketSlotStats;
       const roundData = teamStats[roundKey] as Record<string, number> | undefined;
       if (!roundData) continue;
 
@@ -130,13 +160,13 @@ export function computeMostLikelyBracket(
     };
   };
 
-  // Helper to find the most likely team for the final slot
+  // Helper to find the most likely team for the final slot (by WIN count)
   const findMostLikelyForFinal = (): MostLikelySlotData | null => {
     let bestTeamId: number | null = null;
     let bestCount = 0;
 
-    for (const [teamIdStr, stats] of Object.entries(bracketSlotStats)) {
-      const teamStats = stats as BracketSlotStats;
+    for (const [teamIdStr, stats] of Object.entries(statsToUse)) {
+      const teamStats = stats as BracketSlotWinStats | BracketSlotStats;
       const count = teamStats.final_match || 0;
       if (count > bestCount) {
         bestCount = count;
@@ -202,10 +232,10 @@ export function computeMostLikelyBracket(
   // Final
   bracket.final_match = findMostLikelyForFinal();
 
-  // Champion is the most_likely_winner from results
+  // Champion is the most_likely_winner from results (use WIN stats)
   const championTeam = teamMap.get(results.most_likely_winner);
   if (championTeam) {
-    const championStats = bracketSlotStats[String(results.most_likely_winner)] as BracketSlotStats | undefined;
+    const championStats = statsToUse[String(results.most_likely_winner)] as BracketSlotWinStats | BracketSlotStats | undefined;
     const championCount = championStats?.final_match || 0;
     bracket.champion = {
       teamId: results.most_likely_winner,

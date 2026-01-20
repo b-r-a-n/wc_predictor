@@ -75,6 +75,7 @@ export interface AggregatedResults {
   most_likely_final: [number, number];
   path_stats?: Record<string, PathStatistics>;  // Path statistics for each team (keys are stringified TeamIds)
   bracket_slot_stats?: Record<string, BracketSlotStats>;  // Bracket slot statistics for each team (keys are stringified TeamIds)
+  bracket_slot_win_stats?: Record<string, BracketSlotWinStats>;  // Bracket slot WIN statistics (only winners, not participants)
   slot_opponent_stats?: Record<string, SlotOpponentStats>;  // Slot-specific opponent statistics (keys are stringified TeamIds)
   most_frequent_bracket?: RustMostFrequentBracket;  // Most frequent complete bracket outcome
 }
@@ -140,12 +141,21 @@ export interface PathStatistics {
   complete_paths: Record<string, number>; // path_key -> count
 }
 
-// Bracket slot statistics - tracks which bracket positions each team occupies
+// Bracket slot statistics - tracks which bracket positions each team occupies (participation)
 export interface BracketSlotStats {
   round_of_32: Record<string, number>;   // slot "0"-"15" -> count
   round_of_16: Record<string, number>;   // slot "0"-"7" -> count
   quarter_finals: Record<string, number>; // slot "0"-"3" -> count
   semi_finals: Record<string, number>;    // slot "0"-"1" -> count
+  final_match: number;
+}
+
+// Bracket slot WIN statistics - tracks only WINS per slot (not participation)
+export interface BracketSlotWinStats {
+  round_of_32: Record<string, number>;   // slot "0"-"15" -> win count
+  round_of_16: Record<string, number>;   // slot "0"-"7" -> win count
+  quarter_finals: Record<string, number>; // slot "0"-"3" -> win count
+  semi_finals: Record<string, number>;    // slot "0"-"1" -> win count
   final_match: number;
 }
 

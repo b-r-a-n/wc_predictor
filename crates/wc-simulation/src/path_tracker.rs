@@ -63,6 +63,41 @@ impl BracketSlotStats {
     }
 }
 
+/// Tracks WINS (not just participation) per bracket slot for each team.
+/// Only the match winner gets recorded, not the loser.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct BracketSlotWinStats {
+    /// Round of 32 slot wins (slot 0-15 -> count)
+    pub round_of_32: HashMap<u8, u32>,
+    /// Round of 16 slot wins (slot 0-7 -> count)
+    pub round_of_16: HashMap<u8, u32>,
+    /// Quarter-finals slot wins (slot 0-3 -> count)
+    pub quarter_finals: HashMap<u8, u32>,
+    /// Semi-finals slot wins (slot 0-1 -> count)
+    pub semi_finals: HashMap<u8, u32>,
+    /// Final wins count (champion)
+    pub final_match: u32,
+}
+
+impl BracketSlotWinStats {
+    /// Create new empty bracket slot win stats.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Record a win at a specific slot in a round.
+    pub fn record_win(&mut self, round: &str, slot: u8) {
+        match round {
+            "round_of_32" => *self.round_of_32.entry(slot).or_insert(0) += 1,
+            "round_of_16" => *self.round_of_16.entry(slot).or_insert(0) += 1,
+            "quarter_finals" => *self.quarter_finals.entry(slot).or_insert(0) += 1,
+            "semi_finals" => *self.semi_finals.entry(slot).or_insert(0) += 1,
+            "final" => self.final_match += 1,
+            _ => {}
+        }
+    }
+}
+
 /// Track opponents faced by team in specific bracket slots per round.
 /// This enables per-slot opponent statistics (e.g., who did the team face
 /// specifically in R32 slot #2, not just "anywhere in R32").
@@ -346,6 +381,49 @@ mod tests {
     fn test_bracket_slot_stats_unknown_round() {
         let mut stats = BracketSlotStats::new();
         stats.record_slot("unknown_round", 0);
+        // Should not panic and all maps should remain empty
+        assert!(stats.round_of_32.is_empty());
+        assert!(stats.round_of_16.is_empty());
+        assert!(stats.quarter_finals.is_empty());
+        assert!(stats.semi_finals.is_empty());
+        assert_eq!(stats.final_match, 0);
+    }
+
+    #[test]
+    fn test_bracket_slot_win_stats_new() {
+        let stats = BracketSlotWinStats::new();
+        assert!(stats.round_of_32.is_empty());
+        assert!(stats.round_of_16.is_empty());
+        assert!(stats.quarter_finals.is_empty());
+        assert!(stats.semi_finals.is_empty());
+        assert_eq!(stats.final_match, 0);
+    }
+
+    #[test]
+    fn test_bracket_slot_win_stats_record_win() {
+        let mut stats = BracketSlotWinStats::new();
+
+        stats.record_win("round_of_32", 5);
+        stats.record_win("round_of_32", 5);
+        stats.record_win("round_of_32", 10);
+        stats.record_win("round_of_16", 3);
+        stats.record_win("quarter_finals", 1);
+        stats.record_win("semi_finals", 0);
+        stats.record_win("final", 0);
+        stats.record_win("final", 0);
+
+        assert_eq!(stats.round_of_32.get(&5), Some(&2));
+        assert_eq!(stats.round_of_32.get(&10), Some(&1));
+        assert_eq!(stats.round_of_16.get(&3), Some(&1));
+        assert_eq!(stats.quarter_finals.get(&1), Some(&1));
+        assert_eq!(stats.semi_finals.get(&0), Some(&1));
+        assert_eq!(stats.final_match, 2);
+    }
+
+    #[test]
+    fn test_bracket_slot_win_stats_unknown_round() {
+        let mut stats = BracketSlotWinStats::new();
+        stats.record_win("unknown_round", 0);
         // Should not panic and all maps should remain empty
         assert!(stats.round_of_32.is_empty());
         assert!(stats.round_of_16.is_empty());
