@@ -59,6 +59,39 @@ pub struct MostLikelyBracket {
     pub champion: Option<MostLikelyBracketSlot>,
 }
 
+/// A single R32 match in the optimal bracket, showing both teams and winner.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OptimalR32Match {
+    /// R32 slot index (0-15)
+    pub slot: u8,
+    /// Team A data (typically higher seed)
+    pub team_a: MostLikelyBracketSlot,
+    /// Team B data
+    pub team_b: MostLikelyBracketSlot,
+    /// Winner of this match
+    pub winner: TeamId,
+}
+
+/// The optimal bracket computed via Hungarian algorithm.
+/// Guarantees exactly 32 unique teams in R32 and valid bracket structure.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OptimalBracket {
+    /// Round of 32 matches with both teams (16 matches)
+    pub round_of_32: Vec<OptimalR32Match>,
+    /// Round of 16 slot assignments (slot 0-7 -> team data)
+    pub round_of_16: HashMap<u8, MostLikelyBracketSlot>,
+    /// Quarter-finals slot assignments (slot 0-3 -> team data)
+    pub quarter_finals: HashMap<u8, MostLikelyBracketSlot>,
+    /// Semi-finals slot assignments (slot 0-1 -> team data)
+    pub semi_finals: HashMap<u8, MostLikelyBracketSlot>,
+    /// Champion
+    pub champion: Option<MostLikelyBracketSlot>,
+    /// Product of all individual slot probabilities (very small)
+    pub joint_probability: f64,
+    /// Log of joint probability (more useful for comparison)
+    pub log_probability: f64,
+}
+
 /// Tracks which bracket slots (positions) a team plays in at each knockout round.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct BracketSlotStats {

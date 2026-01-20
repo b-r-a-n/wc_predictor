@@ -6,7 +6,8 @@ use serde::{Deserialize, Serialize};
 
 use wc_core::{MatchResult, TeamId, Tournament, TournamentResult};
 
-use crate::path_tracker::{BracketSlotStats, BracketSlotWinStats, MostFrequentBracket, MostLikelyBracket, MostLikelyBracketSlot, PathStatistics, SlotOpponentStats};
+use crate::optimal_bracket::compute_optimal_bracket;
+use crate::path_tracker::{BracketSlotStats, BracketSlotWinStats, MostFrequentBracket, MostLikelyBracket, MostLikelyBracketSlot, OptimalBracket, PathStatistics, SlotOpponentStats};
 
 /// Aggregated statistics from multiple tournament simulations.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -31,6 +32,8 @@ pub struct AggregatedResults {
     pub most_frequent_bracket: Option<MostFrequentBracket>,
     /// The most likely bracket computed via greedy algorithm (ensures unique teams)
     pub most_likely_bracket: MostLikelyBracket,
+    /// The optimal bracket computed via Hungarian algorithm (guarantees exactly 32 unique teams)
+    pub optimal_bracket: OptimalBracket,
 }
 
 /// Statistics for a single team across all simulations.
@@ -510,6 +513,16 @@ impl AggregatedResults {
             total,
         );
 
+        // Compute the optimal bracket using Hungarian algorithm
+        let team_ids: Vec<wc_core::TeamId> = tournament.teams.iter().map(|t| t.id).collect();
+        let optimal_bracket = compute_optimal_bracket(
+            &team_ids,
+            &tournament.groups,
+            &bracket_slot_stats,
+            &bracket_slot_win_stats,
+            total,
+        );
+
         Self {
             total_simulations: total,
             team_stats,
@@ -521,6 +534,7 @@ impl AggregatedResults {
             slot_opponent_stats,
             most_frequent_bracket,
             most_likely_bracket,
+            optimal_bracket,
         }
     }
 

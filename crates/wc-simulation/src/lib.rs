@@ -8,10 +8,12 @@
 
 pub mod aggregator;
 pub mod engine;
+pub mod optimal_bracket;
 pub mod path_tracker;
 pub mod runner;
 
 pub use aggregator::{AggregatedResults, TeamStatistics};
 pub use engine::SimulationEngine;
-pub use path_tracker::{BracketSlotStats, BracketSlotWinStats, MostLikelyBracket, MostLikelyBracketSlot, PathStatistics, RoundMatchups, SlotOpponentStats};
+pub use optimal_bracket::compute_optimal_bracket;
+pub use path_tracker::{BracketSlotStats, BracketSlotWinStats, MostLikelyBracket, MostLikelyBracketSlot, OptimalBracket, OptimalR32Match, PathStatistics, RoundMatchups, SlotOpponentStats};
 pub use runner::{SimulationConfig, SimulationRunner};

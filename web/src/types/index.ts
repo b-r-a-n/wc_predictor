@@ -86,6 +86,26 @@ export interface RustMostLikelyBracket {
   champion: RustMostLikelyBracketSlot | null;
 }
 
+// Single R32 match in the optimal bracket with both teams and winner
+export interface RustOptimalR32Match {
+  slot: number;
+  team_a: RustMostLikelyBracketSlot;
+  team_b: RustMostLikelyBracketSlot;
+  winner: number;  // TeamId
+}
+
+// Optimal bracket computed via Hungarian algorithm from Rust
+// Guarantees exactly 32 unique teams in R32 and valid bracket structure
+export interface RustOptimalBracket {
+  round_of_32: RustOptimalR32Match[];  // 16 matches with both teams
+  round_of_16: Record<string, RustMostLikelyBracketSlot>;
+  quarter_finals: Record<string, RustMostLikelyBracketSlot>;
+  semi_finals: Record<string, RustMostLikelyBracketSlot>;
+  champion: RustMostLikelyBracketSlot | null;
+  joint_probability: number;
+  log_probability: number;
+}
+
 export interface AggregatedResults {
   total_simulations: number;
   team_stats: Record<string, TeamStatistics>;  // Keys are stringified numbers due to JSON serialization
@@ -97,6 +117,7 @@ export interface AggregatedResults {
   slot_opponent_stats?: Record<string, SlotOpponentStats>;  // Slot-specific opponent statistics (keys are stringified TeamIds)
   most_frequent_bracket?: RustMostFrequentBracket;  // Most frequent complete bracket outcome
   most_likely_bracket?: RustMostLikelyBracket;  // Greedy bracket from Rust (unique teams, structurally valid)
+  optimal_bracket?: RustOptimalBracket;  // Hungarian algorithm bracket (exactly 32 unique teams)
 }
 
 // Match probability types
