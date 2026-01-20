@@ -2,7 +2,7 @@
   "matches": [
     {
       "date": "2026-06-11",
-      "time": "12:00",
+      "time": "15:00",
       "venueId": "azteca",
       "round": "group_stage",
       "groupId": "A",
@@ -12,7 +12,7 @@
     },
     {
       "date": "2026-06-11",
-      "time": "18:00",
+      "time": "22:00",
       "venueId": "akron",
       "round": "group_stage",
       "groupId": "A",
@@ -27,7 +27,7 @@
       "round": "group_stage",
       "groupId": "B",
       "homePlaceholder": "B1",
-      "awayPlaceholder": "B2",
+      "awayPlaceholder": "B4",
       "matchNumber": 3
     },
     {
@@ -42,12 +42,12 @@
     },
     {
       "date": "2026-06-13",
-      "time": "12:00",
+      "time": "21:00",
       "venueId": "gillette",
       "round": "group_stage",
       "groupId": "C",
-      "homePlaceholder": "C3",
-      "awayPlaceholder": "C4",
+      "homePlaceholder": "C4",
+      "awayPlaceholder": "C3",
       "matchNumber": 5
     },
     {
@@ -62,21 +62,21 @@
     },
     {
       "date": "2026-06-13",
-      "time": "18:00",
+      "time": "15:00",
       "venueId": "levis",
       "round": "group_stage",
       "groupId": "B",
       "homePlaceholder": "B3",
-      "awayPlaceholder": "B4",
+      "awayPlaceholder": "B2",
       "matchNumber": 7
     },
     {
-      "date": "2026-06-13",
-      "time": "21:00",
+      "date": "2026-06-14",
+      "time": "00:00",
       "venueId": "bc_place",
       "round": "group_stage",
       "groupId": "D",
-      "homePlaceholder": "D3",
+      "homePlaceholder": "D2",
       "awayPlaceholder": "D4",
       "matchNumber": 8
     },
@@ -112,7 +112,7 @@
     },
     {
       "date": "2026-06-14",
-      "time": "21:00",
+      "time": "22:00",
       "venueId": "bbva",
       "round": "group_stage",
       "groupId": "F",
@@ -142,7 +142,7 @@
     },
     {
       "date": "2026-06-15",
-      "time": "18:00",
+      "time": "15:00",
       "venueId": "lumen",
       "round": "group_stage",
       "groupId": "G",
@@ -162,7 +162,7 @@
     },
     {
       "date": "2026-06-16",
-      "time": "12:00",
+      "time": "18:00",
       "venueId": "gillette",
       "round": "group_stage",
       "groupId": "I",
@@ -181,8 +181,8 @@
       "matchNumber": 18
     },
     {
-      "date": "2026-06-16",
-      "time": "18:00",
+      "date": "2026-06-17",
+      "time": "00:00",
       "venueId": "levis",
       "round": "group_stage",
       "groupId": "J",
@@ -202,11 +202,11 @@
     },
     {
       "date": "2026-06-17",
-      "time": "12:00",
+      "time": "22:00",
       "venueId": "azteca",
       "round": "group_stage",
       "groupId": "K",
-      "homePlaceholder": "K1",
+      "homePlaceholder": "K3",
       "awayPlaceholder": "K2",
       "matchNumber": 21
     },
@@ -222,7 +222,7 @@
     },
     {
       "date": "2026-06-17",
-      "time": "18:00",
+      "time": "19:00",
       "venueId": "bmo",
       "round": "group_stage",
       "groupId": "L",
@@ -252,7 +252,7 @@
     },
     {
       "date": "2026-06-18",
-      "time": "15:00",
+      "time": "18:00",
       "venueId": "bc_place",
       "round": "group_stage",
       "groupId": "B",
@@ -262,7 +262,7 @@
     },
     {
       "date": "2026-06-18",
-      "time": "18:00",
+      "time": "21:00",
       "venueId": "akron",
       "round": "group_stage",
       "groupId": "A",
@@ -282,11 +282,11 @@
     },
     {
       "date": "2026-06-19",
-      "time": "12:00",
+      "time": "18:00",
       "venueId": "gillette",
       "round": "group_stage",
       "groupId": "C",
-      "homePlaceholder": "C4",
+      "homePlaceholder": "C3",
       "awayPlaceholder": "C2",
       "matchNumber": 29
     },
@@ -302,7 +302,7 @@
     },
     {
       "date": "2026-06-19",
-      "time": "18:00",
+      "time": "15:00",
       "venueId": "lumen",
       "round": "group_stage",
       "groupId": "D",
@@ -311,13 +311,13 @@
       "matchNumber": 31
     },
     {
-      "date": "2026-06-19",
-      "time": "21:00",
+      "date": "2026-06-20",
+      "time": "00:00",
       "venueId": "levis",
       "round": "group_stage",
       "groupId": "D",
       "homePlaceholder": "D4",
-      "awayPlaceholder": "D2",
+      "awayPlaceholder": "D3",
       "matchNumber": 32
     },
     {
@@ -332,22 +332,22 @@
     },
     {
       "date": "2026-06-20",
-      "time": "15:00",
+      "time": "16:00",
       "venueId": "bmo",
       "round": "group_stage",
       "groupId": "E",
       "homePlaceholder": "E1",
-      "awayPlaceholder": "E3",
+      "awayPlaceholder": "E2",
       "matchNumber": 34
     },
     {
-      "date": "2026-06-20",
-      "time": "23:00",
+      "date": "2026-06-21",
+      "time": "00:00",
       "venueId": "bbva",
       "round": "group_stage",
       "groupId": "F",
-      "homePlaceholder": "F2",
-      "awayPlaceholder": "F3",
+      "homePlaceholder": "F3",
+      "awayPlaceholder": "F2",
       "matchNumber": 35
     },
     {
@@ -432,7 +432,7 @@
     },
     {
       "date": "2026-06-22",
-      "time": "21:00",
+      "time": "23:00",
       "venueId": "levis",
       "round": "group_stage",
       "groupId": "J",
@@ -452,17 +452,17 @@
     },
     {
       "date": "2026-06-23",
-      "time": "15:00",
+      "time": "22:00",
       "venueId": "akron",
       "round": "group_stage",
       "groupId": "K",
-      "homePlaceholder": "K4",
-      "awayPlaceholder": "K2",
+      "homePlaceholder": "K2",
+      "awayPlaceholder": "K4",
       "matchNumber": 46
     },
     {
       "date": "2026-06-23",
-      "time": "18:00",
+      "time": "16:00",
       "venueId": "gillette",
       "round": "group_stage",
       "groupId": "L",
@@ -472,7 +472,7 @@
     },
     {
       "date": "2026-06-23",
-      "time": "21:00",
+      "time": "19:00",
       "venueId": "bmo",
       "round": "group_stage",
       "groupId": "L",
@@ -502,7 +502,7 @@
     },
     {
       "date": "2026-06-24",
-      "time": "18:00",
+      "time": "21:00",
       "venueId": "azteca",
       "round": "group_stage",
       "groupId": "A",
@@ -512,7 +512,7 @@
     },
     {
       "date": "2026-06-24",
-      "time": "18:00",
+      "time": "21:00",
       "venueId": "bbva",
       "round": "group_stage",
       "groupId": "A",
@@ -522,7 +522,7 @@
     },
     {
       "date": "2026-06-24",
-      "time": "18:00",
+      "time": "15:00",
       "venueId": "lumen",
       "round": "group_stage",
       "groupId": "B",
@@ -532,12 +532,12 @@
     },
     {
       "date": "2026-06-24",
-      "time": "18:00",
+      "time": "15:00",
       "venueId": "bc_place",
       "round": "group_stage",
       "groupId": "B",
-      "homePlaceholder": "B1",
-      "awayPlaceholder": "B4",
+      "homePlaceholder": "B2",
+      "awayPlaceholder": "B1",
       "matchNumber": 54
     },
     {
@@ -572,7 +572,7 @@
     },
     {
       "date": "2026-06-25",
-      "time": "18:00",
+      "time": "22:00",
       "venueId": "levis",
       "round": "group_stage",
       "groupId": "D",
@@ -606,8 +606,8 @@
       "venueId": "bmo",
       "round": "group_stage",
       "groupId": "I",
-      "homePlaceholder": "I4",
-      "awayPlaceholder": "I1",
+      "homePlaceholder": "I2",
+      "awayPlaceholder": "I4",
       "matchNumber": 61
     },
     {
@@ -622,7 +622,7 @@
     },
     {
       "date": "2026-06-26",
-      "time": "18:00",
+      "time": "23:00",
       "venueId": "lumen",
       "round": "group_stage",
       "groupId": "G",
@@ -632,7 +632,7 @@
     },
     {
       "date": "2026-06-26",
-      "time": "18:00",
+      "time": "23:00",
       "venueId": "bc_place",
       "round": "group_stage",
       "groupId": "G",
@@ -642,11 +642,11 @@
     },
     {
       "date": "2026-06-26",
-      "time": "21:00",
+      "time": "20:00",
       "venueId": "akron",
       "round": "group_stage",
       "groupId": "H",
-      "homePlaceholder": "H4",
+      "homePlaceholder": "H3",
       "awayPlaceholder": "H1",
       "matchNumber": 65
     },
@@ -795,7 +795,7 @@
     {
       "matchNumber": 81,
       "date": "2026-07-01",
-      "time": "20:00",
+      "time": "22:00",
       "venueId": "levis",
       "round": "round_of_32",
       "homePlaceholder": "1D",
@@ -906,8 +906,8 @@
       "time": "15:00",
       "venueId": "att",
       "round": "round_of_16",
-      "homePlaceholder": "W9",
-      "awayPlaceholder": "W10"
+      "homePlaceholder": "W11",
+      "awayPlaceholder": "W12"
     },
     {
       "matchNumber": 94,
@@ -915,8 +915,8 @@
       "time": "20:00",
       "venueId": "lumen",
       "round": "round_of_16",
-      "homePlaceholder": "W11",
-      "awayPlaceholder": "W12"
+      "homePlaceholder": "W9",
+      "awayPlaceholder": "W10"
     },
     {
       "matchNumber": 95,
@@ -933,8 +933,8 @@
       "time": "16:00",
       "venueId": "bc_place",
       "round": "round_of_16",
-      "homePlaceholder": "W15",
-      "awayPlaceholder": "W16"
+      "homePlaceholder": "W85",
+      "awayPlaceholder": "W87"
     },
     {
       "matchNumber": 97,
