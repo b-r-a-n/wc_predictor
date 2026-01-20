@@ -2,7 +2,7 @@
   "name": "wc-wasm",
   "type": "module",
   "description": "WebAssembly bindings for World Cup simulation",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "files": [
     "wc_wasm_bg.wasm",
     "wc_wasm.js",
