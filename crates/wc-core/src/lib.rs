@@ -16,7 +16,9 @@ pub mod team;
 pub mod tiebreaker;
 pub mod tournament;
 
-pub use fixed_results::{FixedMatchResult, FixedResultSpec, FixedResults, MatchFixture};
+pub use fixed_results::{
+    FixedMatchResult, FixedResultSpec, FixedResults, FixedResultsError, MatchFixture,
+};
 pub use group::{Group, GroupId, GroupResult};
 pub use knockout::{KnockoutBracket, KnockoutRound};
 pub use match_result::{MatchOutcome, MatchResult, PenaltyResult};

@@ -7,6 +7,8 @@ description = "Core domain types for World Cup simulation"
 [dependencies]
 serde = { workspace = true }
 thiserror = { workspace = true }
+rand = { workspace = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }
+rand_chacha = { workspace = true }
