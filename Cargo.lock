@@ -912,7 +912,10 @@ dependencies = [
 name = "wc-core"
 version = "0.2.3"
 dependencies = [
+ "rand",
+ "rand_chacha",
  "serde",
+ "serde_json",
  "thiserror 1.0.69",
 ]
 
