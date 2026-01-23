@@ -4,8 +4,8 @@ use rand_chacha::ChaCha8Rng;
 use std::collections::HashMap;
 
 use wc_core::{
-    bracket, Group, GroupResult, GroupStanding, KnockoutBracket, KnockoutRound, MatchResult,
-    TeamId, Tournament, TournamentResult,
+    bracket, FixedResults, Group, GroupResult, GroupStanding, KnockoutBracket, KnockoutRound,
+    MatchResult, TeamId, Tournament, TournamentResult,
 };
 use wc_strategies::{MatchContext, PredictionStrategy};
 
@@ -13,6 +13,7 @@ use wc_strategies::{MatchContext, PredictionStrategy};
 pub struct SimulationEngine<'a> {
     tournament: &'a Tournament,
     strategy: &'a dyn PredictionStrategy,
+    fixed_results: Option<&'a FixedResults>,
 }
 
 impl<'a> SimulationEngine<'a> {
@@ -21,7 +22,14 @@ impl<'a> SimulationEngine<'a> {
         Self {
             tournament,
             strategy,
+            fixed_results: None,
         }
+    }
+
+    /// Add fixed results to the engine (builder pattern).
+    pub fn with_fixed_results(mut self, fixed: &'a FixedResults) -> Self {
+        self.fixed_results = Some(fixed);
+        self
     }
 
     /// Run a single tournament simulation.
@@ -66,25 +74,47 @@ impl<'a> SimulationEngine<'a> {
         let mut matches = Vec::with_capacity(6);
 
         for (home_id, away_id) in fixtures {
-            let home_team = self.tournament.get_team(home_id).unwrap().clone();
-            let away_team = self.tournament.get_team(away_id).unwrap().clone();
+            // Check if this match has a fixed result
+            let result = if let Some(fixed) = self.fixed_results {
+                if let Some(spec) = fixed.get_group_match(group.id, home_id, away_id) {
+                    // Use the fixed result
+                    spec.to_match_result(home_id, away_id, false, rng)
+                } else {
+                    // Simulate normally
+                    self.simulate_group_match(rng, home_id, away_id)
+                }
+            } else {
+                // No fixed results, simulate normally
+                self.simulate_group_match(rng, home_id, away_id)
+            };
 
-            let ctx = MatchContext::new(home_team, away_team, false);
-            let result = self.strategy.simulate_match(&ctx, rng);
             matches.push(result);
         }
 
         // Calculate standings with tiebreakers
         let standings =
             wc_core::tiebreaker::calculate_standings(&group.teams, &matches, group.id);
-        let standings =
-            wc_core::tiebreaker::resolve_standings(standings, &matches);
+        let standings = wc_core::tiebreaker::resolve_standings(standings, &matches);
 
         GroupResult {
             group_id: group.id,
             matches,
             standings,
         }
+    }
+
+    /// Simulate a single group stage match using the strategy.
+    fn simulate_group_match(
+        &self,
+        rng: &mut ChaCha8Rng,
+        home_id: TeamId,
+        away_id: TeamId,
+    ) -> MatchResult {
+        let home_team = self.tournament.get_team(home_id).unwrap().clone();
+        let away_team = self.tournament.get_team(away_id).unwrap().clone();
+
+        let ctx = MatchContext::new(home_team, away_team, false);
+        self.strategy.simulate_match(&ctx, rng)
     }
 
     /// Build Round of 32 pairings using official FIFA 2026 bracket structure.
@@ -130,55 +160,52 @@ impl<'a> SimulationEngine<'a> {
         // Round of 32 (16 matches) - use explicit pairings from bracket module
         let round_of_32: Vec<MatchResult> = r32_pairings
             .iter()
-            .map(|(team_a, team_b)| {
-                self.simulate_single_match(rng, *team_a, *team_b, KnockoutRound::RoundOf32)
+            .enumerate()
+            .map(|(slot, (team_a, team_b))| {
+                self.simulate_knockout_match_with_slot(
+                    rng,
+                    *team_a,
+                    *team_b,
+                    KnockoutRound::RoundOf32,
+                    slot as u8,
+                )
             })
             .collect();
-        let ro32_winners: Vec<TeamId> = round_of_32
-            .iter()
-            .filter_map(|m| m.winner())
-            .collect();
+        let ro32_winners: Vec<TeamId> = round_of_32.iter().filter_map(|m| m.winner()).collect();
 
         // Round of 16 (8 matches)
-        let round_of_16 = self.simulate_knockout_round(rng, &ro32_winners, KnockoutRound::RoundOf16);
-        let ro16_winners: Vec<TeamId> = round_of_16
-            .iter()
-            .filter_map(|m| m.winner())
-            .collect();
+        let round_of_16 =
+            self.simulate_knockout_round_with_slots(rng, &ro32_winners, KnockoutRound::RoundOf16);
+        let ro16_winners: Vec<TeamId> = round_of_16.iter().filter_map(|m| m.winner()).collect();
 
         // Quarter-finals (4 matches)
-        let quarter_finals = self.simulate_knockout_round(rng, &ro16_winners, KnockoutRound::QuarterFinal);
-        let qf_winners: Vec<TeamId> = quarter_finals
-            .iter()
-            .filter_map(|m| m.winner())
-            .collect();
+        let quarter_finals =
+            self.simulate_knockout_round_with_slots(rng, &ro16_winners, KnockoutRound::QuarterFinal);
+        let qf_winners: Vec<TeamId> = quarter_finals.iter().filter_map(|m| m.winner()).collect();
 
         // Semi-finals (2 matches)
-        let semi_finals = self.simulate_knockout_round(rng, &qf_winners, KnockoutRound::SemiFinal);
+        let semi_finals =
+            self.simulate_knockout_round_with_slots(rng, &qf_winners, KnockoutRound::SemiFinal);
 
-        let sf_winners: Vec<TeamId> = semi_finals
-            .iter()
-            .filter_map(|m| m.winner())
-            .collect();
-        let sf_losers: Vec<TeamId> = semi_finals
-            .iter()
-            .filter_map(|m| m.loser())
-            .collect();
+        let sf_winners: Vec<TeamId> = semi_finals.iter().filter_map(|m| m.winner()).collect();
+        let sf_losers: Vec<TeamId> = semi_finals.iter().filter_map(|m| m.loser()).collect();
 
         // Third-place match
-        let third_place = self.simulate_single_match(
+        let third_place = self.simulate_knockout_match_with_slot(
             rng,
             sf_losers[0],
             sf_losers[1],
             KnockoutRound::ThirdPlace,
+            0,
         );
 
         // Final
-        let final_match = self.simulate_single_match(
+        let final_match = self.simulate_knockout_match_with_slot(
             rng,
             sf_winners[0],
             sf_winners[1],
             KnockoutRound::Final,
+            0,
         );
 
         KnockoutBracket {
@@ -191,8 +218,8 @@ impl<'a> SimulationEngine<'a> {
         }
     }
 
-    /// Simulate a knockout round.
-    fn simulate_knockout_round(
+    /// Simulate a knockout round with slot tracking for fixed results.
+    fn simulate_knockout_round_with_slots(
         &self,
         rng: &mut ChaCha8Rng,
         teams: &[TeamId],
@@ -200,23 +227,34 @@ impl<'a> SimulationEngine<'a> {
     ) -> Vec<MatchResult> {
         teams
             .chunks(2)
-            .map(|pair| self.simulate_single_match(rng, pair[0], pair[1], round))
+            .enumerate()
+            .map(|(slot, pair)| {
+                self.simulate_knockout_match_with_slot(rng, pair[0], pair[1], round, slot as u8)
+            })
             .collect()
     }
 
-    /// Simulate a single knockout match.
-    fn simulate_single_match(
+    /// Simulate a single knockout match, checking for fixed results first.
+    fn simulate_knockout_match_with_slot(
         &self,
         rng: &mut ChaCha8Rng,
         team_a: TeamId,
         team_b: TeamId,
         round: KnockoutRound,
+        slot: u8,
     ) -> MatchResult {
+        // Check if this match has a fixed result
+        if let Some(fixed) = self.fixed_results {
+            if let Some(spec) = fixed.get_knockout_match(round, slot) {
+                return spec.to_match_result(team_a, team_b, true, rng);
+            }
+        }
+
+        // No fixed result, simulate normally
         let home_team = self.tournament.get_team(team_a).unwrap().clone();
         let away_team = self.tournament.get_team(team_b).unwrap().clone();
 
-        let ctx = MatchContext::new(home_team, away_team, true)
-            .with_importance(round.importance());
+        let ctx = MatchContext::new(home_team, away_team, true).with_importance(round.importance());
 
         self.strategy.simulate_match(&ctx, rng)
     }
@@ -226,7 +264,7 @@ impl<'a> SimulationEngine<'a> {
 mod tests {
     use super::*;
     use rand::SeedableRng;
-    use wc_core::{Confederation, Group, GroupId, Team};
+    use wc_core::{Confederation, FixedResultSpec, Group, GroupId, MatchFixture, Team};
     use wc_strategies::EloStrategy;
 
     fn create_test_tournament() -> Tournament {
@@ -336,5 +374,291 @@ mod tests {
         // Neither team should be Runner-up A (the old incorrect pairing)
         let has_runner_up_a = match_79.home_team == runner_up_a || match_79.away_team == runner_up_a;
         assert!(!has_runner_up_a, "Match 79 should NOT include Runner-up of Group A");
+    }
+
+    // ==================== FIXED RESULTS TESTS ====================
+
+    #[test]
+    fn test_fixed_single_group_match() {
+        let tournament = create_test_tournament();
+        let strategy = EloStrategy::default();
+
+        // Fix first match of Group A: Team 0 vs Team 1 → Team 0 wins 3-0
+        let mut fixed = FixedResults::new();
+        fixed.insert(
+            MatchFixture::group_stage(GroupId('A'), TeamId(0), TeamId(1)),
+            FixedResultSpec::exact_score(3, 0),
+        );
+
+        let engine = SimulationEngine::new(&tournament, &strategy).with_fixed_results(&fixed);
+
+        // Run multiple simulations - fixed result should appear every time
+        for seed in 0..10 {
+            let mut rng = ChaCha8Rng::seed_from_u64(seed);
+            let result = engine.simulate(&mut rng);
+
+            let group_a = &result.group_results[0];
+            let first_match = &group_a.matches[0];
+
+            assert_eq!(first_match.home_team, TeamId(0));
+            assert_eq!(first_match.away_team, TeamId(1));
+            assert_eq!(first_match.home_goals, 3, "Fixed score should be 3-0");
+            assert_eq!(first_match.away_goals, 0, "Fixed score should be 3-0");
+        }
+    }
+
+    #[test]
+    fn test_fixed_multiple_group_matches_same_group() {
+        let tournament = create_test_tournament();
+        let strategy = EloStrategy::default();
+
+        // Fix multiple matches in Group A
+        let mut fixed = FixedResults::new();
+        fixed.insert(
+            MatchFixture::group_stage(GroupId('A'), TeamId(0), TeamId(1)),
+            FixedResultSpec::exact_score(2, 0),
+        );
+        fixed.insert(
+            MatchFixture::group_stage(GroupId('A'), TeamId(2), TeamId(3)),
+            FixedResultSpec::exact_score(1, 1),
+        );
+
+        let engine = SimulationEngine::new(&tournament, &strategy).with_fixed_results(&fixed);
+
+        let mut rng = ChaCha8Rng::seed_from_u64(42);
+        let result = engine.simulate(&mut rng);
+
+        let group_a = &result.group_results[0];
+
+        // First match: 0 vs 1 → 2-0
+        assert_eq!(group_a.matches[0].home_goals, 2);
+        assert_eq!(group_a.matches[0].away_goals, 0);
+
+        // Second match: 2 vs 3 → 1-1
+        assert_eq!(group_a.matches[1].home_goals, 1);
+        assert_eq!(group_a.matches[1].away_goals, 1);
+    }
+
+    #[test]
+    fn test_fixed_r32_match() {
+        let tournament = create_test_tournament();
+        let strategy = EloStrategy::default();
+
+        // Fix R32 slot 0 to have exact score 2-1
+        let mut fixed = FixedResults::new();
+        fixed.insert(
+            MatchFixture::knockout(KnockoutRound::RoundOf32, 0),
+            FixedResultSpec::exact_score(2, 1),
+        );
+
+        let engine = SimulationEngine::new(&tournament, &strategy).with_fixed_results(&fixed);
+
+        for seed in 0..5 {
+            let mut rng = ChaCha8Rng::seed_from_u64(seed);
+            let result = engine.simulate(&mut rng);
+
+            let r32_match_0 = &result.knockout_bracket.round_of_32[0];
+            assert_eq!(r32_match_0.home_goals, 2, "R32 slot 0 should be 2-1");
+            assert_eq!(r32_match_0.away_goals, 1, "R32 slot 0 should be 2-1");
+        }
+    }
+
+    #[test]
+    fn test_fixed_final_exact_score() {
+        let tournament = create_test_tournament();
+        let strategy = EloStrategy::default();
+
+        // Just fix the final score - doesn't matter who plays, the score should be fixed
+        let mut fixed = FixedResults::new();
+        fixed.insert(
+            MatchFixture::knockout(KnockoutRound::Final, 0),
+            FixedResultSpec::exact_score(3, 2),
+        );
+
+        let engine = SimulationEngine::new(&tournament, &strategy).with_fixed_results(&fixed);
+
+        // Run multiple simulations - final should always be 3-2
+        for seed in 0..10 {
+            let mut rng = ChaCha8Rng::seed_from_u64(seed);
+            let result = engine.simulate(&mut rng);
+
+            let final_match = &result.knockout_bracket.final_match;
+            assert_eq!(
+                final_match.home_goals, 3,
+                "Final should always be 3-2 (seed {})",
+                seed
+            );
+            assert_eq!(
+                final_match.away_goals, 2,
+                "Final should always be 3-2 (seed {})",
+                seed
+            );
+            // Home team should always win
+            assert_eq!(
+                final_match.winner(),
+                Some(final_match.home_team),
+                "Home team should win 3-2"
+            );
+        }
+    }
+
+    #[test]
+    fn test_fixed_semifinal_determines_finalists() {
+        let tournament = create_test_tournament();
+        let strategy = EloStrategy::default();
+
+        // Fix both semifinals with exact scores
+        let mut fixed = FixedResults::new();
+        fixed.insert(
+            MatchFixture::knockout(KnockoutRound::SemiFinal, 0),
+            FixedResultSpec::exact_score(2, 0), // Home wins
+        );
+        fixed.insert(
+            MatchFixture::knockout(KnockoutRound::SemiFinal, 1),
+            FixedResultSpec::exact_score(0, 1), // Away wins
+        );
+
+        let engine = SimulationEngine::new(&tournament, &strategy).with_fixed_results(&fixed);
+
+        for seed in 0..5 {
+            let mut rng = ChaCha8Rng::seed_from_u64(seed);
+            let result = engine.simulate(&mut rng);
+
+            // SF 0 should be 2-0
+            let sf0 = &result.knockout_bracket.semi_finals[0];
+            assert_eq!(sf0.home_goals, 2);
+            assert_eq!(sf0.away_goals, 0);
+
+            // SF 1 should be 0-1
+            let sf1 = &result.knockout_bracket.semi_finals[1];
+            assert_eq!(sf1.home_goals, 0);
+            assert_eq!(sf1.away_goals, 1);
+
+            // Final should have: SF0 home team vs SF1 away team
+            let final_match = &result.knockout_bracket.final_match;
+            assert_eq!(final_match.home_team, sf0.home_team);
+            assert_eq!(final_match.away_team, sf1.away_team);
+        }
+    }
+
+    #[test]
+    fn test_winner_only_produces_valid_score() {
+        let tournament = create_test_tournament();
+        let strategy = EloStrategy::default();
+
+        let mut fixed = FixedResults::new();
+        fixed.insert(
+            MatchFixture::group_stage(GroupId('A'), TeamId(0), TeamId(1)),
+            FixedResultSpec::winner_only(TeamId(0)),
+        );
+
+        let engine = SimulationEngine::new(&tournament, &strategy).with_fixed_results(&fixed);
+
+        for seed in 0..20 {
+            let mut rng = ChaCha8Rng::seed_from_u64(seed);
+            let result = engine.simulate(&mut rng);
+
+            let group_a = &result.group_results[0];
+            let first_match = &group_a.matches[0];
+
+            assert_eq!(
+                first_match.winner(),
+                Some(TeamId(0)),
+                "Team 0 should always win"
+            );
+            assert!(
+                first_match.home_goals > first_match.away_goals,
+                "Home team (0) should have more goals"
+            );
+        }
+    }
+
+    #[test]
+    fn test_fixed_results_deterministic() {
+        let tournament = create_test_tournament();
+        let strategy = EloStrategy::default();
+
+        let mut fixed = FixedResults::new();
+        // Use winner_only which uses RNG
+        fixed.insert(
+            MatchFixture::group_stage(GroupId('A'), TeamId(0), TeamId(1)),
+            FixedResultSpec::winner_only(TeamId(0)),
+        );
+
+        let engine = SimulationEngine::new(&tournament, &strategy).with_fixed_results(&fixed);
+
+        // Same seed should produce same result
+        let mut rng1 = ChaCha8Rng::seed_from_u64(12345);
+        let result1 = engine.simulate(&mut rng1);
+
+        let mut rng2 = ChaCha8Rng::seed_from_u64(12345);
+        let result2 = engine.simulate(&mut rng2);
+
+        let match1 = &result1.group_results[0].matches[0];
+        let match2 = &result2.group_results[0].matches[0];
+
+        assert_eq!(match1.home_goals, match2.home_goals);
+        assert_eq!(match1.away_goals, match2.away_goals);
+        assert_eq!(result1.champion, result2.champion);
+    }
+
+    #[test]
+    fn test_mix_fixed_and_simulated() {
+        let tournament = create_test_tournament();
+        let strategy = EloStrategy::default();
+
+        // Fix only one match, rest should be simulated normally
+        let mut fixed = FixedResults::new();
+        fixed.insert(
+            MatchFixture::group_stage(GroupId('A'), TeamId(0), TeamId(1)),
+            FixedResultSpec::exact_score(5, 0),
+        );
+
+        let engine = SimulationEngine::new(&tournament, &strategy).with_fixed_results(&fixed);
+
+        let mut rng = ChaCha8Rng::seed_from_u64(42);
+        let result = engine.simulate(&mut rng);
+
+        // Fixed match should have exact score
+        let group_a = &result.group_results[0];
+        assert_eq!(group_a.matches[0].home_goals, 5);
+        assert_eq!(group_a.matches[0].away_goals, 0);
+
+        // Other matches in group A should be simulated (not all 5-0)
+        let other_matches_varied = group_a.matches[1..].iter().any(|m| {
+            m.home_goals != 5 || m.away_goals != 0
+        });
+        assert!(other_matches_varied, "Non-fixed matches should be simulated normally");
+
+        // Other groups should be simulated normally
+        let group_b = &result.group_results[1];
+        let group_b_has_varied = group_b.matches.iter().any(|m| {
+            m.home_goals != 5 || m.away_goals != 0
+        });
+        assert!(group_b_has_varied, "Group B should have varied scores");
+    }
+
+    #[test]
+    fn test_no_fixed_results_unchanged_behavior() {
+        let tournament = create_test_tournament();
+        let strategy = EloStrategy::default();
+
+        // Engine without fixed results
+        let engine_no_fixed = SimulationEngine::new(&tournament, &strategy);
+
+        // Engine with empty fixed results
+        let fixed = FixedResults::new();
+        let engine_empty_fixed =
+            SimulationEngine::new(&tournament, &strategy).with_fixed_results(&fixed);
+
+        let mut rng1 = ChaCha8Rng::seed_from_u64(42);
+        let result1 = engine_no_fixed.simulate(&mut rng1);
+
+        let mut rng2 = ChaCha8Rng::seed_from_u64(42);
+        let result2 = engine_empty_fixed.simulate(&mut rng2);
+
+        // Should produce identical results
+        assert_eq!(result1.champion, result2.champion);
+        assert_eq!(result1.runner_up, result2.runner_up);
     }
 }
