@@ -37,6 +37,15 @@ class Team(BaseModel):
     world_cup_wins: Annotated[
         int, Field(ge=0, description="Number of World Cup titles won")
     ]
+    sofascore_form: Annotated[
+        float,
+        Field(
+            ge=0.0,
+            le=3.0,
+            default=1.5,
+            description="Sofascore form rating (average points per game)",
+        ),
+    ]
 
     class Config:
         use_enum_values = True

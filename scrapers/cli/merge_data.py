@@ -164,6 +164,31 @@ def get_fifa_ranking(
     return None
 
 
+def get_sofascore_form(
+    team: dict,
+    sofascore_data: dict | None,
+) -> float:
+    """Get Sofascore form rating for a team.
+
+    Args:
+        team: Team data from mapping.
+        sofascore_data: Scraped Sofascore form data, or None.
+
+    Returns:
+        Sofascore form rating, or 1.5 default if not found.
+    """
+    if sofascore_data is None:
+        return 1.5
+
+    canonical = team["canonical_name"]
+    teams = sofascore_data.get("teams", {})
+
+    if canonical in teams:
+        return float(teams[canonical])
+
+    return 1.5
+
+
 def build_groups(
     groups_data: dict,
     lookups: dict,
@@ -275,6 +300,13 @@ def get_default_values_for_tbd(team: dict) -> dict:
     help="Path to fifa_rankings.json",
 )
 @click.option(
+    "--sofascore",
+    "-s",
+    type=click.Path(exists=True, path_type=Path),
+    default=None,
+    help="Path to sofascore_form.json (optional)",
+)
+@click.option(
     "--groups",
     "-g",
     type=click.Path(exists=True, path_type=Path),
@@ -309,6 +341,7 @@ def merge_data(
     elo: Path,
     transfermarkt: Path,
     fifa: Path,
+    sofascore: Path | None,
     groups: Path,
     output: Path,
     allow_tbd_defaults: bool,
@@ -336,12 +369,13 @@ def merge_data(
     console.print()
 
     # Load all input files
+    file_count = 6 if sofascore else 5
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
         console=console,
     ) as progress:
-        task = progress.add_task("Loading input files...", total=5)
+        task = progress.add_task("Loading input files...", total=file_count)
 
         progress.update(task, description="Loading team mapping...")
         team_mapping = load_json_file(mapping, "Team mapping")
@@ -358,6 +392,12 @@ def merge_data(
         progress.update(task, description="Loading FIFA rankings...")
         fifa_data = load_json_file(fifa, "FIFA rankings")
         progress.advance(task)
+
+        sofascore_data = None
+        if sofascore:
+            progress.update(task, description="Loading Sofascore form data...")
+            sofascore_data = load_json_file(sofascore, "Sofascore form")
+            progress.advance(task)
 
         progress.update(task, description="Loading groups...")
         groups_data = load_json_file(groups, "Groups")
@@ -391,6 +431,9 @@ def merge_data(
 
         # Get FIFA ranking
         fifa_ranking = get_fifa_ranking(team_data, fifa_data, lookups)
+
+        # Get Sofascore form
+        sofascore_form = get_sofascore_form(team_data, sofascore_data)
 
         # Handle missing data
         if is_tbd:
@@ -455,6 +498,7 @@ def merge_data(
             "market_value_millions": market_value,
             "fifa_ranking": fifa_ranking,
             "world_cup_wins": team_data.get("world_cup_wins", 0),
+            "sofascore_form": sofascore_form,
         }
 
         teams.append(team_entry)
@@ -462,7 +506,8 @@ def merge_data(
         if verbose:
             console.print(
                 f"  [green]+[/green] {canonical} "
-                f"(ELO: {elo_rating:.0f}, Market: {market_value:.1f}M, FIFA: {fifa_ranking})"
+                f"(ELO: {elo_rating:.0f}, Market: {market_value:.1f}M, "
+                f"FIFA: {fifa_ranking}, Form: {sofascore_form:.1f})"
             )
 
     # Report warnings

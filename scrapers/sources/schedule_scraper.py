@@ -367,33 +367,32 @@ class ScheduleScraper(BaseScraper):
             start_match_number: Starting match number for knockout stage.
         """
         matches = []
-        match_num = start_match_number
 
         # Round of 32 - June 29-July 2, 2026
-        # Note: Match numbers define bracket slot via matchMapping.ts
-        # Match numbers are assigned in chronological order starting from 73
+        # Match numbers and pairings from official FIFA bracket (bracket.rs).
+        # Order: by match number (which follows bracket position, not chronology).
         r32_matches = [
-            {"date": "2026-06-29", "time": "16:30", "venueId": "gillette", "home": "1E", "away": "3A/B/C/D/F"},
-            {"date": "2026-06-29", "time": "16:00", "venueId": "metlife", "home": "2B", "away": "2A"},
-            {"date": "2026-06-29", "time": "21:00", "venueId": "bbva", "home": "1F", "away": "2C"},
-            {"date": "2026-06-29", "time": "22:00", "venueId": "nrg", "home": "2D", "away": "2C"},
-            {"date": "2026-06-30", "time": "21:00", "venueId": "azteca", "home": "1A", "away": "3C/E/F/H/I"},
-            {"date": "2026-06-30", "time": "16:00", "venueId": "mercedes_benz", "home": "2F", "away": "2E"},
-            {"date": "2026-06-30", "time": "19:00", "venueId": "sofi", "home": "1G", "away": "3J/K/L"},
-            {"date": "2026-06-30", "time": "22:00", "venueId": "att", "home": "2H", "away": "2G"},
-            {"date": "2026-07-01", "time": "22:00", "venueId": "levis", "home": "1D", "away": "3B/E/F/I/J"},
-            {"date": "2026-07-01", "time": "16:00", "venueId": "lumen", "home": "1G", "away": "3A/E/H/I/J"},
-            {"date": "2026-07-01", "time": "19:00", "venueId": "sofi", "home": "1D", "away": "3B/E/F"},
-            {"date": "2026-07-01", "time": "22:00", "venueId": "hard_rock", "home": "2C", "away": "2D"},
-            {"date": "2026-07-02", "time": "23:00", "venueId": "bc_place", "home": "1B", "away": "3E/F/G/I/J"},
-            {"date": "2026-07-02", "time": "16:00", "venueId": "arrowhead", "home": "2E", "away": "2F"},
-            {"date": "2026-07-02", "time": "19:00", "venueId": "bmo", "home": "2K", "away": "2L"},
-            {"date": "2026-07-02", "time": "22:00", "venueId": "att", "home": "2G", "away": "2H"},
+            {"matchNumber": 73,  "date": "2026-06-29", "time": "13:00", "venueId": "gillette",      "home": "2A", "away": "2B"},
+            {"matchNumber": 74,  "date": "2026-06-29", "time": "16:00", "venueId": "metlife",        "home": "1E", "away": "3A/B/C/D/F"},
+            {"matchNumber": 75,  "date": "2026-06-29", "time": "19:00", "venueId": "bbva",           "home": "1F", "away": "2C"},
+            {"matchNumber": 76,  "date": "2026-06-29", "time": "22:00", "venueId": "nrg",            "home": "1C", "away": "2F"},
+            {"matchNumber": 77,  "date": "2026-06-30", "time": "13:00", "venueId": "azteca",         "home": "1I", "away": "3C/D/F/G/H"},
+            {"matchNumber": 78,  "date": "2026-06-30", "time": "16:00", "venueId": "mercedes_benz",  "home": "2E", "away": "2I"},
+            {"matchNumber": 79,  "date": "2026-06-30", "time": "19:00", "venueId": "sofi",           "home": "1A", "away": "3C/E/F/H/I"},
+            {"matchNumber": 80,  "date": "2026-06-30", "time": "22:00", "venueId": "att",            "home": "1L", "away": "3E/H/I/J/K"},
+            {"matchNumber": 81,  "date": "2026-07-01", "time": "13:00", "venueId": "levis",          "home": "1D", "away": "3B/E/F/I/J"},
+            {"matchNumber": 82,  "date": "2026-07-01", "time": "16:00", "venueId": "lumen",          "home": "1G", "away": "3A/E/H/I/J"},
+            {"matchNumber": 83,  "date": "2026-07-01", "time": "19:00", "venueId": "sofi",           "home": "2K", "away": "2L"},
+            {"matchNumber": 84,  "date": "2026-07-01", "time": "22:00", "venueId": "hard_rock",      "home": "1H", "away": "2J"},
+            {"matchNumber": 85,  "date": "2026-07-02", "time": "13:00", "venueId": "bc_place",       "home": "1B", "away": "3E/F/G/I/J"},
+            {"matchNumber": 86,  "date": "2026-07-02", "time": "16:00", "venueId": "arrowhead",      "home": "1J", "away": "2H"},
+            {"matchNumber": 87,  "date": "2026-07-02", "time": "19:00", "venueId": "bmo",            "home": "1K", "away": "3D/E/I/J/L"},
+            {"matchNumber": 88,  "date": "2026-07-02", "time": "22:00", "venueId": "att",            "home": "2D", "away": "2G"},
         ]
 
-        for i, m in enumerate(r32_matches):
+        for m in r32_matches:
             matches.append({
-                "matchNumber": match_num,
+                "matchNumber": m["matchNumber"],
                 "date": m["date"],
                 "time": m["time"],
                 "venueId": m["venueId"],
@@ -401,92 +400,91 @@ class ScheduleScraper(BaseScraper):
                 "homePlaceholder": m["home"],
                 "awayPlaceholder": m["away"],
             })
-            match_num += 1
 
         # Round of 16 - July 4-7, 2026
-        # Note: Mexico City (Azteca) hosts Match 92 on July 5 at 8 PM ET
+        # Pairings from official FIFA bracket: W{matchNum} references R32 match winners.
         r16_matches = [
-            {"date": "2026-07-04", "time": "13:00", "venueId": "nrg"},
-            {"date": "2026-07-04", "time": "17:00", "venueId": "lincoln_financial"},
-            {"date": "2026-07-05", "time": "16:00", "venueId": "metlife"},
-            {"date": "2026-07-05", "time": "20:00", "venueId": "azteca"},
-            {"date": "2026-07-06", "time": "15:00", "venueId": "att"},
-            {"date": "2026-07-06", "time": "20:00", "venueId": "lumen"},
-            {"date": "2026-07-07", "time": "12:00", "venueId": "mercedes_benz"},
-            {"date": "2026-07-07", "time": "16:00", "venueId": "bc_place"},
+            {"matchNumber": 89,  "date": "2026-07-04", "time": "13:00", "venueId": "nrg",               "home": "W74", "away": "W77"},
+            {"matchNumber": 90,  "date": "2026-07-04", "time": "17:00", "venueId": "lincoln_financial",  "home": "W73", "away": "W75"},
+            {"matchNumber": 91,  "date": "2026-07-05", "time": "16:00", "venueId": "metlife",            "home": "W76", "away": "W78"},
+            {"matchNumber": 92,  "date": "2026-07-05", "time": "20:00", "venueId": "azteca",             "home": "W79", "away": "W80"},
+            {"matchNumber": 93,  "date": "2026-07-06", "time": "15:00", "venueId": "att",                "home": "W83", "away": "W84"},
+            {"matchNumber": 94,  "date": "2026-07-06", "time": "20:00", "venueId": "lumen",              "home": "W81", "away": "W82"},
+            {"matchNumber": 95,  "date": "2026-07-07", "time": "12:00", "venueId": "mercedes_benz",      "home": "W86", "away": "W88"},
+            {"matchNumber": 96,  "date": "2026-07-07", "time": "16:00", "venueId": "bc_place",           "home": "W85", "away": "W87"},
         ]
 
-        for i, m in enumerate(r16_matches):
+        for m in r16_matches:
             matches.append({
-                "matchNumber": match_num,
+                "matchNumber": m["matchNumber"],
                 "date": m["date"],
                 "time": m["time"],
                 "venueId": m["venueId"],
                 "round": "round_of_16",
-                "homePlaceholder": f"W{i * 2 + 1}",
-                "awayPlaceholder": f"W{i * 2 + 2}",
+                "homePlaceholder": m["home"],
+                "awayPlaceholder": m["away"],
             })
-            match_num += 1
 
         # Quarter-finals - July 10-11, 2026
+        # Pairings from official FIFA bracket.
         qf_matches = [
-            {"date": "2026-07-10", "time": "16:00", "venueId": "metlife"},
-            {"date": "2026-07-10", "time": "12:00", "venueId": "sofi"},
-            {"date": "2026-07-11", "time": "16:00", "venueId": "hard_rock"},
-            {"date": "2026-07-11", "time": "20:00", "venueId": "arrowhead"},
+            {"matchNumber": 97,  "date": "2026-07-10", "time": "16:00", "venueId": "metlife",    "home": "W89", "away": "W90"},
+            {"matchNumber": 98,  "date": "2026-07-10", "time": "12:00", "venueId": "sofi",       "home": "W93", "away": "W94"},
+            {"matchNumber": 99,  "date": "2026-07-11", "time": "16:00", "venueId": "hard_rock",  "home": "W91", "away": "W92"},
+            {"matchNumber": 100, "date": "2026-07-11", "time": "20:00", "venueId": "arrowhead",  "home": "W95", "away": "W96"},
         ]
 
-        for i, m in enumerate(qf_matches):
+        for m in qf_matches:
             matches.append({
-                "matchNumber": match_num,
+                "matchNumber": m["matchNumber"],
                 "date": m["date"],
                 "time": m["time"],
                 "venueId": m["venueId"],
                 "round": "quarter_finals",
-                "homePlaceholder": f"WQF{i * 2 + 1}",
-                "awayPlaceholder": f"WQF{i * 2 + 2}",
+                "homePlaceholder": m["home"],
+                "awayPlaceholder": m["away"],
             })
-            match_num += 1
 
         # Semi-finals - July 14-15, 2026
-        sf_matches = [
-            {"date": "2026-07-14", "time": "20:00", "venueId": "att"},
-            {"date": "2026-07-15", "time": "20:00", "venueId": "mercedes_benz"},
-        ]
-
-        for i, m in enumerate(sf_matches):
-            matches.append({
-                "matchNumber": match_num,
-                "date": m["date"],
-                "time": m["time"],
-                "venueId": m["venueId"],
-                "round": "semi_finals",
-                "homePlaceholder": f"WSF{i * 2 + 1}",
-                "awayPlaceholder": f"WSF{i * 2 + 2}",
-            })
-            match_num += 1
+        matches.append({
+            "matchNumber": 101,
+            "date": "2026-07-14",
+            "time": "20:00",
+            "venueId": "att",
+            "round": "semi_finals",
+            "homePlaceholder": "W97",
+            "awayPlaceholder": "W98",
+        })
+        matches.append({
+            "matchNumber": 102,
+            "date": "2026-07-15",
+            "time": "20:00",
+            "venueId": "mercedes_benz",
+            "round": "semi_finals",
+            "homePlaceholder": "W99",
+            "awayPlaceholder": "W100",
+        })
 
         # Third place play-off - July 18, 2026
         matches.append({
-            "matchNumber": match_num,
+            "matchNumber": 103,
             "date": "2026-07-18",
             "time": "16:00",
             "venueId": "hard_rock",
             "round": "third_place",
-            "homePlaceholder": "LSF1",
-            "awayPlaceholder": "LSF2",
+            "homePlaceholder": "L101",
+            "awayPlaceholder": "L102",
         })
-        match_num += 1
 
         # Final - July 19, 2026
         matches.append({
-            "matchNumber": match_num,
+            "matchNumber": 104,
             "date": "2026-07-19",
             "time": "16:00",
             "venueId": "metlife",
             "round": "final",
-            "homePlaceholder": "WSF1",
-            "awayPlaceholder": "WSF2",
+            "homePlaceholder": "W101",
+            "awayPlaceholder": "W102",
         })
 
         return matches

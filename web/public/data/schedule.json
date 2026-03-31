@@ -42,12 +42,12 @@
     },
     {
       "date": "2026-06-13",
-      "time": "21:00",
-      "venueId": "gillette",
+      "time": "15:00",
+      "venueId": "levis",
       "round": "group_stage",
-      "groupId": "C",
-      "homePlaceholder": "C4",
-      "awayPlaceholder": "C3",
+      "groupId": "B",
+      "homePlaceholder": "B3",
+      "awayPlaceholder": "B2",
       "matchNumber": 5
     },
     {
@@ -62,12 +62,12 @@
     },
     {
       "date": "2026-06-13",
-      "time": "15:00",
-      "venueId": "levis",
+      "time": "21:00",
+      "venueId": "gillette",
       "round": "group_stage",
-      "groupId": "B",
-      "homePlaceholder": "B3",
-      "awayPlaceholder": "B2",
+      "groupId": "C",
+      "homePlaceholder": "C4",
+      "awayPlaceholder": "C3",
       "matchNumber": 7
     },
     {
@@ -92,22 +92,22 @@
     },
     {
       "date": "2026-06-14",
-      "time": "19:00",
-      "venueId": "lincoln_financial",
-      "round": "group_stage",
-      "groupId": "E",
-      "homePlaceholder": "E2",
-      "awayPlaceholder": "E3",
-      "matchNumber": 10
-    },
-    {
-      "date": "2026-06-14",
       "time": "16:00",
       "venueId": "att",
       "round": "group_stage",
       "groupId": "F",
       "homePlaceholder": "F1",
       "awayPlaceholder": "F2",
+      "matchNumber": 10
+    },
+    {
+      "date": "2026-06-14",
+      "time": "19:00",
+      "venueId": "lincoln_financial",
+      "round": "group_stage",
+      "groupId": "E",
+      "homePlaceholder": "E2",
+      "awayPlaceholder": "E3",
       "matchNumber": 11
     },
     {
@@ -132,22 +132,22 @@
     },
     {
       "date": "2026-06-15",
-      "time": "18:00",
-      "venueId": "hard_rock",
-      "round": "group_stage",
-      "groupId": "H",
-      "homePlaceholder": "H2",
-      "awayPlaceholder": "H3",
-      "matchNumber": 14
-    },
-    {
-      "date": "2026-06-15",
       "time": "15:00",
       "venueId": "lumen",
       "round": "group_stage",
       "groupId": "G",
       "homePlaceholder": "G1",
       "awayPlaceholder": "G2",
+      "matchNumber": 14
+    },
+    {
+      "date": "2026-06-15",
+      "time": "18:00",
+      "venueId": "hard_rock",
+      "round": "group_stage",
+      "groupId": "H",
+      "homePlaceholder": "H2",
+      "awayPlaceholder": "H3",
       "matchNumber": 15
     },
     {
@@ -162,33 +162,23 @@
     },
     {
       "date": "2026-06-16",
-      "time": "18:00",
-      "venueId": "gillette",
-      "round": "group_stage",
-      "groupId": "I",
-      "homePlaceholder": "I4",
-      "awayPlaceholder": "I3",
-      "matchNumber": 17
-    },
-    {
-      "date": "2026-06-16",
       "time": "15:00",
       "venueId": "metlife",
       "round": "group_stage",
       "groupId": "I",
       "homePlaceholder": "I1",
       "awayPlaceholder": "I2",
-      "matchNumber": 18
+      "matchNumber": 17
     },
     {
-      "date": "2026-06-17",
-      "time": "00:00",
-      "venueId": "levis",
+      "date": "2026-06-16",
+      "time": "18:00",
+      "venueId": "gillette",
       "round": "group_stage",
-      "groupId": "J",
-      "homePlaceholder": "J3",
-      "awayPlaceholder": "J4",
-      "matchNumber": 19
+      "groupId": "I",
+      "homePlaceholder": "I4",
+      "awayPlaceholder": "I3",
+      "matchNumber": 18
     },
     {
       "date": "2026-06-16",
@@ -198,17 +188,17 @@
       "groupId": "J",
       "homePlaceholder": "J1",
       "awayPlaceholder": "J2",
-      "matchNumber": 20
+      "matchNumber": 19
     },
     {
       "date": "2026-06-17",
-      "time": "22:00",
-      "venueId": "azteca",
+      "time": "00:00",
+      "venueId": "levis",
       "round": "group_stage",
-      "groupId": "K",
-      "homePlaceholder": "K3",
-      "awayPlaceholder": "K2",
-      "matchNumber": 21
+      "groupId": "J",
+      "homePlaceholder": "J3",
+      "awayPlaceholder": "J4",
+      "matchNumber": 20
     },
     {
       "date": "2026-06-17",
@@ -218,6 +208,16 @@
       "groupId": "K",
       "homePlaceholder": "K1",
       "awayPlaceholder": "K4",
+      "matchNumber": 21
+    },
+    {
+      "date": "2026-06-17",
+      "time": "16:00",
+      "venueId": "att",
+      "round": "group_stage",
+      "groupId": "L",
+      "homePlaceholder": "L1",
+      "awayPlaceholder": "L2",
       "matchNumber": 22
     },
     {
@@ -232,12 +232,12 @@
     },
     {
       "date": "2026-06-17",
-      "time": "16:00",
-      "venueId": "att",
+      "time": "22:00",
+      "venueId": "azteca",
       "round": "group_stage",
-      "groupId": "L",
-      "homePlaceholder": "L1",
-      "awayPlaceholder": "L2",
+      "groupId": "K",
+      "homePlaceholder": "K3",
+      "awayPlaceholder": "K2",
       "matchNumber": 24
     },
     {
@@ -252,13 +252,23 @@
     },
     {
       "date": "2026-06-18",
+      "time": "15:00",
+      "venueId": "sofi",
+      "round": "group_stage",
+      "groupId": "B",
+      "homePlaceholder": "B2",
+      "awayPlaceholder": "B4",
+      "matchNumber": 26
+    },
+    {
+      "date": "2026-06-18",
       "time": "18:00",
       "venueId": "bc_place",
       "round": "group_stage",
       "groupId": "B",
       "homePlaceholder": "B1",
       "awayPlaceholder": "B3",
-      "matchNumber": 26
+      "matchNumber": 27
     },
     {
       "date": "2026-06-18",
@@ -268,37 +278,7 @@
       "groupId": "A",
       "homePlaceholder": "A1",
       "awayPlaceholder": "A3",
-      "matchNumber": 27
-    },
-    {
-      "date": "2026-06-18",
-      "time": "15:00",
-      "venueId": "sofi",
-      "round": "group_stage",
-      "groupId": "B",
-      "homePlaceholder": "B2",
-      "awayPlaceholder": "B4",
       "matchNumber": 28
-    },
-    {
-      "date": "2026-06-19",
-      "time": "18:00",
-      "venueId": "gillette",
-      "round": "group_stage",
-      "groupId": "C",
-      "homePlaceholder": "C3",
-      "awayPlaceholder": "C2",
-      "matchNumber": 29
-    },
-    {
-      "date": "2026-06-19",
-      "time": "21:00",
-      "venueId": "lincoln_financial",
-      "round": "group_stage",
-      "groupId": "C",
-      "homePlaceholder": "C1",
-      "awayPlaceholder": "C4",
-      "matchNumber": 30
     },
     {
       "date": "2026-06-19",
@@ -308,6 +288,26 @@
       "groupId": "D",
       "homePlaceholder": "D1",
       "awayPlaceholder": "D3",
+      "matchNumber": 29
+    },
+    {
+      "date": "2026-06-19",
+      "time": "18:00",
+      "venueId": "gillette",
+      "round": "group_stage",
+      "groupId": "C",
+      "homePlaceholder": "C3",
+      "awayPlaceholder": "C2",
+      "matchNumber": 30
+    },
+    {
+      "date": "2026-06-19",
+      "time": "21:00",
+      "venueId": "lincoln_financial",
+      "round": "group_stage",
+      "groupId": "C",
+      "homePlaceholder": "C1",
+      "awayPlaceholder": "C4",
       "matchNumber": 31
     },
     {
@@ -322,12 +322,12 @@
     },
     {
       "date": "2026-06-20",
-      "time": "20:00",
-      "venueId": "arrowhead",
+      "time": "13:00",
+      "venueId": "nrg",
       "round": "group_stage",
-      "groupId": "E",
-      "homePlaceholder": "E3",
-      "awayPlaceholder": "E4",
+      "groupId": "F",
+      "homePlaceholder": "F1",
+      "awayPlaceholder": "F4",
       "matchNumber": 33
     },
     {
@@ -341,6 +341,16 @@
       "matchNumber": 34
     },
     {
+      "date": "2026-06-20",
+      "time": "20:00",
+      "venueId": "arrowhead",
+      "round": "group_stage",
+      "groupId": "E",
+      "homePlaceholder": "E3",
+      "awayPlaceholder": "E4",
+      "matchNumber": 35
+    },
+    {
       "date": "2026-06-21",
       "time": "00:00",
       "venueId": "bbva",
@@ -348,16 +358,6 @@
       "groupId": "F",
       "homePlaceholder": "F3",
       "awayPlaceholder": "F2",
-      "matchNumber": 35
-    },
-    {
-      "date": "2026-06-20",
-      "time": "13:00",
-      "venueId": "nrg",
-      "round": "group_stage",
-      "groupId": "F",
-      "homePlaceholder": "F1",
-      "awayPlaceholder": "F4",
       "matchNumber": 36
     },
     {
@@ -372,22 +372,22 @@
     },
     {
       "date": "2026-06-21",
-      "time": "18:00",
-      "venueId": "hard_rock",
-      "round": "group_stage",
-      "groupId": "H",
-      "homePlaceholder": "H3",
-      "awayPlaceholder": "H4",
-      "matchNumber": 38
-    },
-    {
-      "date": "2026-06-21",
       "time": "15:00",
       "venueId": "sofi",
       "round": "group_stage",
       "groupId": "G",
       "homePlaceholder": "G1",
       "awayPlaceholder": "G3",
+      "matchNumber": 38
+    },
+    {
+      "date": "2026-06-21",
+      "time": "18:00",
+      "venueId": "hard_rock",
+      "round": "group_stage",
+      "groupId": "H",
+      "homePlaceholder": "H3",
+      "awayPlaceholder": "H4",
       "matchNumber": 39
     },
     {
@@ -402,13 +402,23 @@
     },
     {
       "date": "2026-06-22",
+      "time": "13:00",
+      "venueId": "att",
+      "round": "group_stage",
+      "groupId": "J",
+      "homePlaceholder": "J1",
+      "awayPlaceholder": "J3",
+      "matchNumber": 41
+    },
+    {
+      "date": "2026-06-22",
       "time": "17:00",
       "venueId": "lincoln_financial",
       "round": "group_stage",
       "groupId": "I",
       "homePlaceholder": "I1",
       "awayPlaceholder": "I4",
-      "matchNumber": 41
+      "matchNumber": 42
     },
     {
       "date": "2026-06-22",
@@ -418,16 +428,6 @@
       "groupId": "I",
       "homePlaceholder": "I3",
       "awayPlaceholder": "I2",
-      "matchNumber": 42
-    },
-    {
-      "date": "2026-06-22",
-      "time": "13:00",
-      "venueId": "att",
-      "round": "group_stage",
-      "groupId": "J",
-      "homePlaceholder": "J1",
-      "awayPlaceholder": "J3",
       "matchNumber": 43
     },
     {
@@ -452,23 +452,13 @@
     },
     {
       "date": "2026-06-23",
-      "time": "22:00",
-      "venueId": "akron",
-      "round": "group_stage",
-      "groupId": "K",
-      "homePlaceholder": "K2",
-      "awayPlaceholder": "K4",
-      "matchNumber": 46
-    },
-    {
-      "date": "2026-06-23",
       "time": "16:00",
       "venueId": "gillette",
       "round": "group_stage",
       "groupId": "L",
       "homePlaceholder": "L1",
       "awayPlaceholder": "L3",
-      "matchNumber": 47
+      "matchNumber": 46
     },
     {
       "date": "2026-06-23",
@@ -478,57 +468,17 @@
       "groupId": "L",
       "homePlaceholder": "L4",
       "awayPlaceholder": "L2",
+      "matchNumber": 47
+    },
+    {
+      "date": "2026-06-23",
+      "time": "22:00",
+      "venueId": "akron",
+      "round": "group_stage",
+      "groupId": "K",
+      "homePlaceholder": "K2",
+      "awayPlaceholder": "K4",
       "matchNumber": 48
-    },
-    {
-      "date": "2026-06-24",
-      "time": "18:00",
-      "venueId": "mercedes_benz",
-      "round": "group_stage",
-      "groupId": "C",
-      "homePlaceholder": "C2",
-      "awayPlaceholder": "C4",
-      "matchNumber": 49
-    },
-    {
-      "date": "2026-06-24",
-      "time": "18:00",
-      "venueId": "hard_rock",
-      "round": "group_stage",
-      "groupId": "C",
-      "homePlaceholder": "C3",
-      "awayPlaceholder": "C1",
-      "matchNumber": 50
-    },
-    {
-      "date": "2026-06-24",
-      "time": "21:00",
-      "venueId": "azteca",
-      "round": "group_stage",
-      "groupId": "A",
-      "homePlaceholder": "A4",
-      "awayPlaceholder": "A1",
-      "matchNumber": 51
-    },
-    {
-      "date": "2026-06-24",
-      "time": "21:00",
-      "venueId": "bbva",
-      "round": "group_stage",
-      "groupId": "A",
-      "homePlaceholder": "A2",
-      "awayPlaceholder": "A3",
-      "matchNumber": 52
-    },
-    {
-      "date": "2026-06-24",
-      "time": "15:00",
-      "venueId": "lumen",
-      "round": "group_stage",
-      "groupId": "B",
-      "homePlaceholder": "B4",
-      "awayPlaceholder": "B3",
-      "matchNumber": 53
     },
     {
       "date": "2026-06-24",
@@ -538,7 +488,67 @@
       "groupId": "B",
       "homePlaceholder": "B2",
       "awayPlaceholder": "B1",
+      "matchNumber": 49
+    },
+    {
+      "date": "2026-06-24",
+      "time": "15:00",
+      "venueId": "lumen",
+      "round": "group_stage",
+      "groupId": "B",
+      "homePlaceholder": "B3",
+      "awayPlaceholder": "B2",
+      "matchNumber": 50
+    },
+    {
+      "date": "2026-06-24",
+      "time": "18:00",
+      "venueId": "mercedes_benz",
+      "round": "group_stage",
+      "groupId": "C",
+      "homePlaceholder": "C2",
+      "awayPlaceholder": "C4",
+      "matchNumber": 51
+    },
+    {
+      "date": "2026-06-24",
+      "time": "18:00",
+      "venueId": "hard_rock",
+      "round": "group_stage",
+      "groupId": "C",
+      "homePlaceholder": "C3",
+      "awayPlaceholder": "C1",
+      "matchNumber": 52
+    },
+    {
+      "date": "2026-06-24",
+      "time": "21:00",
+      "venueId": "azteca",
+      "round": "group_stage",
+      "groupId": "A",
+      "homePlaceholder": "A4",
+      "awayPlaceholder": "A1",
+      "matchNumber": 53
+    },
+    {
+      "date": "2026-06-24",
+      "time": "21:00",
+      "venueId": "bbva",
+      "round": "group_stage",
+      "groupId": "A",
+      "homePlaceholder": "A2",
+      "awayPlaceholder": "A3",
       "matchNumber": 54
+    },
+    {
+      "date": "2026-06-24",
+      "time": "21:00",
+      "venueId": "sofi",
+      "round": "group_stage",
+      "groupId": "B",
+      "homePlaceholder": "B4",
+      "awayPlaceholder": "B3",
+      "matchNumber": 55
     },
     {
       "date": "2026-06-25",
@@ -548,7 +558,7 @@
       "groupId": "E",
       "homePlaceholder": "E3",
       "awayPlaceholder": "E1",
-      "matchNumber": 55
+      "matchNumber": 56
     },
     {
       "date": "2026-06-25",
@@ -558,27 +568,7 @@
       "groupId": "E",
       "homePlaceholder": "E4",
       "awayPlaceholder": "E2",
-      "matchNumber": 56
-    },
-    {
-      "date": "2026-06-25",
-      "time": "22:00",
-      "venueId": "sofi",
-      "round": "group_stage",
-      "groupId": "D",
-      "homePlaceholder": "D4",
-      "awayPlaceholder": "D1",
       "matchNumber": 57
-    },
-    {
-      "date": "2026-06-25",
-      "time": "22:00",
-      "venueId": "levis",
-      "round": "group_stage",
-      "groupId": "D",
-      "homePlaceholder": "D3",
-      "awayPlaceholder": "D2",
-      "matchNumber": 58
     },
     {
       "date": "2026-06-25",
@@ -588,7 +578,7 @@
       "groupId": "F",
       "homePlaceholder": "F2",
       "awayPlaceholder": "F4",
-      "matchNumber": 59
+      "matchNumber": 58
     },
     {
       "date": "2026-06-25",
@@ -598,7 +588,27 @@
       "groupId": "F",
       "homePlaceholder": "F3",
       "awayPlaceholder": "F1",
+      "matchNumber": 59
+    },
+    {
+      "date": "2026-06-25",
+      "time": "22:00",
+      "venueId": "sofi",
+      "round": "group_stage",
+      "groupId": "D",
+      "homePlaceholder": "D4",
+      "awayPlaceholder": "D1",
       "matchNumber": 60
+    },
+    {
+      "date": "2026-06-25",
+      "time": "22:00",
+      "venueId": "levis",
+      "round": "group_stage",
+      "groupId": "D",
+      "homePlaceholder": "D3",
+      "awayPlaceholder": "D2",
+      "matchNumber": 61
     },
     {
       "date": "2026-06-26",
@@ -608,7 +618,7 @@
       "groupId": "I",
       "homePlaceholder": "I2",
       "awayPlaceholder": "I4",
-      "matchNumber": 61
+      "matchNumber": 62
     },
     {
       "date": "2026-06-26",
@@ -618,27 +628,7 @@
       "groupId": "I",
       "homePlaceholder": "I3",
       "awayPlaceholder": "I1",
-      "matchNumber": 62
-    },
-    {
-      "date": "2026-06-26",
-      "time": "23:00",
-      "venueId": "lumen",
-      "round": "group_stage",
-      "groupId": "G",
-      "homePlaceholder": "G2",
-      "awayPlaceholder": "G3",
       "matchNumber": 63
-    },
-    {
-      "date": "2026-06-26",
-      "time": "23:00",
-      "venueId": "bc_place",
-      "round": "group_stage",
-      "groupId": "G",
-      "homePlaceholder": "G4",
-      "awayPlaceholder": "G1",
-      "matchNumber": 64
     },
     {
       "date": "2026-06-26",
@@ -648,7 +638,7 @@
       "groupId": "H",
       "homePlaceholder": "H3",
       "awayPlaceholder": "H1",
-      "matchNumber": 65
+      "matchNumber": 64
     },
     {
       "date": "2026-06-26",
@@ -658,47 +648,27 @@
       "groupId": "H",
       "homePlaceholder": "H4",
       "awayPlaceholder": "H2",
+      "matchNumber": 65
+    },
+    {
+      "date": "2026-06-26",
+      "time": "23:00",
+      "venueId": "lumen",
+      "round": "group_stage",
+      "groupId": "G",
+      "homePlaceholder": "G2",
+      "awayPlaceholder": "G3",
       "matchNumber": 66
     },
     {
-      "date": "2026-06-27",
-      "time": "19:30",
-      "venueId": "mercedes_benz",
+      "date": "2026-06-26",
+      "time": "23:00",
+      "venueId": "bc_place",
       "round": "group_stage",
-      "groupId": "K",
-      "homePlaceholder": "K3",
-      "awayPlaceholder": "K4",
+      "groupId": "G",
+      "homePlaceholder": "G4",
+      "awayPlaceholder": "G1",
       "matchNumber": 67
-    },
-    {
-      "date": "2026-06-27",
-      "time": "19:30",
-      "venueId": "hard_rock",
-      "round": "group_stage",
-      "groupId": "K",
-      "homePlaceholder": "K2",
-      "awayPlaceholder": "K1",
-      "matchNumber": 68
-    },
-    {
-      "date": "2026-06-27",
-      "time": "22:00",
-      "venueId": "att",
-      "round": "group_stage",
-      "groupId": "J",
-      "homePlaceholder": "J4",
-      "awayPlaceholder": "J1",
-      "matchNumber": 69
-    },
-    {
-      "date": "2026-06-27",
-      "time": "22:00",
-      "venueId": "arrowhead",
-      "round": "group_stage",
-      "groupId": "J",
-      "homePlaceholder": "J2",
-      "awayPlaceholder": "J3",
-      "matchNumber": 70
     },
     {
       "date": "2026-06-27",
@@ -708,7 +678,7 @@
       "groupId": "L",
       "homePlaceholder": "L4",
       "awayPlaceholder": "L1",
-      "matchNumber": 71
+      "matchNumber": 68
     },
     {
       "date": "2026-06-27",
@@ -718,13 +688,53 @@
       "groupId": "L",
       "homePlaceholder": "L2",
       "awayPlaceholder": "L3",
+      "matchNumber": 69
+    },
+    {
+      "date": "2026-06-27",
+      "time": "19:30",
+      "venueId": "mercedes_benz",
+      "round": "group_stage",
+      "groupId": "K",
+      "homePlaceholder": "K4",
+      "awayPlaceholder": "K3",
+      "matchNumber": 70
+    },
+    {
+      "date": "2026-06-27",
+      "time": "19:30",
+      "venueId": "hard_rock",
+      "round": "group_stage",
+      "groupId": "K",
+      "homePlaceholder": "K2",
+      "awayPlaceholder": "K1",
+      "matchNumber": 71
+    },
+    {
+      "date": "2026-06-27",
+      "time": "22:00",
+      "venueId": "att",
+      "round": "group_stage",
+      "groupId": "J",
+      "homePlaceholder": "J4",
+      "awayPlaceholder": "J1",
       "matchNumber": 72
     },
     {
+      "date": "2026-06-27",
+      "time": "22:00",
+      "venueId": "arrowhead",
+      "round": "group_stage",
+      "groupId": "J",
+      "homePlaceholder": "J2",
+      "awayPlaceholder": "J3",
+      "matchNumber": 73
+    },
+    {
       "matchNumber": 73,
-      "date": "2026-06-28",
-      "time": "15:00",
-      "venueId": "sofi",
+      "date": "2026-06-29",
+      "time": "13:00",
+      "venueId": "gillette",
       "round": "round_of_32",
       "homePlaceholder": "2A",
       "awayPlaceholder": "2B"
@@ -732,8 +742,8 @@
     {
       "matchNumber": 74,
       "date": "2026-06-29",
-      "time": "16:30",
-      "venueId": "gillette",
+      "time": "16:00",
+      "venueId": "metlife",
       "round": "round_of_32",
       "homePlaceholder": "1E",
       "awayPlaceholder": "3A/B/C/D/F"
@@ -741,7 +751,7 @@
     {
       "matchNumber": 75,
       "date": "2026-06-29",
-      "time": "21:00",
+      "time": "19:00",
       "venueId": "bbva",
       "round": "round_of_32",
       "homePlaceholder": "1F",
@@ -750,7 +760,7 @@
     {
       "matchNumber": 76,
       "date": "2026-06-29",
-      "time": "13:00",
+      "time": "22:00",
       "venueId": "nrg",
       "round": "round_of_32",
       "homePlaceholder": "1C",
@@ -759,8 +769,8 @@
     {
       "matchNumber": 77,
       "date": "2026-06-30",
-      "time": "17:00",
-      "venueId": "metlife",
+      "time": "13:00",
+      "venueId": "azteca",
       "round": "round_of_32",
       "homePlaceholder": "1I",
       "awayPlaceholder": "3C/D/F/G/H"
@@ -768,8 +778,8 @@
     {
       "matchNumber": 78,
       "date": "2026-06-30",
-      "time": "13:00",
-      "venueId": "att",
+      "time": "16:00",
+      "venueId": "mercedes_benz",
       "round": "round_of_32",
       "homePlaceholder": "2E",
       "awayPlaceholder": "2I"
@@ -777,17 +787,17 @@
     {
       "matchNumber": 79,
       "date": "2026-06-30",
-      "time": "21:00",
-      "venueId": "azteca",
+      "time": "19:00",
+      "venueId": "sofi",
       "round": "round_of_32",
       "homePlaceholder": "1A",
       "awayPlaceholder": "3C/E/F/H/I"
     },
     {
       "matchNumber": 80,
-      "date": "2026-07-01",
-      "time": "12:00",
-      "venueId": "mercedes_benz",
+      "date": "2026-06-30",
+      "time": "22:00",
+      "venueId": "att",
       "round": "round_of_32",
       "homePlaceholder": "1L",
       "awayPlaceholder": "3E/H/I/J/K"
@@ -795,7 +805,7 @@
     {
       "matchNumber": 81,
       "date": "2026-07-01",
-      "time": "22:00",
+      "time": "13:00",
       "venueId": "levis",
       "round": "round_of_32",
       "homePlaceholder": "1D",
@@ -812,18 +822,18 @@
     },
     {
       "matchNumber": 83,
-      "date": "2026-07-02",
+      "date": "2026-07-01",
       "time": "19:00",
-      "venueId": "bmo",
+      "venueId": "sofi",
       "round": "round_of_32",
       "homePlaceholder": "2K",
       "awayPlaceholder": "2L"
     },
     {
       "matchNumber": 84,
-      "date": "2026-07-02",
-      "time": "15:00",
-      "venueId": "sofi",
+      "date": "2026-07-01",
+      "time": "22:00",
+      "venueId": "hard_rock",
       "round": "round_of_32",
       "homePlaceholder": "1H",
       "awayPlaceholder": "2J"
@@ -831,7 +841,7 @@
     {
       "matchNumber": 85,
       "date": "2026-07-02",
-      "time": "23:00",
+      "time": "13:00",
       "venueId": "bc_place",
       "round": "round_of_32",
       "homePlaceholder": "1B",
@@ -839,26 +849,26 @@
     },
     {
       "matchNumber": 86,
-      "date": "2026-07-03",
-      "time": "18:00",
-      "venueId": "hard_rock",
+      "date": "2026-07-02",
+      "time": "16:00",
+      "venueId": "arrowhead",
       "round": "round_of_32",
       "homePlaceholder": "1J",
       "awayPlaceholder": "2H"
     },
     {
       "matchNumber": 87,
-      "date": "2026-07-03",
-      "time": "21:30",
-      "venueId": "arrowhead",
+      "date": "2026-07-02",
+      "time": "19:00",
+      "venueId": "bmo",
       "round": "round_of_32",
       "homePlaceholder": "1K",
       "awayPlaceholder": "3D/E/I/J/L"
     },
     {
       "matchNumber": 88,
-      "date": "2026-07-03",
-      "time": "14:00",
+      "date": "2026-07-02",
+      "time": "22:00",
       "venueId": "att",
       "round": "round_of_32",
       "homePlaceholder": "2D",
@@ -870,8 +880,8 @@
       "time": "13:00",
       "venueId": "nrg",
       "round": "round_of_16",
-      "homePlaceholder": "W1",
-      "awayPlaceholder": "W2"
+      "homePlaceholder": "W74",
+      "awayPlaceholder": "W77"
     },
     {
       "matchNumber": 90,
@@ -879,8 +889,8 @@
       "time": "17:00",
       "venueId": "lincoln_financial",
       "round": "round_of_16",
-      "homePlaceholder": "W3",
-      "awayPlaceholder": "W4"
+      "homePlaceholder": "W73",
+      "awayPlaceholder": "W75"
     },
     {
       "matchNumber": 91,
@@ -888,8 +898,8 @@
       "time": "16:00",
       "venueId": "metlife",
       "round": "round_of_16",
-      "homePlaceholder": "W5",
-      "awayPlaceholder": "W6"
+      "homePlaceholder": "W76",
+      "awayPlaceholder": "W78"
     },
     {
       "matchNumber": 92,
@@ -897,8 +907,8 @@
       "time": "20:00",
       "venueId": "azteca",
       "round": "round_of_16",
-      "homePlaceholder": "W7",
-      "awayPlaceholder": "W8"
+      "homePlaceholder": "W79",
+      "awayPlaceholder": "W80"
     },
     {
       "matchNumber": 93,
@@ -906,8 +916,8 @@
       "time": "15:00",
       "venueId": "att",
       "round": "round_of_16",
-      "homePlaceholder": "W11",
-      "awayPlaceholder": "W12"
+      "homePlaceholder": "W83",
+      "awayPlaceholder": "W84"
     },
     {
       "matchNumber": 94,
@@ -915,8 +925,8 @@
       "time": "20:00",
       "venueId": "lumen",
       "round": "round_of_16",
-      "homePlaceholder": "W9",
-      "awayPlaceholder": "W10"
+      "homePlaceholder": "W81",
+      "awayPlaceholder": "W82"
     },
     {
       "matchNumber": 95,
@@ -924,8 +934,8 @@
       "time": "12:00",
       "venueId": "mercedes_benz",
       "round": "round_of_16",
-      "homePlaceholder": "W13",
-      "awayPlaceholder": "W14"
+      "homePlaceholder": "W86",
+      "awayPlaceholder": "W88"
     },
     {
       "matchNumber": 96,
@@ -938,12 +948,12 @@
     },
     {
       "matchNumber": 97,
-      "date": "2026-07-09",
+      "date": "2026-07-10",
       "time": "16:00",
-      "venueId": "gillette",
+      "venueId": "metlife",
       "round": "quarter_finals",
-      "homePlaceholder": "WQF1",
-      "awayPlaceholder": "WQF2"
+      "homePlaceholder": "W89",
+      "awayPlaceholder": "W90"
     },
     {
       "matchNumber": 98,
@@ -951,65 +961,65 @@
       "time": "12:00",
       "venueId": "sofi",
       "round": "quarter_finals",
-      "homePlaceholder": "WQF3",
-      "awayPlaceholder": "WQF4"
+      "homePlaceholder": "W93",
+      "awayPlaceholder": "W94"
     },
     {
       "matchNumber": 99,
       "date": "2026-07-11",
-      "time": "17:00",
+      "time": "16:00",
       "venueId": "hard_rock",
       "round": "quarter_finals",
-      "homePlaceholder": "WQF5",
-      "awayPlaceholder": "WQF6"
+      "homePlaceholder": "W91",
+      "awayPlaceholder": "W92"
     },
     {
       "matchNumber": 100,
       "date": "2026-07-11",
-      "time": "21:00",
+      "time": "20:00",
       "venueId": "arrowhead",
       "round": "quarter_finals",
-      "homePlaceholder": "WQF7",
-      "awayPlaceholder": "WQF8"
+      "homePlaceholder": "W95",
+      "awayPlaceholder": "W96"
     },
     {
       "matchNumber": 101,
       "date": "2026-07-14",
-      "time": "15:00",
+      "time": "20:00",
       "venueId": "att",
       "round": "semi_finals",
-      "homePlaceholder": "WSF1",
-      "awayPlaceholder": "WSF2"
+      "homePlaceholder": "W97",
+      "awayPlaceholder": "W98"
     },
     {
       "matchNumber": 102,
       "date": "2026-07-15",
-      "time": "15:00",
+      "time": "20:00",
       "venueId": "mercedes_benz",
       "round": "semi_finals",
-      "homePlaceholder": "WSF3",
-      "awayPlaceholder": "WSF4"
+      "homePlaceholder": "W99",
+      "awayPlaceholder": "W100"
     },
     {
       "matchNumber": 103,
       "date": "2026-07-18",
-      "time": "17:00",
+      "time": "16:00",
       "venueId": "hard_rock",
       "round": "third_place",
-      "homePlaceholder": "LSF1",
-      "awayPlaceholder": "LSF2"
+      "homePlaceholder": "L101",
+      "awayPlaceholder": "L102"
     },
     {
       "matchNumber": 104,
       "date": "2026-07-19",
-      "time": "15:00",
+      "time": "16:00",
       "venueId": "metlife",
       "round": "final",
-      "homePlaceholder": "WSF1",
-      "awayPlaceholder": "WSF2"
+      "homePlaceholder": "W101",
+      "awayPlaceholder": "W102"
     }
   ],
-  "lastUpdated": "2026-01-20T00:00:00.000000+00:00",
+  "lastUpdated": "2026-03-31T12:18:17.480729+00:00",
   "source": "static_generation",
   "tournament": "FIFA World Cup 2026"
 }

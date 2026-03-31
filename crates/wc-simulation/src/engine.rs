@@ -661,4 +661,5 @@ mod tests {
         assert_eq!(result1.champion, result2.champion);
         assert_eq!(result1.runner_up, result2.runner_up);
     }
+
 }

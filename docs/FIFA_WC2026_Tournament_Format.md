@@ -61,7 +61,7 @@ Match Day 3: X4 vs X1, X2 vs X3
 | M85 | 1B (Winner B) | vs | Best 3rd EFGIJ |
 | M86 | 1J (Winner J) | vs | 2H (Runner-up H) |
 | M87 | 1K (Winner K) | vs | Best 3rd DEIJL |
-| M88 | 2D (Winner D) | vs | 2G (Runner-up G) |
+| M88 | 2D (Runner-up D) | vs | 2G (Runner-up G) |
 
 **Note**: Teams from the same group cannot meet in the Round of 32.
 
