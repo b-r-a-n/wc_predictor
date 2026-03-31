@@ -6,7 +6,7 @@
       "code": "ARG",
       "confederation": "CONMEBOL",
       "elo_rating": 2113.0,
-      "market_value_millions": 575.0,
+      "market_value_millions": 761.2,
       "fifa_ranking": 2,
       "world_cup_wins": 3,
       "sofascore_form": 2.7
@@ -16,31 +16,31 @@
       "name": "Australia",
       "code": "AUS",
       "confederation": "AFC",
-      "elo_rating": 1774.0,
-      "market_value_millions": 32.85,
-      "fifa_ranking": 26,
+      "elo_rating": 1779.0,
+      "market_value_millions": 50.48,
+      "fifa_ranking": 45,
       "world_cup_wins": 0,
-      "sofascore_form": 1.7
+      "sofascore_form": 1.3
     },
     {
       "id": 2,
       "name": "Austria",
       "code": "AUT",
       "confederation": "UEFA",
-      "elo_rating": 1818.0,
-      "market_value_millions": 231.9,
-      "fifa_ranking": 24,
+      "elo_rating": 1821.0,
+      "market_value_millions": 263.4,
+      "fifa_ranking": 45,
       "world_cup_wins": 0,
-      "sofascore_form": 2.3
+      "sofascore_form": 2.2
     },
     {
       "id": 3,
       "name": "Algeria",
       "code": "ALG",
       "confederation": "CAF",
-      "elo_rating": 1726.0,
-      "market_value_millions": 229.1,
-      "fifa_ranking": 28,
+      "elo_rating": 1739.0,
+      "market_value_millions": 227.75,
+      "fifa_ranking": 45,
       "world_cup_wins": 0,
       "sofascore_form": 2.5
     },
@@ -49,31 +49,31 @@
       "name": "Belgium",
       "code": "BEL",
       "confederation": "UEFA",
-      "elo_rating": 1849.0,
-      "market_value_millions": 442.2,
+      "elo_rating": 1867.0,
+      "market_value_millions": 534.2,
       "fifa_ranking": 9,
       "world_cup_wins": 0,
-      "sofascore_form": 2.4
+      "sofascore_form": 2.1
     },
     {
       "id": 5,
       "name": "Brazil",
       "code": "BRA",
       "confederation": "CONMEBOL",
-      "elo_rating": 1978.0,
-      "market_value_millions": 932.0,
+      "elo_rating": 1970.0,
+      "market_value_millions": 778.5,
       "fifa_ranking": 5,
       "world_cup_wins": 5,
-      "sofascore_form": 1.5
+      "sofascore_form": 1.3
     },
     {
       "id": 6,
       "name": "Canada",
       "code": "CAN",
       "confederation": "CONCACAF",
-      "elo_rating": 1802.0,
-      "market_value_millions": 21.88,
-      "fifa_ranking": 29,
+      "elo_rating": 1794.0,
+      "market_value_millions": 129.88,
+      "fifa_ranking": 45,
       "world_cup_wins": 0,
       "sofascore_form": 2.2
     },
@@ -82,74 +82,74 @@
       "name": "Cape Verde",
       "code": "CPV",
       "confederation": "CAF",
-      "elo_rating": 1560.0,
-      "market_value_millions": 31.83,
-      "fifa_ranking": 67,
+      "elo_rating": 1549.0,
+      "market_value_millions": 45.15,
+      "fifa_ranking": 70,
       "world_cup_wins": 0,
-      "sofascore_form": 1.7
+      "sofascore_form": 1.9
     },
     {
       "id": 8,
       "name": "Colombia",
       "code": "COL",
       "confederation": "CONMEBOL",
-      "elo_rating": 1998.0,
-      "market_value_millions": 285.1,
-      "fifa_ranking": 13,
+      "elo_rating": 1975.0,
+      "market_value_millions": 300.5,
+      "fifa_ranking": 14,
       "world_cup_wins": 0,
-      "sofascore_form": 3.0
+      "sofascore_form": 2.8
     },
     {
       "id": 9,
       "name": "Croatia",
       "code": "CRO",
       "confederation": "UEFA",
-      "elo_rating": 1932.0,
-      "market_value_millions": 258.5,
+      "elo_rating": 1944.0,
+      "market_value_millions": 282.3,
       "fifa_ranking": 11,
       "world_cup_wins": 0,
-      "sofascore_form": 2.1
+      "sofascore_form": 2.4
     },
     {
       "id": 10,
       "name": "Curacao",
       "code": "CUW",
       "confederation": "CONCACAF",
-      "elo_rating": 1467.0,
-      "market_value_millions": 25.38,
-      "fifa_ranking": 82,
+      "elo_rating": 1440.0,
+      "market_value_millions": 28.38,
+      "fifa_ranking": 70,
       "world_cup_wins": 0,
-      "sofascore_form": 0.3
+      "sofascore_form": 0.9
     },
     {
       "id": 11,
       "name": "Ecuador",
       "code": "ECU",
       "confederation": "CONMEBOL",
-      "elo_rating": 1933.0,
-      "market_value_millions": 349.58,
-      "fifa_ranking": 23,
+      "elo_rating": 1929.0,
+      "market_value_millions": 383.73,
+      "fifa_ranking": 25,
       "world_cup_wins": 0,
-      "sofascore_form": 2.0
+      "sofascore_form": 1.7
     },
     {
       "id": 12,
       "name": "Egypt",
       "code": "EGY",
       "confederation": "CAF",
-      "elo_rating": 1599.0,
-      "market_value_millions": 136.2,
-      "fifa_ranking": 31,
+      "elo_rating": 1680.0,
+      "market_value_millions": 108.0,
+      "fifa_ranking": 70,
       "world_cup_wins": 0,
-      "sofascore_form": 1.8
+      "sofascore_form": 2.1
     },
     {
       "id": 13,
       "name": "England",
       "code": "ENG",
       "confederation": "UEFA",
-      "elo_rating": 2042.0,
-      "market_value_millions": 1300.0,
+      "elo_rating": 2036.0,
+      "market_value_millions": 1620.0,
       "fifa_ranking": 4,
       "world_cup_wins": 1,
       "sofascore_form": 1.6
@@ -159,42 +159,42 @@
       "name": "France",
       "code": "FRA",
       "confederation": "UEFA",
-      "elo_rating": 2063.0,
-      "market_value_millions": 1290.0,
+      "elo_rating": 2081.0,
+      "market_value_millions": 1360.0,
       "fifa_ranking": 3,
       "world_cup_wins": 2,
-      "sofascore_form": 2.1
+      "sofascore_form": 1.9
     },
     {
       "id": 15,
       "name": "Germany",
       "code": "GER",
       "confederation": "UEFA",
-      "elo_rating": 1910.0,
-      "market_value_millions": 828.0,
+      "elo_rating": 1922.0,
+      "market_value_millions": 773.5,
       "fifa_ranking": 10,
       "world_cup_wins": 4,
-      "sofascore_form": 2.0
+      "sofascore_form": 1.8
     },
     {
       "id": 16,
       "name": "Ghana",
       "code": "GHA",
       "confederation": "CAF",
-      "elo_rating": 1509.0,
-      "market_value_millions": 164.9,
-      "fifa_ranking": 72,
+      "elo_rating": 1506.0,
+      "market_value_millions": 199.28,
+      "fifa_ranking": 70,
       "world_cup_wins": 0,
-      "sofascore_form": 0.7
+      "sofascore_form": 1.3
     },
     {
       "id": 17,
       "name": "Haiti",
       "code": "HAI",
       "confederation": "CONCACAF",
-      "elo_rating": 1542.0,
-      "market_value_millions": 38.75,
-      "fifa_ranking": 84,
+      "elo_rating": 1530.0,
+      "market_value_millions": 55.1,
+      "fifa_ranking": 70,
       "world_cup_wins": 0,
       "sofascore_form": 1.5
     },
@@ -203,30 +203,30 @@
       "name": "Iran",
       "code": "IRN",
       "confederation": "AFC",
-      "elo_rating": 1754.0,
-      "market_value_millions": 34.25,
-      "fifa_ranking": 20,
+      "elo_rating": 1739.0,
+      "market_value_millions": 36.78,
+      "fifa_ranking": 45,
       "world_cup_wins": 0,
-      "sofascore_form": 2.7
+      "sofascore_form": 2.5
     },
     {
       "id": 19,
       "name": "Ivory Coast",
       "code": "CIV",
       "confederation": "CAF",
-      "elo_rating": 1607.0,
-      "market_value_millions": 370.8,
-      "fifa_ranking": 37,
+      "elo_rating": 1663.0,
+      "market_value_millions": 425.9,
+      "fifa_ranking": 70,
       "world_cup_wins": 0,
-      "sofascore_form": 2.6
+      "sofascore_form": 2.3
     },
     {
       "id": 20,
       "name": "Japan",
       "code": "JPN",
       "confederation": "AFC",
-      "elo_rating": 1878.0,
-      "market_value_millions": 223.5,
+      "elo_rating": 1888.0,
+      "market_value_millions": 264.2,
       "fifa_ranking": 19,
       "world_cup_wins": 0,
       "sofascore_form": 2.33
@@ -236,19 +236,19 @@
       "name": "Jordan",
       "code": "JOR",
       "confederation": "AFC",
-      "elo_rating": 1691.0,
-      "market_value_millions": 9.3,
-      "fifa_ranking": 64,
+      "elo_rating": 1687.0,
+      "market_value_millions": 15.98,
+      "fifa_ranking": 70,
       "world_cup_wins": 0,
-      "sofascore_form": 2.1
+      "sofascore_form": 1.9
     },
     {
       "id": 22,
       "name": "Mexico",
       "code": "MEX",
       "confederation": "CONCACAF",
-      "elo_rating": 1835.0,
-      "market_value_millions": 142.1,
+      "elo_rating": 1858.0,
+      "market_value_millions": 165.8,
       "fifa_ranking": 16,
       "world_cup_wins": 0,
       "sofascore_form": 1.5
@@ -258,8 +258,8 @@
       "name": "Morocco",
       "code": "MAR",
       "confederation": "CAF",
-      "elo_rating": 1854.0,
-      "market_value_millions": 435.55,
+      "elo_rating": 1810.0,
+      "market_value_millions": 456.0,
       "fifa_ranking": 8,
       "world_cup_wins": 0,
       "sofascore_form": 2.7
@@ -269,8 +269,8 @@
       "name": "Netherlands",
       "code": "NED",
       "confederation": "UEFA",
-      "elo_rating": 1959.0,
-      "market_value_millions": 808.0,
+      "elo_rating": 1965.0,
+      "market_value_millions": 766.0,
       "fifa_ranking": 7,
       "world_cup_wins": 0,
       "sofascore_form": 2.2
@@ -280,42 +280,42 @@
       "name": "New Zealand",
       "code": "NZL",
       "confederation": "OFC",
-      "elo_rating": 1586.0,
-      "market_value_millions": 16.43,
-      "fifa_ranking": 87,
+      "elo_rating": 1552.0,
+      "market_value_millions": 22.2,
+      "fifa_ranking": 70,
       "world_cup_wins": 0,
-      "sofascore_form": 0.67
+      "sofascore_form": 0.89
     },
     {
       "id": 26,
       "name": "Norway",
       "code": "NOR",
       "confederation": "UEFA",
-      "elo_rating": 1922.0,
-      "market_value_millions": 502.9,
-      "fifa_ranking": 32,
+      "elo_rating": 1916.0,
+      "market_value_millions": 504.0,
+      "fifa_ranking": 25,
       "world_cup_wins": 0,
-      "sofascore_form": 1.5
+      "sofascore_form": 1.6
     },
     {
       "id": 27,
       "name": "Panama",
       "code": "PAN",
       "confederation": "CONCACAF",
-      "elo_rating": 1742.0,
-      "market_value_millions": 34.2,
-      "fifa_ranking": 33,
+      "elo_rating": 1730.0,
+      "market_value_millions": 32.9,
+      "fifa_ranking": 45,
       "world_cup_wins": 0,
-      "sofascore_form": 1.0
+      "sofascore_form": 0.7
     },
     {
       "id": 28,
       "name": "Paraguay",
       "code": "PAR",
       "confederation": "CONMEBOL",
-      "elo_rating": 1832.0,
-      "market_value_millions": 123.95,
-      "fifa_ranking": 40,
+      "elo_rating": 1844.0,
+      "market_value_millions": 143.85,
+      "fifa_ranking": 45,
       "world_cup_wins": 0,
       "sofascore_form": 1.0
     },
@@ -324,8 +324,8 @@
       "name": "Portugal",
       "code": "POR",
       "confederation": "UEFA",
-      "elo_rating": 1976.0,
-      "market_value_millions": 841.0,
+      "elo_rating": 1975.0,
+      "market_value_millions": 864.5,
       "fifa_ranking": 6,
       "world_cup_wins": 0,
       "sofascore_form": 2.4
@@ -335,9 +335,9 @@
       "name": "Qatar",
       "code": "QAT",
       "confederation": "AFC",
-      "elo_rating": 1426.0,
-      "market_value_millions": 18.0,
-      "fifa_ranking": 53,
+      "elo_rating": 1427.0,
+      "market_value_millions": 18.3,
+      "fifa_ranking": 70,
       "world_cup_wins": 0,
       "sofascore_form": 2.0
     },
@@ -346,53 +346,53 @@
       "name": "Saudi Arabia",
       "code": "KSA",
       "confederation": "AFC",
-      "elo_rating": 1593.0,
-      "market_value_millions": 21.8,
-      "fifa_ranking": 60,
+      "elo_rating": 1571.0,
+      "market_value_millions": 27.63,
+      "fifa_ranking": 70,
       "world_cup_wins": 0,
-      "sofascore_form": 1.4
+      "sofascore_form": 1.5
     },
     {
       "id": 32,
       "name": "Scotland",
       "code": "SCO",
       "confederation": "UEFA",
-      "elo_rating": 1790.0,
-      "market_value_millions": 211.45,
-      "fifa_ranking": 38,
+      "elo_rating": 1780.0,
+      "market_value_millions": 198.15,
+      "fifa_ranking": 45,
       "world_cup_wins": 0,
-      "sofascore_form": 1.2
+      "sofascore_form": 1.0
     },
     {
       "id": 33,
       "name": "Senegal",
       "code": "SEN",
       "confederation": "CAF",
-      "elo_rating": 1803.0,
-      "market_value_millions": 405.9,
-      "fifa_ranking": 14,
+      "elo_rating": 1878.0,
+      "market_value_millions": 474.0,
+      "fifa_ranking": 12,
       "world_cup_wins": 0,
-      "sofascore_form": 2.2
+      "sofascore_form": 1.6
     },
     {
       "id": 34,
       "name": "South Africa",
       "code": "RSA",
       "confederation": "CAF",
-      "elo_rating": 1530.0,
-      "market_value_millions": 44.45,
-      "fifa_ranking": 61,
+      "elo_rating": 1531.0,
+      "market_value_millions": 41.15,
+      "fifa_ranking": 70,
       "world_cup_wins": 0,
-      "sofascore_form": 1.7
+      "sofascore_form": 1.5
     },
     {
       "id": 35,
       "name": "South Korea",
       "code": "KOR",
       "confederation": "AFC",
-      "elo_rating": 1785.0,
-      "market_value_millions": 118.8,
-      "fifa_ranking": 22,
+      "elo_rating": 1758.0,
+      "market_value_millions": 136.75,
+      "fifa_ranking": 45,
       "world_cup_wins": 0,
       "sofascore_form": 2.1
     },
@@ -401,8 +401,8 @@
       "name": "Spain",
       "code": "ESP",
       "confederation": "UEFA",
-      "elo_rating": 2171.0,
-      "market_value_millions": 1150.0,
+      "elo_rating": 2174.0,
+      "market_value_millions": 1310.0,
       "fifa_ranking": 1,
       "world_cup_wins": 1,
       "sofascore_form": 2.5
@@ -412,31 +412,31 @@
       "name": "Switzerland",
       "code": "SUI",
       "confederation": "UEFA",
-      "elo_rating": 1897.0,
-      "market_value_millions": 251.0,
+      "elo_rating": 1885.0,
+      "market_value_millions": 322.1,
       "fifa_ranking": 18,
       "world_cup_wins": 0,
-      "sofascore_form": 1.8
+      "sofascore_form": 1.9
     },
     {
       "id": 38,
       "name": "Tunisia",
       "code": "TUN",
       "confederation": "CAF",
-      "elo_rating": 1643.0,
-      "market_value_millions": 68.45,
-      "fifa_ranking": 47,
+      "elo_rating": 1626.0,
+      "market_value_millions": 52.0,
+      "fifa_ranking": 70,
       "world_cup_wins": 0,
-      "sofascore_form": 1.89
+      "sofascore_form": 2.11
     },
     {
       "id": 39,
       "name": "United States",
       "code": "USA",
       "confederation": "CONCACAF",
-      "elo_rating": 1747.0,
-      "market_value_millions": 169.7,
-      "fifa_ranking": 15,
+      "elo_rating": 1730.0,
+      "market_value_millions": 356.7,
+      "fifa_ranking": 45,
       "world_cup_wins": 0,
       "sofascore_form": 1.1
     },
@@ -445,8 +445,8 @@
       "name": "Uruguay",
       "code": "URU",
       "confederation": "CONMEBOL",
-      "elo_rating": 1890.0,
-      "market_value_millions": 419.2,
+      "elo_rating": 1896.0,
+      "market_value_millions": 366.45,
       "fifa_ranking": 17,
       "world_cup_wins": 2,
       "sofascore_form": 2.3
@@ -456,9 +456,9 @@
       "name": "Uzbekistan",
       "code": "UZB",
       "confederation": "AFC",
-      "elo_rating": 1735.0,
-      "market_value_millions": 14.85,
-      "fifa_ranking": 50,
+      "elo_rating": 1732.0,
+      "market_value_millions": 63.75,
+      "fifa_ranking": 45,
       "world_cup_wins": 0,
       "sofascore_form": 2.1
     },
@@ -471,7 +471,7 @@
       "market_value_millions": 300.0,
       "fifa_ranking": 30,
       "world_cup_wins": 0,
-      "sofascore_form": 1.9
+      "sofascore_form": 1.5
     },
     {
       "id": 43,
@@ -482,7 +482,7 @@
       "market_value_millions": 300.0,
       "fifa_ranking": 30,
       "world_cup_wins": 0,
-      "sofascore_form": 1.9
+      "sofascore_form": 1.5
     },
     {
       "id": 44,
@@ -493,7 +493,7 @@
       "market_value_millions": 300.0,
       "fifa_ranking": 30,
       "world_cup_wins": 0,
-      "sofascore_form": 1.9
+      "sofascore_form": 1.5
     },
     {
       "id": 45,
@@ -504,7 +504,7 @@
       "market_value_millions": 300.0,
       "fifa_ranking": 30,
       "world_cup_wins": 0,
-      "sofascore_form": 1.9
+      "sofascore_form": 1.5
     },
     {
       "id": 46,
@@ -515,7 +515,7 @@
       "market_value_millions": 50.0,
       "fifa_ranking": 60,
       "world_cup_wins": 0,
-      "sofascore_form": 1.9
+      "sofascore_form": 1.5
     },
     {
       "id": 47,
@@ -526,7 +526,7 @@
       "market_value_millions": 50.0,
       "fifa_ranking": 60,
       "world_cup_wins": 0,
-      "sofascore_form": 1.9
+      "sofascore_form": 1.5
     }
   ],
   "groups": [
