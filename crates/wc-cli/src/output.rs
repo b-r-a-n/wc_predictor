@@ -79,12 +79,40 @@ pub fn render_simulation_table(results: &AggregatedResults, top_n: usize, tourna
     println!();
 }
 
+/// A bracket slot with team name resolved.
+#[derive(Serialize)]
+pub struct BracketSlot<'a> {
+    pub team: TeamSummary<'a>,
+    pub probability: f64,
+}
+
+/// A bracket match with two teams and a winner.
+#[derive(Serialize)]
+pub struct BracketMatch<'a> {
+    pub slot: u8,
+    pub team_a: BracketSlot<'a>,
+    pub team_b: BracketSlot<'a>,
+    pub winner: TeamSummary<'a>,
+}
+
+/// The most likely bracket from R32 to champion.
+#[derive(Serialize)]
+pub struct MostLikelyBracket<'a> {
+    pub round_of_32: Vec<BracketMatch<'a>>,
+    pub round_of_16: Vec<BracketSlot<'a>>,
+    pub quarter_finals: Vec<BracketSlot<'a>>,
+    pub semi_finals: Vec<BracketSlot<'a>>,
+    pub champion: Option<BracketSlot<'a>>,
+    pub joint_probability: f64,
+}
+
 /// Render simulation results as JSON.
 #[derive(Serialize)]
 pub struct SimulationJsonOutput<'a> {
     pub total_simulations: u32,
     pub most_likely_winner: TeamSummary<'a>,
     pub most_likely_final: FinalMatchup<'a>,
+    pub most_likely_bracket: MostLikelyBracket<'a>,
     pub rankings: Vec<TeamRanking<'a>>,
 }
 
@@ -144,6 +172,50 @@ impl<'a> SimulationJsonOutput<'a> {
             })
             .collect();
 
+        let resolve_slot = |slot: &wc_simulation::path_tracker::MostLikelyBracketSlot| -> BracketSlot<'a> {
+            let t = tournament.get_team(slot.team_id).unwrap();
+            BracketSlot {
+                team: TeamSummary { id: t.id.0, name: &t.name, code: &t.code },
+                probability: slot.probability,
+            }
+        };
+
+        let ob = &results.optimal_bracket;
+
+        let r32: Vec<BracketMatch> = ob.round_of_32.iter().map(|m| {
+            let w = tournament.get_team(m.winner).unwrap();
+            BracketMatch {
+                slot: m.slot,
+                team_a: resolve_slot(&m.team_a),
+                team_b: resolve_slot(&m.team_b),
+                winner: TeamSummary { id: w.id.0, name: &w.name, code: &w.code },
+            }
+        }).collect();
+
+        let mut r16: Vec<BracketSlot> = (0..8u8)
+            .filter_map(|s| ob.round_of_16.get(&s).map(|slot| resolve_slot(slot)))
+            .collect();
+        let _ = &mut r16; // ensure ordering
+
+        let qf: Vec<BracketSlot> = (0..4u8)
+            .filter_map(|s| ob.quarter_finals.get(&s).map(|slot| resolve_slot(slot)))
+            .collect();
+
+        let sf: Vec<BracketSlot> = (0..2u8)
+            .filter_map(|s| ob.semi_finals.get(&s).map(|slot| resolve_slot(slot)))
+            .collect();
+
+        let champ = ob.champion.as_ref().map(|s| resolve_slot(s));
+
+        let most_likely_bracket = MostLikelyBracket {
+            round_of_32: r32,
+            round_of_16: r16,
+            quarter_finals: qf,
+            semi_finals: sf,
+            champion: champ,
+            joint_probability: ob.joint_probability,
+        };
+
         Self {
             total_simulations: results.total_simulations,
             most_likely_winner: TeamSummary {
@@ -163,6 +235,7 @@ impl<'a> SimulationJsonOutput<'a> {
                     code: &final_b.code,
                 },
             },
+            most_likely_bracket,
             rankings,
         }
     }
