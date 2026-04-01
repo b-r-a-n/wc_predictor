@@ -22,6 +22,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Build WASM module
+        run: wasm-pack build --target web --release --out-dir ../../web/wasm-pkg
+        working-directory: crates/wc-wasm
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
