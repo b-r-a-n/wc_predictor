@@ -177,39 +177,39 @@ class ScheduleScraper(BaseScraper):
         {"date": "2026-06-11", "time": "22:00", "venueId": "akron", "groupId": "A", "home": "A3", "away": "A4"},
         # June 12
         # Toronto: Canada vs UEFA Playoff A (Group B)
-        {"date": "2026-06-12", "time": "15:00", "venueId": "bmo", "groupId": "B", "home": "B1", "away": "B4"},
+        {"date": "2026-06-12", "time": "15:00", "venueId": "bmo", "groupId": "B", "home": "B1", "away": "B2"},
         # Los Angeles: USA vs Paraguay (Group D)
-        {"date": "2026-06-12", "time": "21:00", "venueId": "sofi", "groupId": "D", "home": "D1", "away": "D3"},
+        {"date": "2026-06-12", "time": "21:00", "venueId": "sofi", "groupId": "D", "home": "D1", "away": "D2"},
         # June 13
         # Boston: Haiti vs Scotland (Group C)
-        {"date": "2026-06-13", "time": "21:00", "venueId": "gillette", "groupId": "C", "home": "C4", "away": "C3"},
+        {"date": "2026-06-13", "time": "21:00", "venueId": "gillette", "groupId": "C", "home": "C3", "away": "C4"},
         # New York/New Jersey: Brazil vs Morocco (Group C)
         {"date": "2026-06-13", "time": "18:00", "venueId": "metlife", "groupId": "C", "home": "C1", "away": "C2"},
         # San Francisco: Qatar vs Switzerland (Group B)
-        {"date": "2026-06-13", "time": "15:00", "venueId": "levis", "groupId": "B", "home": "B3", "away": "B2"},
+        {"date": "2026-06-13", "time": "15:00", "venueId": "levis", "groupId": "B", "home": "B3", "away": "B4"},
         # Vancouver: Australia vs UEFA Playoff C (Group D)
-        {"date": "2026-06-14", "time": "00:00", "venueId": "bc_place", "groupId": "D", "home": "D2", "away": "D4"},
+        {"date": "2026-06-14", "time": "00:00", "venueId": "bc_place", "groupId": "D", "home": "D3", "away": "D4"},
         # June 14
         # Houston: Germany vs Curaçao (Group E)
-        {"date": "2026-06-14", "time": "13:00", "venueId": "nrg", "groupId": "E", "home": "E1", "away": "E4"},
+        {"date": "2026-06-14", "time": "13:00", "venueId": "nrg", "groupId": "E", "home": "E1", "away": "E2"},
         # Philadelphia: Ivory Coast vs Ecuador (Group E)
-        {"date": "2026-06-14", "time": "19:00", "venueId": "lincoln_financial", "groupId": "E", "home": "E2", "away": "E3"},
+        {"date": "2026-06-14", "time": "19:00", "venueId": "lincoln_financial", "groupId": "E", "home": "E3", "away": "E4"},
         # Dallas: Netherlands vs Japan (Group F)
         {"date": "2026-06-14", "time": "16:00", "venueId": "att", "groupId": "F", "home": "F1", "away": "F2"},
         # Monterrey: UEFA Playoff B vs Tunisia (Group F) - 10:00 PM ET
-        {"date": "2026-06-14", "time": "22:00", "venueId": "bbva", "groupId": "F", "home": "F4", "away": "F3"},
+        {"date": "2026-06-14", "time": "22:00", "venueId": "bbva", "groupId": "F", "home": "F3", "away": "F4"},
         # June 15
         # Atlanta: Spain vs Cape Verde (Group H)
-        {"date": "2026-06-15", "time": "12:00", "venueId": "mercedes_benz", "groupId": "H", "home": "H1", "away": "H4"},
+        {"date": "2026-06-15", "time": "12:00", "venueId": "mercedes_benz", "groupId": "H", "home": "H1", "away": "H2"},
         # Miami: Saudi Arabia vs Uruguay (Group H)
-        {"date": "2026-06-15", "time": "18:00", "venueId": "hard_rock", "groupId": "H", "home": "H2", "away": "H3"},
+        {"date": "2026-06-15", "time": "18:00", "venueId": "hard_rock", "groupId": "H", "home": "H3", "away": "H4"},
         # Seattle: Belgium vs Egypt (Group G)
         {"date": "2026-06-15", "time": "15:00", "venueId": "lumen", "groupId": "G", "home": "G1", "away": "G2"},
         # Los Angeles: Iran vs New Zealand (Group G)
         {"date": "2026-06-15", "time": "21:00", "venueId": "sofi", "groupId": "G", "home": "G3", "away": "G4"},
         # June 16
         # Boston: Intercontinental Playoff 2 vs Norway (Group I)
-        {"date": "2026-06-16", "time": "18:00", "venueId": "gillette", "groupId": "I", "home": "I4", "away": "I3"},
+        {"date": "2026-06-16", "time": "18:00", "venueId": "gillette", "groupId": "I", "home": "I3", "away": "I4"},
         # New York/New Jersey: France vs Senegal (Group I)
         {"date": "2026-06-16", "time": "15:00", "venueId": "metlife", "groupId": "I", "home": "I1", "away": "I2"},
         # San Francisco: Austria vs Jordan (Group J)
@@ -218,9 +218,9 @@ class ScheduleScraper(BaseScraper):
         {"date": "2026-06-16", "time": "21:00", "venueId": "arrowhead", "groupId": "J", "home": "J1", "away": "J2"},
         # June 17
         # Mexico City: Uzbekistan vs Colombia (Group K) at 10:00 PM ET
-        {"date": "2026-06-17", "time": "22:00", "venueId": "azteca", "groupId": "K", "home": "K3", "away": "K2"},
+        {"date": "2026-06-17", "time": "22:00", "venueId": "azteca", "groupId": "K", "home": "K3", "away": "K4"},
         # Houston: Portugal vs Intercontinental Playoff 1 (Group K)
-        {"date": "2026-06-17", "time": "13:00", "venueId": "nrg", "groupId": "K", "home": "K1", "away": "K4"},
+        {"date": "2026-06-17", "time": "13:00", "venueId": "nrg", "groupId": "K", "home": "K1", "away": "K2"},
         # Toronto: Ghana vs Panama (Group L)
         {"date": "2026-06-17", "time": "19:00", "venueId": "bmo", "groupId": "L", "home": "L3", "away": "L4"},
         # Dallas: England vs Croatia (Group L)
@@ -233,39 +233,39 @@ class ScheduleScraper(BaseScraper):
         # Vancouver: Canada vs Qatar (Group B)
         {"date": "2026-06-18", "time": "18:00", "venueId": "bc_place", "groupId": "B", "home": "B1", "away": "B3"},
         # Los Angeles: Switzerland vs UEFA Playoff A (Group B)
-        {"date": "2026-06-18", "time": "15:00", "venueId": "sofi", "groupId": "B", "home": "B2", "away": "B4"},
+        {"date": "2026-06-18", "time": "15:00", "venueId": "sofi", "groupId": "B", "home": "B4", "away": "B2"},
         # June 19
         # Boston: Scotland vs Morocco (Group C)
-        {"date": "2026-06-19", "time": "18:00", "venueId": "gillette", "groupId": "C", "home": "C3", "away": "C2"},
+        {"date": "2026-06-19", "time": "18:00", "venueId": "gillette", "groupId": "C", "home": "C4", "away": "C2"},
         # Philadelphia: Brazil vs Haiti (Group C)
-        {"date": "2026-06-19", "time": "21:00", "venueId": "lincoln_financial", "groupId": "C", "home": "C1", "away": "C4"},
+        {"date": "2026-06-19", "time": "21:00", "venueId": "lincoln_financial", "groupId": "C", "home": "C1", "away": "C3"},
         # Seattle: USA vs Australia (Group D)
         {"date": "2026-06-19", "time": "15:00", "venueId": "lumen", "groupId": "D", "home": "D1", "away": "D3"},
         # San Francisco: UEFA Playoff C vs Paraguay (Group D)
-        {"date": "2026-06-20", "time": "00:00", "venueId": "levis", "groupId": "D", "home": "D4", "away": "D3"},
+        {"date": "2026-06-20", "time": "00:00", "venueId": "levis", "groupId": "D", "home": "D4", "away": "D2"},
         # June 20
         # Kansas City: Ecuador vs Curaçao (Group E)
-        {"date": "2026-06-20", "time": "20:00", "venueId": "arrowhead", "groupId": "E", "home": "E3", "away": "E4"},
+        {"date": "2026-06-20", "time": "20:00", "venueId": "arrowhead", "groupId": "E", "home": "E4", "away": "E2"},
         # Toronto: Germany vs Ivory Coast (Group E)
-        {"date": "2026-06-20", "time": "16:00", "venueId": "bmo", "groupId": "E", "home": "E1", "away": "E2"},
+        {"date": "2026-06-20", "time": "16:00", "venueId": "bmo", "groupId": "E", "home": "E1", "away": "E3"},
         # Houston: Netherlands vs UEFA Playoff B (Group F)
-        {"date": "2026-06-20", "time": "13:00", "venueId": "nrg", "groupId": "F", "home": "F1", "away": "F4"},
+        {"date": "2026-06-20", "time": "13:00", "venueId": "nrg", "groupId": "F", "home": "F1", "away": "F3"},
         # Monterrey: Tunisia vs Japan (Group F) - 1000th FIFA World Cup match - 12:00 AM ET (midnight)
-        {"date": "2026-06-21", "time": "00:00", "venueId": "bbva", "groupId": "F", "home": "F3", "away": "F2"},
+        {"date": "2026-06-21", "time": "00:00", "venueId": "bbva", "groupId": "F", "home": "F4", "away": "F2"},
         # June 21
         # Atlanta: Spain vs Saudi Arabia (Group H)
-        {"date": "2026-06-21", "time": "12:00", "venueId": "mercedes_benz", "groupId": "H", "home": "H1", "away": "H2"},
+        {"date": "2026-06-21", "time": "12:00", "venueId": "mercedes_benz", "groupId": "H", "home": "H1", "away": "H3"},
         # Miami: Uruguay vs Cape Verde (Group H)
-        {"date": "2026-06-21", "time": "18:00", "venueId": "hard_rock", "groupId": "H", "home": "H3", "away": "H4"},
+        {"date": "2026-06-21", "time": "18:00", "venueId": "hard_rock", "groupId": "H", "home": "H4", "away": "H2"},
         # Los Angeles: Belgium vs Iran (Group G)
         {"date": "2026-06-21", "time": "15:00", "venueId": "sofi", "groupId": "G", "home": "G1", "away": "G3"},
         # Vancouver: New Zealand vs Egypt (Group G)
         {"date": "2026-06-21", "time": "21:00", "venueId": "bc_place", "groupId": "G", "home": "G4", "away": "G2"},
         # June 22
         # Philadelphia: France vs Intercontinental Playoff 2 (Group I)
-        {"date": "2026-06-22", "time": "17:00", "venueId": "lincoln_financial", "groupId": "I", "home": "I1", "away": "I4"},
+        {"date": "2026-06-22", "time": "17:00", "venueId": "lincoln_financial", "groupId": "I", "home": "I1", "away": "I3"},
         # New York/New Jersey: Norway vs Senegal (Group I)
-        {"date": "2026-06-22", "time": "20:00", "venueId": "metlife", "groupId": "I", "home": "I3", "away": "I2"},
+        {"date": "2026-06-22", "time": "20:00", "venueId": "metlife", "groupId": "I", "home": "I4", "away": "I2"},
         # Dallas: Argentina vs Austria (Group J)
         {"date": "2026-06-22", "time": "13:00", "venueId": "att", "groupId": "J", "home": "J1", "away": "J3"},
         # San Francisco: Jordan vs Algeria (Group J)
@@ -274,7 +274,7 @@ class ScheduleScraper(BaseScraper):
         # Houston: Portugal vs Uzbekistan (Group K)
         {"date": "2026-06-23", "time": "13:00", "venueId": "nrg", "groupId": "K", "home": "K1", "away": "K3"},
         # Guadalajara: Colombia vs Intercontinental Playoff 1 (Group K) - 10:00 PM ET
-        {"date": "2026-06-23", "time": "22:00", "venueId": "akron", "groupId": "K", "home": "K2", "away": "K4"},
+        {"date": "2026-06-23", "time": "22:00", "venueId": "akron", "groupId": "K", "home": "K4", "away": "K2"},
         # Boston: England vs Ghana (Group L)
         {"date": "2026-06-23", "time": "16:00", "venueId": "gillette", "groupId": "L", "home": "L1", "away": "L3"},
         # Toronto: Panama vs Croatia (Group L)
@@ -285,46 +285,46 @@ class ScheduleScraper(BaseScraper):
         # Monterrey: South Africa vs South Korea (Group A) - 9:00 PM ET
         {"date": "2026-06-24", "time": "21:00", "venueId": "bbva", "groupId": "A", "home": "A2", "away": "A3"},
         # Los Angeles: UEFA Playoff A vs Qatar (Group B)
-        {"date": "2026-06-24", "time": "21:00", "venueId": "sofi", "groupId": "B", "home": "B4", "away": "B3"},
+        {"date": "2026-06-24", "time": "21:00", "venueId": "sofi", "groupId": "B", "home": "B2", "away": "B3"},
         # Vancouver: Switzerland vs Canada (Group B)
-        {"date": "2026-06-24", "time": "15:00", "venueId": "bc_place", "groupId": "B", "home": "B2", "away": "B1"},
+        {"date": "2026-06-24", "time": "15:00", "venueId": "bc_place", "groupId": "B", "home": "B4", "away": "B1"},
         # Seattle: UEFA Playoff A vs Qatar (Group B)
-        {"date": "2026-06-24", "time": "15:00", "venueId": "lumen", "groupId": "B", "home": "B3", "away": "B2"},
+        {"date": "2026-06-24", "time": "15:00", "venueId": "lumen", "groupId": "B", "home": "B2", "away": "B3"},
         # Atlanta: Morocco vs Haiti (Group C)
-        {"date": "2026-06-24", "time": "18:00", "venueId": "mercedes_benz", "groupId": "C", "home": "C2", "away": "C4"},
+        {"date": "2026-06-24", "time": "18:00", "venueId": "mercedes_benz", "groupId": "C", "home": "C2", "away": "C3"},
         # Miami: Scotland vs Brazil (Group C)
-        {"date": "2026-06-24", "time": "18:00", "venueId": "hard_rock", "groupId": "C", "home": "C3", "away": "C1"},
+        {"date": "2026-06-24", "time": "18:00", "venueId": "hard_rock", "groupId": "C", "home": "C4", "away": "C1"},
         # June 25
         # Los Angeles: UEFA Playoff C vs USA (Group D)
         {"date": "2026-06-25", "time": "22:00", "venueId": "sofi", "groupId": "D", "home": "D4", "away": "D1"},
         # San Francisco: Paraguay vs Australia (Group D)
-        {"date": "2026-06-25", "time": "22:00", "venueId": "levis", "groupId": "D", "home": "D3", "away": "D2"},
+        {"date": "2026-06-25", "time": "22:00", "venueId": "levis", "groupId": "D", "home": "D2", "away": "D3"},
         # New York/New Jersey: Ecuador vs Germany (Group E)
-        {"date": "2026-06-25", "time": "16:00", "venueId": "metlife", "groupId": "E", "home": "E3", "away": "E1"},
+        {"date": "2026-06-25", "time": "16:00", "venueId": "metlife", "groupId": "E", "home": "E4", "away": "E1"},
         # Philadelphia: Curaçao vs Ivory Coast (Group E)
-        {"date": "2026-06-25", "time": "16:00", "venueId": "lincoln_financial", "groupId": "E", "home": "E4", "away": "E2"},
+        {"date": "2026-06-25", "time": "16:00", "venueId": "lincoln_financial", "groupId": "E", "home": "E2", "away": "E3"},
         # Dallas: Japan vs UEFA Playoff B (Group F)
-        {"date": "2026-06-25", "time": "19:00", "venueId": "att", "groupId": "F", "home": "F2", "away": "F4"},
+        {"date": "2026-06-25", "time": "19:00", "venueId": "att", "groupId": "F", "home": "F2", "away": "F3"},
         # Kansas City: Tunisia vs Netherlands (Group F)
-        {"date": "2026-06-25", "time": "19:00", "venueId": "arrowhead", "groupId": "F", "home": "F3", "away": "F1"},
+        {"date": "2026-06-25", "time": "19:00", "venueId": "arrowhead", "groupId": "F", "home": "F4", "away": "F1"},
         # June 26
         # Seattle: Egypt vs Iran (Group G)
         {"date": "2026-06-26", "time": "23:00", "venueId": "lumen", "groupId": "G", "home": "G2", "away": "G3"},
         # Vancouver: New Zealand vs Belgium (Group G)
         {"date": "2026-06-26", "time": "23:00", "venueId": "bc_place", "groupId": "G", "home": "G4", "away": "G1"},
         # Guadalajara: Uruguay vs Spain (Group H) - 8:00 PM ET
-        {"date": "2026-06-26", "time": "20:00", "venueId": "akron", "groupId": "H", "home": "H3", "away": "H1"},
+        {"date": "2026-06-26", "time": "20:00", "venueId": "akron", "groupId": "H", "home": "H4", "away": "H1"},
         # Houston: Cape Verde vs Saudi Arabia (Group H)
-        {"date": "2026-06-26", "time": "20:00", "venueId": "nrg", "groupId": "H", "home": "H4", "away": "H2"},
+        {"date": "2026-06-26", "time": "20:00", "venueId": "nrg", "groupId": "H", "home": "H2", "away": "H3"},
         # Toronto: Senegal vs Intercontinental Playoff 2 (Group I)
-        {"date": "2026-06-26", "time": "15:00", "venueId": "bmo", "groupId": "I", "home": "I2", "away": "I4"},
+        {"date": "2026-06-26", "time": "15:00", "venueId": "bmo", "groupId": "I", "home": "I2", "away": "I3"},
         # Boston: Norway vs France (Group I)
-        {"date": "2026-06-26", "time": "15:00", "venueId": "gillette", "groupId": "I", "home": "I3", "away": "I1"},
+        {"date": "2026-06-26", "time": "15:00", "venueId": "gillette", "groupId": "I", "home": "I4", "away": "I1"},
         # June 27 - Final group stage day
         # Atlanta: Intercontinental Playoff 1 vs Uzbekistan (Group K)
-        {"date": "2026-06-27", "time": "19:30", "venueId": "mercedes_benz", "groupId": "K", "home": "K4", "away": "K3"},
+        {"date": "2026-06-27", "time": "19:30", "venueId": "mercedes_benz", "groupId": "K", "home": "K2", "away": "K3"},
         # Miami: Colombia vs Portugal (Group K)
-        {"date": "2026-06-27", "time": "19:30", "venueId": "hard_rock", "groupId": "K", "home": "K2", "away": "K1"},
+        {"date": "2026-06-27", "time": "19:30", "venueId": "hard_rock", "groupId": "K", "home": "K4", "away": "K1"},
         # Dallas: Jordan vs Argentina (Group J)
         {"date": "2026-06-27", "time": "22:00", "venueId": "att", "groupId": "J", "home": "J4", "away": "J1"},
         # Kansas City: Algeria vs Austria (Group J)
