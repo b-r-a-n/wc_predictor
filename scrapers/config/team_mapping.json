@@ -1,8 +1,8 @@
 {
   "meta": {
     "version": "1.0.0",
-    "last_updated": "2026-01-15",
-    "note": "World Cup 2026 team mapping - 48 teams in 12 groups. 42 confirmed qualifiers, 6 TBD playoff spots (March 2026).",
+    "last_updated": "2026-04-01",
+    "note": "World Cup 2026 team mapping - all 48 teams confirmed after March 31 playoff finals.",
     "sources": [
       "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/final-draw-results",
       "https://www.transfermarkt.us"
@@ -603,119 +603,116 @@
     },
     {
       "id": 42,
-      "canonical_name": "TBD - UEFA Playoff A",
-      "fifa_code": "TBD",
+      "canonical_name": "Bosnia and Herzegovina",
+      "fifa_code": "BIH",
       "confederation": "UEFA",
       "world_cup_wins": 0,
-      "playoff": true,
-      "playoff_teams": ["Italy", "Wales", "Bosnia and Herzegovina", "Northern Ireland"],
+      "first_world_cup": true,
       "aliases": {
-        "elo": "TBD",
-        "transfermarkt": "TBD",
-        "transfermarkt_id": null,
-        "fifa": "TBD"
+        "elo": "Bosnia-Herzegovina",
+        "transfermarkt": "bosnien-herzegowina",
+        "transfermarkt_id": 3446,
+        "fifa": "Bosnia and Herzegovina",
+        "sofascore_id": 4721
       }
     },
     {
       "id": 43,
-      "canonical_name": "TBD - UEFA Playoff B",
-      "fifa_code": "TBD",
+      "canonical_name": "Sweden",
+      "fifa_code": "SWE",
       "confederation": "UEFA",
       "world_cup_wins": 0,
-      "playoff": true,
-      "playoff_teams": ["Ukraine", "Sweden", "Poland", "Albania"],
       "aliases": {
-        "elo": "TBD",
-        "transfermarkt": "TBD",
-        "transfermarkt_id": null,
-        "fifa": "TBD"
+        "elo": "Sweden",
+        "transfermarkt": "schweden",
+        "transfermarkt_id": 3557,
+        "fifa": "Sweden",
+        "sofascore_id": 4711
       }
     },
     {
       "id": 44,
-      "canonical_name": "TBD - UEFA Playoff C",
-      "fifa_code": "TBD",
+      "canonical_name": "Turkey",
+      "fifa_code": "TUR",
       "confederation": "UEFA",
       "world_cup_wins": 0,
-      "playoff": true,
-      "playoff_teams": ["Turkey", "Romania", "Slovakia", "Kosovo"],
       "aliases": {
-        "elo": "TBD",
-        "transfermarkt": "TBD",
-        "transfermarkt_id": null,
-        "fifa": "TBD"
+        "elo": "Turkey",
+        "transfermarkt": "turkei",
+        "transfermarkt_id": 3381,
+        "fifa": "Türkiye",
+        "sofascore_id": 4700
       }
     },
     {
       "id": 45,
-      "canonical_name": "TBD - UEFA Playoff D",
-      "fifa_code": "TBD",
+      "canonical_name": "Czechia",
+      "fifa_code": "CZE",
       "confederation": "UEFA",
       "world_cup_wins": 0,
-      "playoff": true,
-      "playoff_teams": ["Denmark", "Czechia", "Republic of Ireland", "North Macedonia"],
       "aliases": {
-        "elo": "TBD",
-        "transfermarkt": "TBD",
-        "transfermarkt_id": null,
-        "fifa": "TBD"
+        "elo": "Czech Republic",
+        "transfermarkt": "tschechien",
+        "transfermarkt_id": 3445,
+        "fifa": "Czechia",
+        "sofascore_id": 4715
       }
     },
     {
       "id": 46,
-      "canonical_name": "TBD - Intercontinental Playoff 1",
-      "fifa_code": "TBD",
-      "confederation": "TBD",
+      "canonical_name": "DR Congo",
+      "fifa_code": "COD",
+      "confederation": "CAF",
       "world_cup_wins": 0,
-      "playoff": true,
-      "playoff_teams": ["Jamaica", "New Caledonia", "DR Congo"],
+      "first_world_cup": true,
       "aliases": {
-        "elo": "TBD",
-        "transfermarkt": "TBD",
-        "transfermarkt_id": null,
-        "fifa": "TBD"
+        "elo": "Congo DR",
+        "transfermarkt": "democratic-republic-of-the-congo",
+        "transfermarkt_id": 3854,
+        "fifa": "DR Congo",
+        "sofascore_id": 4786
       }
     },
     {
       "id": 47,
-      "canonical_name": "TBD - Intercontinental Playoff 2",
-      "fifa_code": "TBD",
-      "confederation": "TBD",
+      "canonical_name": "Iraq",
+      "fifa_code": "IRQ",
+      "confederation": "AFC",
       "world_cup_wins": 0,
-      "playoff": true,
-      "playoff_teams": ["Bolivia", "Suriname", "Iraq"],
+      "first_world_cup": true,
       "aliases": {
-        "elo": "TBD",
-        "transfermarkt": "TBD",
-        "transfermarkt_id": null,
-        "fifa": "TBD"
+        "elo": "Iraq",
+        "transfermarkt": "irak",
+        "transfermarkt_id": 3560,
+        "fifa": "Iraq",
+        "sofascore_id": 4710
       }
     }
   ],
   "groups": {
-    "A": ["Mexico", "South Africa", "South Korea", "TBD - UEFA Playoff D"],
-    "B": ["Canada", "TBD - UEFA Playoff A", "Qatar", "Switzerland"],
+    "A": ["Mexico", "South Africa", "South Korea", "Czechia"],
+    "B": ["Canada", "Bosnia and Herzegovina", "Qatar", "Switzerland"],
     "C": ["Brazil", "Morocco", "Haiti", "Scotland"],
-    "D": ["United States", "Paraguay", "Australia", "TBD - UEFA Playoff C"],
+    "D": ["United States", "Paraguay", "Australia", "Turkey"],
     "E": ["Germany", "Curacao", "Ivory Coast", "Ecuador"],
-    "F": ["Netherlands", "Japan", "TBD - UEFA Playoff B", "Tunisia"],
+    "F": ["Netherlands", "Japan", "Sweden", "Tunisia"],
     "G": ["Belgium", "Egypt", "Iran", "New Zealand"],
     "H": ["Spain", "Cape Verde", "Saudi Arabia", "Uruguay"],
-    "I": ["France", "Senegal", "TBD - Intercontinental Playoff 2", "Norway"],
+    "I": ["France", "Senegal", "Iraq", "Norway"],
     "J": ["Argentina", "Algeria", "Austria", "Jordan"],
-    "K": ["Portugal", "TBD - Intercontinental Playoff 1", "Uzbekistan", "Colombia"],
+    "K": ["Portugal", "DR Congo", "Uzbekistan", "Colombia"],
     "L": ["England", "Croatia", "Ghana", "Panama"]
   },
   "confederations": {
     "AFC": {
       "name": "Asian Football Confederation",
-      "slots": 8,
-      "teams": ["Australia", "Iran", "Japan", "Jordan", "Qatar", "Saudi Arabia", "South Korea", "Uzbekistan"]
+      "slots": 9,
+      "teams": ["Australia", "Iran", "Iraq", "Japan", "Jordan", "Qatar", "Saudi Arabia", "South Korea", "Uzbekistan"]
     },
     "CAF": {
       "name": "Confederation of African Football",
-      "slots": 9,
-      "teams": ["Algeria", "Cape Verde", "Egypt", "Ghana", "Ivory Coast", "Morocco", "Senegal", "South Africa", "Tunisia"]
+      "slots": 10,
+      "teams": ["Algeria", "Cape Verde", "DR Congo", "Egypt", "Ghana", "Ivory Coast", "Morocco", "Senegal", "South Africa", "Tunisia"]
     },
     "CONCACAF": {
       "name": "Confederation of North, Central America and Caribbean Association Football",
@@ -735,22 +732,7 @@
     "UEFA": {
       "name": "Union of European Football Associations",
       "slots": 16,
-      "confirmed_teams": ["Austria", "Belgium", "Croatia", "England", "France", "Germany", "Netherlands", "Norway", "Portugal", "Scotland", "Spain", "Switzerland"],
-      "playoff_teams": ["Albania", "Bosnia and Herzegovina", "Czechia", "Denmark", "Italy", "Kosovo", "North Macedonia", "Northern Ireland", "Poland", "Republic of Ireland", "Romania", "Slovakia", "Sweden", "Turkey", "Ukraine", "Wales"]
-    }
-  },
-  "playoff_schedule": {
-    "uefa_playoffs": {
-      "semifinals": "2026-03-26",
-      "finals": "2026-03-31"
-    },
-    "intercontinental_playoffs": {
-      "semifinals": "2026-03-26",
-      "finals": "2026-03-31",
-      "venues": {
-        "semifinal_1": "Guadalajara, Mexico",
-        "semifinal_2": "Monterrey, Mexico"
-      }
+      "teams": ["Austria", "Belgium", "Bosnia and Herzegovina", "Croatia", "Czechia", "England", "France", "Germany", "Netherlands", "Norway", "Portugal", "Scotland", "Spain", "Sweden", "Switzerland", "Turkey"]
     }
   },
   "tournament_info": {
@@ -771,7 +753,7 @@
       "venue": "Estadio Azteca, Mexico City",
       "date": "2026-06-11"
     },
-    "first_time_qualifiers": ["Cape Verde", "Curacao", "Jordan", "Uzbekistan"],
-    "notable_absences": ["Chile", "Nigeria", "Cameroon", "Costa Rica", "Serbia", "Greece"]
+    "first_time_qualifiers": ["Bosnia and Herzegovina", "Cape Verde", "Curacao", "DR Congo", "Iraq", "Jordan", "Uzbekistan"],
+    "notable_absences": ["Chile", "Nigeria", "Cameroon", "Costa Rica", "Serbia", "Greece", "Italy", "Denmark", "Poland"]
   }
 }
