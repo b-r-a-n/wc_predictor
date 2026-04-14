@@ -39,3 +39,5 @@ declare module '../../wasm-pkg' {
 
   export default function init(): Promise<void>;
 }
+
+declare const __COMMIT_SHA__: string;

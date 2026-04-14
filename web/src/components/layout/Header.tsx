@@ -30,9 +30,10 @@ export function Header() {
                     : 'Error'}
               </span>
             </div>
-            {wasmApi && (
-              <span className="text-xs text-blue-300">v{wasmApi.version}</span>
-            )}
+            <div className="text-xs text-blue-300 space-x-2">
+              {wasmApi && <span>sim v{wasmApi.version}</span>}
+              <span>ui {__COMMIT_SHA__}</span>
+            </div>
           </div>
         </div>
       </div>
