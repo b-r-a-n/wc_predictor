@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import init, { WcSimulator, calculateMatchProbability, getVersion } from '../../wasm-pkg';
 import type { TournamentData, Team, Group, AggregatedResults, MatchProbabilities, CompositeWeights, Strategy } from '../types';
+import { normalizeSimulationResult } from '../utils/normalizeSimulationResult';
 
 export interface WasmApi {
   simulator: WcSimulator | null;
@@ -87,121 +88,7 @@ export function useWasm(): { status: WasmStatus; api: WasmApi | null; error: str
                 throw new Error(`Unknown strategy: ${strategy}`);
             }
 
-            // Convert Map to plain object (serde-wasm-bindgen returns HashMap as JS Map)
-            const result = rawResult as {
-              total_simulations: number;
-              team_stats: Map<number, unknown> | Record<string, unknown>;
-              most_likely_winner: number;
-              most_likely_final: [number, number];
-              path_stats?: Map<number, unknown> | Record<string, unknown>;
-              bracket_slot_stats?: Map<number, unknown> | Record<string, unknown>;
-              bracket_slot_win_stats?: Map<number, unknown> | Record<string, unknown>;
-              slot_opponent_stats?: Map<number, unknown> | Record<string, unknown>;
-              optimal_bracket?: unknown;
-            };
-
-            // If team_stats is a Map, convert it to a plain object
-            let teamStats: Record<string, unknown>;
-            if (result.team_stats instanceof Map) {
-              teamStats = {};
-              result.team_stats.forEach((value, key) => {
-                teamStats[String(key)] = value;
-              });
-            } else {
-              teamStats = result.team_stats as Record<string, unknown>;
-            }
-
-            // Get path_stats if available (may be a Map that needs conversion)
-            let pathStats: Record<string, unknown> | undefined;
-            const rawPathStats = result.path_stats;
-            if (rawPathStats instanceof Map) {
-              pathStats = {};
-              rawPathStats.forEach((value: unknown, key: number) => {
-                pathStats![String(key)] = value;
-              });
-            } else if (rawPathStats) {
-              pathStats = rawPathStats as Record<string, unknown>;
-            }
-
-            // Get bracket_slot_stats if available (may be a Map that needs conversion)
-            let bracketSlotStats: Record<string, unknown> | undefined;
-            const rawBracketSlotStats = result.bracket_slot_stats;
-            if (rawBracketSlotStats instanceof Map) {
-              bracketSlotStats = {};
-              rawBracketSlotStats.forEach((value: unknown, key: number) => {
-                bracketSlotStats![String(key)] = value;
-              });
-            } else if (rawBracketSlotStats) {
-              bracketSlotStats = rawBracketSlotStats as Record<string, unknown>;
-            }
-
-            // Get bracket_slot_win_stats if available (may be a Map that needs conversion)
-            let bracketSlotWinStats: Record<string, unknown> | undefined;
-            const rawBracketSlotWinStats = result.bracket_slot_win_stats;
-            if (rawBracketSlotWinStats instanceof Map) {
-              bracketSlotWinStats = {};
-              rawBracketSlotWinStats.forEach((value: unknown, key: number) => {
-                bracketSlotWinStats![String(key)] = value;
-              });
-            } else if (rawBracketSlotWinStats) {
-              bracketSlotWinStats = rawBracketSlotWinStats as Record<string, unknown>;
-            }
-
-            // Get slot_opponent_stats if available (nested Maps that need deep conversion)
-            let slotOpponentStats: Record<string, unknown> | undefined;
-            const rawSlotOpponentStats = result.slot_opponent_stats;
-            if (rawSlotOpponentStats instanceof Map) {
-              slotOpponentStats = {};
-              rawSlotOpponentStats.forEach((teamStats: unknown, teamId: number) => {
-                // teamStats is a SlotOpponentStats object with Map fields
-                const converted: Record<string, unknown> = {};
-                const stats = teamStats as Record<string, unknown>;
-
-                // Convert each round's slot->opponent Map
-                for (const roundKey of ['round_of_32', 'round_of_16', 'quarter_finals', 'semi_finals']) {
-                  const roundData = stats[roundKey];
-                  if (roundData instanceof Map) {
-                    const roundConverted: Record<string, Record<string, number>> = {};
-                    roundData.forEach((opponentMap: unknown, slot: number) => {
-                      if (opponentMap instanceof Map) {
-                        const opponentConverted: Record<string, number> = {};
-                        (opponentMap as Map<number, number>).forEach((count, oppId) => {
-                          opponentConverted[String(oppId)] = count;
-                        });
-                        roundConverted[String(slot)] = opponentConverted;
-                      }
-                    });
-                    converted[roundKey] = roundConverted;
-                  }
-                }
-
-                // Convert final_match (direct opponent->count Map, no slot nesting)
-                const finalData = stats.final_match;
-                if (finalData instanceof Map) {
-                  const finalConverted: Record<string, number> = {};
-                  (finalData as Map<number, number>).forEach((count, oppId) => {
-                    finalConverted[String(oppId)] = count;
-                  });
-                  converted.final_match = finalConverted;
-                }
-
-                slotOpponentStats![String(teamId)] = converted;
-              });
-            } else if (rawSlotOpponentStats) {
-              slotOpponentStats = rawSlotOpponentStats as Record<string, unknown>;
-            }
-
-            return {
-              total_simulations: result.total_simulations,
-              team_stats: teamStats,
-              most_likely_winner: result.most_likely_winner,
-              most_likely_final: result.most_likely_final,
-              path_stats: pathStats,
-              bracket_slot_stats: bracketSlotStats,
-              bracket_slot_win_stats: bracketSlotWinStats,
-              slot_opponent_stats: slotOpponentStats,
-              optimal_bracket: result.optimal_bracket,
-            } as AggregatedResults;
+            return normalizeSimulationResult(rawResult);
           },
           calculateMatchProbability: (teamAElo, teamBElo, isKnockout) => {
             return calculateMatchProbability(teamAElo, teamBElo, isKnockout) as MatchProbabilities;

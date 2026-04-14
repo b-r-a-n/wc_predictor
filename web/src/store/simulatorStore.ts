@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { Team, Group, AggregatedResults, Strategy, CompositeWeights, TabId, WasmStatus, TeamPreset, Venue, VenueData, MatchScheduleData } from '../types';
 import type { WasmApi } from '../hooks/useWasm';
+import { normalizeSimulationResult } from '../utils/normalizeSimulationResult';
 
 // LocalStorage keys
 const STORAGE_KEY_CURRENT_EDITS = 'wc_predictor_current_edits';
@@ -329,59 +330,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
               throw new Error(`Unknown strategy: ${strategy}`);
           }
 
-          // Convert Map to plain object (serde-wasm-bindgen returns HashMap as JS Map)
-          const result = rawResult as {
-            total_simulations: number;
-            team_stats: Map<number, unknown> | Record<string, unknown>;
-            most_likely_winner: number;
-            most_likely_final: [number, number];
-            path_stats?: Map<number, unknown> | Record<string, unknown>;
-            bracket_slot_stats?: Map<number, unknown> | Record<string, unknown>;
-          };
-
-          // If team_stats is a Map, convert it to a plain object
-          let teamStats: Record<string, unknown>;
-          if (result.team_stats instanceof Map) {
-            teamStats = {};
-            result.team_stats.forEach((value, key) => {
-              teamStats[String(key)] = value;
-            });
-          } else {
-            teamStats = result.team_stats as Record<string, unknown>;
-          }
-
-          // Get path_stats if available (may be a Map that needs conversion)
-          let pathStats: Record<string, unknown> | undefined;
-          const rawPathStats = result.path_stats;
-          if (rawPathStats instanceof Map) {
-            pathStats = {};
-            rawPathStats.forEach((value: unknown, key: number) => {
-              pathStats![String(key)] = value;
-            });
-          } else if (rawPathStats) {
-            pathStats = rawPathStats as Record<string, unknown>;
-          }
-
-          // Get bracket_slot_stats if available (may be a Map that needs conversion)
-          let bracketSlotStats: Record<string, unknown> | undefined;
-          const rawBracketSlotStats = result.bracket_slot_stats;
-          if (rawBracketSlotStats instanceof Map) {
-            bracketSlotStats = {};
-            rawBracketSlotStats.forEach((value: unknown, key: number) => {
-              bracketSlotStats![String(key)] = value;
-            });
-          } else if (rawBracketSlotStats) {
-            bracketSlotStats = rawBracketSlotStats as Record<string, unknown>;
-          }
-
-          return {
-            total_simulations: result.total_simulations,
-            team_stats: teamStats,
-            most_likely_winner: result.most_likely_winner,
-            most_likely_final: result.most_likely_final,
-            path_stats: pathStats,
-            bracket_slot_stats: bracketSlotStats,
-          } as AggregatedResults;
+          return normalizeSimulationResult(rawResult);
         },
         calculateMatchProbability: wasmApi?.calculateMatchProbability || (() => ({ home_win: 0, draw: 0, away_win: 0 })),
       };
