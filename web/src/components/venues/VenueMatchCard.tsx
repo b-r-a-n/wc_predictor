@@ -1,8 +1,8 @@
 import type { ScheduledMatch, Team, AggregatedResults, Group } from '../../types';
-import type { KnockoutPairing } from '../../utils/venueUtils';
-import { getFlagEmoji, formatPercent } from '../../utils/formatting';
-import { getRoundDisplayName, formatMatchDate, formatMatchTime, resolveKnockoutMatchPairings } from '../../utils/venueUtils';
+import { getFlagEmoji } from '../../utils/formatting';
+import { getRoundDisplayName, formatMatchDate, formatMatchTime, resolveKnockoutMatchMatrix } from '../../utils/venueUtils';
 import { getSlotForMatch } from '../../utils/matchMapping';
+import { VenueMatchupMatrix } from './VenueMatchupMatrix';
 
 interface VenueMatchCardProps {
   match: ScheduledMatch;
@@ -42,39 +42,6 @@ export function VenueMatchCard({ match, teams, groups, results }: VenueMatchCard
     </div>
   );
 
-  // Render knockout match pairings
-  const renderPairings = (pairings: KnockoutPairing[]) => {
-    if (pairings.length === 0) {
-      return (
-        <div className="text-gray-400 text-sm italic text-center">
-          Run simulation to see predicted matchups
-        </div>
-      );
-    }
-
-    return (
-      <div className="space-y-2">
-        <div className="text-xs text-gray-500 font-medium">Top Predicted Matchups</div>
-        {pairings.map(({ teamA, teamB, probability }) => (
-          <div key={`${teamA.id}-${teamB.id}`} className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-1">
-              <span>{getFlagEmoji(teamA.code)}</span>
-              <span className="text-gray-700">{teamA.name}</span>
-            </div>
-            <span className="text-gray-400 text-xs mx-2">vs</span>
-            <div className="flex items-center gap-1">
-              <span className="text-gray-700">{teamB.name}</span>
-              <span>{getFlagEmoji(teamB.code)}</span>
-            </div>
-            <span className="text-blue-600 font-medium ml-2 text-xs">
-              {formatPercent(probability, 1)}
-            </span>
-          </div>
-        ))}
-      </div>
-    );
-  };
-
   // Get match participants
   let matchContent: React.ReactNode;
 
@@ -105,20 +72,23 @@ export function VenueMatchCard({ match, teams, groups, results }: VenueMatchCard
       </div>
     );
   } else {
-    // Knockout match - show actual pairings from simulation results
-    // Derive slot from match number using the mapping utility
+    // Knockout match - show matchup probability matrix from simulation results
     const knockoutSlot = getSlotForMatch(match.matchNumber) ?? 0;
 
-    // Get pairings for this specific knockout position
-    const pairings = resolveKnockoutMatchPairings(
+    const matrix = resolveKnockoutMatchMatrix(
       match.round as Exclude<typeof match.round, 'group_stage'>,
       knockoutSlot,
       results,
-      teams,
-      5
+      teams
     );
 
-    matchContent = renderPairings(pairings);
+    matchContent = matrix ? (
+      <VenueMatchupMatrix data={matrix} />
+    ) : (
+      <div className="text-gray-400 text-sm italic text-center">
+        Run simulation to see predicted matchups
+      </div>
+    );
   }
 
   return (

@@ -13,6 +13,17 @@ export interface KnockoutPairing {
 }
 
 /**
+ * Symmetric matchup probability matrix for a knockout slot.
+ * `matrix[i][j]` is the probability that teams[i] and teams[j] face each other.
+ * Diagonal entries are 0. Teams are sorted by descending reach probability.
+ */
+export interface MatchupMatrix {
+  teams: Team[];
+  matrix: number[][];
+  totalSimulations: number;
+}
+
+/**
  * Threshold for displaying a team as a candidate (5%)
  */
 const PROBABILITY_THRESHOLD = 0.05;
@@ -256,4 +267,86 @@ export function resolveKnockoutMatchPairings(
       };
     })
     .filter((p): p is KnockoutPairing => p !== null);
+}
+
+/**
+ * Build a symmetric matchup probability matrix for a given knockout slot.
+ * Teams are included if their probability of reaching the slot meets `reachThreshold`,
+ * capped at `maxTeams` and sorted by descending reach probability.
+ */
+export function resolveKnockoutMatchMatrix(
+  round: KnockoutRoundType,
+  slot: number,
+  results: AggregatedResults | null,
+  teams: Team[],
+  reachThreshold: number = 0.01,
+  maxTeams: number = 10
+): MatchupMatrix | null {
+  if (!results || !results.slot_opponent_stats) return null;
+
+  const totalSimulations = results.total_simulations;
+  if (totalSimulations === 0) return null;
+
+  const teamMap = new Map<number, Team>();
+  for (const team of teams) teamMap.set(team.id, team);
+
+  const roundKey = getRoundKey(round);
+
+  // reach count per team (total appearances in this slot), and canonical pair counts
+  const reachCount = new Map<number, number>();
+  const pairCounts = new Map<string, number>();
+
+  for (const [teamIdStr, stats] of Object.entries(results.slot_opponent_stats)) {
+    const teamId = parseInt(teamIdStr, 10);
+    if (!teamMap.has(teamId)) continue;
+    const slotStats = stats as SlotOpponentStats;
+
+    let opponentCounts: Record<string, number> | undefined;
+    if (roundKey === 'final_match') {
+      opponentCounts = slotStats.final_match;
+    } else {
+      const roundData = slotStats[roundKey as keyof Omit<SlotOpponentStats, 'final_match'>] as
+        | Record<string, Record<string, number>>
+        | undefined;
+      if (!roundData) continue;
+      opponentCounts = roundData[String(slot)];
+    }
+    if (!opponentCounts) continue;
+
+    let teamTotal = 0;
+    for (const [oppIdStr, count] of Object.entries(opponentCounts)) {
+      const oppId = parseInt(oppIdStr, 10);
+      teamTotal += count;
+      const [idA, idB] = teamId < oppId ? [teamId, oppId] : [oppId, teamId];
+      const key = `${idA}-${idB}`;
+      // Each pairing is recorded twice (once by each team); take max for symmetry/noise.
+      pairCounts.set(key, Math.max(pairCounts.get(key) ?? 0, count));
+    }
+    if (teamTotal > 0) {
+      reachCount.set(teamId, (reachCount.get(teamId) ?? 0) + teamTotal);
+    }
+  }
+
+  const selectedIds = Array.from(reachCount.entries())
+    .filter(([, count]) => count / totalSimulations >= reachThreshold)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, maxTeams)
+    .map(([id]) => id);
+
+  if (selectedIds.length === 0) return null;
+
+  const selectedTeams = selectedIds
+    .map((id) => teamMap.get(id))
+    .filter((t): t is Team => t !== undefined);
+
+  const matrix: number[][] = selectedTeams.map((rowTeam, i) =>
+    selectedTeams.map((colTeam, j) => {
+      if (i === j) return 0;
+      const [idA, idB] = rowTeam.id < colTeam.id ? [rowTeam.id, colTeam.id] : [colTeam.id, rowTeam.id];
+      const count = pairCounts.get(`${idA}-${idB}`) ?? 0;
+      return count / totalSimulations;
+    })
+  );
+
+  return { teams: selectedTeams, matrix, totalSimulations };
 }
