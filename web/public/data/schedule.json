@@ -722,9 +722,9 @@
     },
     {
       "matchNumber": 73,
-      "date": "2026-06-29",
+      "date": "2026-06-28",
       "time": "13:00",
-      "venueId": "gillette",
+      "venueId": "sofi",
       "round": "round_of_32",
       "homePlaceholder": "2A",
       "awayPlaceholder": "2B"
@@ -733,7 +733,7 @@
       "matchNumber": 74,
       "date": "2026-06-29",
       "time": "16:00",
-      "venueId": "metlife",
+      "venueId": "gillette",
       "round": "round_of_32",
       "homePlaceholder": "1E",
       "awayPlaceholder": "3A/B/C/D/F"
@@ -760,7 +760,7 @@
       "matchNumber": 77,
       "date": "2026-06-30",
       "time": "13:00",
-      "venueId": "azteca",
+      "venueId": "metlife",
       "round": "round_of_32",
       "homePlaceholder": "1I",
       "awayPlaceholder": "3C/D/F/G/H"
@@ -769,7 +769,7 @@
       "matchNumber": 78,
       "date": "2026-06-30",
       "time": "16:00",
-      "venueId": "mercedes_benz",
+      "venueId": "att",
       "round": "round_of_32",
       "homePlaceholder": "2E",
       "awayPlaceholder": "2I"
@@ -778,16 +778,16 @@
       "matchNumber": 79,
       "date": "2026-06-30",
       "time": "19:00",
-      "venueId": "sofi",
+      "venueId": "azteca",
       "round": "round_of_32",
       "homePlaceholder": "1A",
       "awayPlaceholder": "3C/E/F/H/I"
     },
     {
       "matchNumber": 80,
-      "date": "2026-06-30",
+      "date": "2026-07-01",
       "time": "22:00",
-      "venueId": "att",
+      "venueId": "mercedes_benz",
       "round": "round_of_32",
       "homePlaceholder": "1L",
       "awayPlaceholder": "3E/H/I/J/K"
@@ -812,18 +812,18 @@
     },
     {
       "matchNumber": 83,
-      "date": "2026-07-01",
+      "date": "2026-07-02",
       "time": "19:00",
-      "venueId": "sofi",
+      "venueId": "bmo",
       "round": "round_of_32",
       "homePlaceholder": "2K",
       "awayPlaceholder": "2L"
     },
     {
       "matchNumber": 84,
-      "date": "2026-07-01",
+      "date": "2026-07-02",
       "time": "22:00",
-      "venueId": "hard_rock",
+      "venueId": "sofi",
       "round": "round_of_32",
       "homePlaceholder": "1H",
       "awayPlaceholder": "2J"
@@ -839,25 +839,25 @@
     },
     {
       "matchNumber": 86,
-      "date": "2026-07-02",
+      "date": "2026-07-03",
       "time": "16:00",
-      "venueId": "arrowhead",
+      "venueId": "hard_rock",
       "round": "round_of_32",
       "homePlaceholder": "1J",
       "awayPlaceholder": "2H"
     },
     {
       "matchNumber": 87,
-      "date": "2026-07-02",
+      "date": "2026-07-03",
       "time": "19:00",
-      "venueId": "bmo",
+      "venueId": "arrowhead",
       "round": "round_of_32",
       "homePlaceholder": "1K",
       "awayPlaceholder": "3D/E/I/J/L"
     },
     {
       "matchNumber": 88,
-      "date": "2026-07-02",
+      "date": "2026-07-03",
       "time": "22:00",
       "venueId": "att",
       "round": "round_of_32",
