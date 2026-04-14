@@ -74,7 +74,7 @@ export function useWasm(): { status: WasmStatus; api: WasmApi | null; error: str
                 rawResult = simulator.runFormSimulation(iterations);
                 break;
               case 'composite': {
-                const weights = compositeWeights ?? { elo: 0.35, market: 0.25, fifa: 0.25, form: 0.15 };
+                const weights = compositeWeights ?? { elo: 0.4, market: 0.4, fifa: 0.1, form: 0.1 };
                 rawResult = simulator.runCompositeSimulation(
                   weights.elo,
                   weights.market,
