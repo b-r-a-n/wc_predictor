@@ -6,7 +6,7 @@ interface VenueMatchupMatrixProps {
 }
 
 export function VenueMatchupMatrix({ data }: VenueMatchupMatrixProps) {
-  const { teams, matrix } = data;
+  const { teams, matrix, reachProbabilities } = data;
 
   // Compute max off-diagonal value for heat intensity
   let maxProb = 0;
@@ -30,6 +30,9 @@ export function VenueMatchupMatrix({ data }: VenueMatchupMatrixProps) {
           <thead>
             <tr>
               <th className="p-1"></th>
+              <th className="p-1 text-[10px] font-medium text-gray-500 uppercase tracking-tight border-r-2 border-gray-300">
+                Total
+              </th>
               {teams.map((t) => (
                 <th key={t.id} className="p-1 font-normal text-gray-600" title={t.name}>
                   <div className="flex flex-col items-center">
@@ -50,6 +53,12 @@ export function VenueMatchupMatrix({ data }: VenueMatchupMatrixProps) {
                   <span className="mr-1">{getFlagEmoji(rowTeam.code)}</span>
                   <span className="text-[10px] uppercase tracking-tight">{rowTeam.code}</span>
                 </th>
+                <td
+                  className="p-1 text-center font-semibold text-gray-800 border-r-2 border-gray-300"
+                  title={`${rowTeam.name}: total probability of reaching this slot`}
+                >
+                  {formatPercent(reachProbabilities[i], 1)}
+                </td>
                 {teams.map((colTeam, j) => {
                   if (i === j) {
                     return <td key={colTeam.id} className="p-1 bg-gray-100" />;

@@ -16,10 +16,13 @@ export interface KnockoutPairing {
  * Symmetric matchup probability matrix for a knockout slot.
  * `matrix[i][j]` is the probability that teams[i] and teams[j] face each other.
  * Diagonal entries are 0. Teams are sorted by descending reach probability.
+ * `reachProbabilities[i]` is the probability that teams[i] reaches this slot
+ * (equivalent to the sum of row i).
  */
 export interface MatchupMatrix {
   teams: Team[];
   matrix: number[][];
+  reachProbabilities: number[];
   totalSimulations: number;
 }
 
@@ -348,5 +351,9 @@ export function resolveKnockoutMatchMatrix(
     })
   );
 
-  return { teams: selectedTeams, matrix, totalSimulations };
+  const reachProbabilities = selectedTeams.map(
+    (t) => (reachCount.get(t.id) ?? 0) / totalSimulations
+  );
+
+  return { teams: selectedTeams, matrix, reachProbabilities, totalSimulations };
 }
