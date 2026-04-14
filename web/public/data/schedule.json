@@ -72,7 +72,7 @@
     },
     {
       "date": "2026-06-13",
-      "time": "00:00",
+      "time": "21:00",
       "venueId": "bc_place",
       "round": "group_stage",
       "groupId": "D",
@@ -192,7 +192,7 @@
     },
     {
       "date": "2026-06-16",
-      "time": "00:00",
+      "time": "21:00",
       "venueId": "levis",
       "round": "group_stage",
       "groupId": "J",
@@ -312,7 +312,7 @@
     },
     {
       "date": "2026-06-19",
-      "time": "00:00",
+      "time": "20:00",
       "venueId": "levis",
       "round": "group_stage",
       "groupId": "D",
@@ -352,7 +352,7 @@
     },
     {
       "date": "2026-06-20",
-      "time": "00:00",
+      "time": "22:00",
       "venueId": "bbva",
       "round": "group_stage",
       "groupId": "F",
