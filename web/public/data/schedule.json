@@ -541,16 +541,6 @@
       "matchNumber": 54
     },
     {
-      "date": "2026-06-24",
-      "time": "21:00",
-      "venueId": "sofi",
-      "round": "group_stage",
-      "groupId": "B",
-      "homePlaceholder": "B2",
-      "awayPlaceholder": "B3",
-      "matchNumber": 55
-    },
-    {
       "date": "2026-06-25",
       "time": "16:00",
       "venueId": "metlife",
@@ -558,7 +548,7 @@
       "groupId": "E",
       "homePlaceholder": "E4",
       "awayPlaceholder": "E1",
-      "matchNumber": 56
+      "matchNumber": 55
     },
     {
       "date": "2026-06-25",
@@ -568,7 +558,7 @@
       "groupId": "E",
       "homePlaceholder": "E2",
       "awayPlaceholder": "E3",
-      "matchNumber": 57
+      "matchNumber": 56
     },
     {
       "date": "2026-06-25",
@@ -578,7 +568,7 @@
       "groupId": "F",
       "homePlaceholder": "F2",
       "awayPlaceholder": "F3",
-      "matchNumber": 58
+      "matchNumber": 57
     },
     {
       "date": "2026-06-25",
@@ -588,7 +578,7 @@
       "groupId": "F",
       "homePlaceholder": "F4",
       "awayPlaceholder": "F1",
-      "matchNumber": 59
+      "matchNumber": 58
     },
     {
       "date": "2026-06-25",
@@ -598,7 +588,7 @@
       "groupId": "D",
       "homePlaceholder": "D4",
       "awayPlaceholder": "D1",
-      "matchNumber": 60
+      "matchNumber": 59
     },
     {
       "date": "2026-06-25",
@@ -608,7 +598,7 @@
       "groupId": "D",
       "homePlaceholder": "D2",
       "awayPlaceholder": "D3",
-      "matchNumber": 61
+      "matchNumber": 60
     },
     {
       "date": "2026-06-26",
@@ -618,7 +608,7 @@
       "groupId": "I",
       "homePlaceholder": "I2",
       "awayPlaceholder": "I3",
-      "matchNumber": 62
+      "matchNumber": 61
     },
     {
       "date": "2026-06-26",
@@ -628,7 +618,7 @@
       "groupId": "I",
       "homePlaceholder": "I4",
       "awayPlaceholder": "I1",
-      "matchNumber": 63
+      "matchNumber": 62
     },
     {
       "date": "2026-06-26",
@@ -638,7 +628,7 @@
       "groupId": "H",
       "homePlaceholder": "H4",
       "awayPlaceholder": "H1",
-      "matchNumber": 64
+      "matchNumber": 63
     },
     {
       "date": "2026-06-26",
@@ -648,7 +638,7 @@
       "groupId": "H",
       "homePlaceholder": "H2",
       "awayPlaceholder": "H3",
-      "matchNumber": 65
+      "matchNumber": 64
     },
     {
       "date": "2026-06-26",
@@ -658,7 +648,7 @@
       "groupId": "G",
       "homePlaceholder": "G2",
       "awayPlaceholder": "G3",
-      "matchNumber": 66
+      "matchNumber": 65
     },
     {
       "date": "2026-06-26",
@@ -668,7 +658,7 @@
       "groupId": "G",
       "homePlaceholder": "G4",
       "awayPlaceholder": "G1",
-      "matchNumber": 67
+      "matchNumber": 66
     },
     {
       "date": "2026-06-27",
@@ -678,7 +668,7 @@
       "groupId": "L",
       "homePlaceholder": "L4",
       "awayPlaceholder": "L1",
-      "matchNumber": 68
+      "matchNumber": 67
     },
     {
       "date": "2026-06-27",
@@ -688,7 +678,7 @@
       "groupId": "L",
       "homePlaceholder": "L2",
       "awayPlaceholder": "L3",
-      "matchNumber": 69
+      "matchNumber": 68
     },
     {
       "date": "2026-06-27",
@@ -698,7 +688,7 @@
       "groupId": "K",
       "homePlaceholder": "K2",
       "awayPlaceholder": "K3",
-      "matchNumber": 70
+      "matchNumber": 69
     },
     {
       "date": "2026-06-27",
@@ -708,7 +698,7 @@
       "groupId": "K",
       "homePlaceholder": "K4",
       "awayPlaceholder": "K1",
-      "matchNumber": 71
+      "matchNumber": 70
     },
     {
       "date": "2026-06-27",
@@ -718,7 +708,7 @@
       "groupId": "J",
       "homePlaceholder": "J4",
       "awayPlaceholder": "J1",
-      "matchNumber": 72
+      "matchNumber": 71
     },
     {
       "date": "2026-06-27",
@@ -728,7 +718,7 @@
       "groupId": "J",
       "homePlaceholder": "J2",
       "awayPlaceholder": "J3",
-      "matchNumber": 73
+      "matchNumber": 72
     },
     {
       "matchNumber": 73,
