@@ -1,16 +1,16 @@
-import { useMemo, useCallback, useState } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useSimulatorStore } from '../../store/simulatorStore';
 import { getFlagEmoji, formatNumber } from '../../utils/formatting';
 import { computeOptimalBracket, type OptimalBracketDisplay } from '../../utils/bracketUtils';
 import { getMatchForSlot } from '../../utils/matchMapping';
-import { BracketSlot } from './BracketSlot';
 import { MostLikelyBracketSlot } from './MostLikelyBracketSlot';
 import { BracketConnectors } from './BracketConnectors';
+import { TeamPathTree } from './TeamPathTree';
 import {
   calculateSlotPositions,
   calculateBracketDimensions,
 } from './bracketLayout';
-import type { Team, Venue, BracketSlotStats, KnockoutRoundType, PathStatistics, SlotOpponentStats, MostLikelySlotData } from '../../types';
+import type { Team, Venue, BracketSlotStats, KnockoutRoundType, SlotOpponentStats, MostLikelySlotData } from '../../types';
 
 // Round configuration for the bracket
 const ROUNDS: {
@@ -27,27 +27,16 @@ const ROUNDS: {
   { key: 'final_match', displayName: 'Final', slotCount: 1, mappingKey: 'final', roundIndex: 4 },
 ];
 
-// Map PathStatistics round keys to BracketSlotStats round keys
-const PATH_ROUND_TO_BRACKET_ROUND: Record<string, keyof BracketSlotStats> = {
-  round_of_32_matchups: 'round_of_32',
-  round_of_16_matchups: 'round_of_16',
-  quarter_final_matchups: 'quarter_finals',
-  semi_final_matchups: 'semi_finals',
-  final_matchups: 'final_match',
-};
-
 export function TournamentPaths() {
   const {
     results,
     teams,
+    groups,
     venues,
     schedule,
     selectedTeamForPaths,
     setSelectedTeamForPaths
   } = useSimulatorStore();
-
-  // Track which slot is expanded
-  const [expandedSlot, setExpandedSlot] = useState<string | null>(null);
 
   // Create team lookup map
   const teamMap = useMemo(() => {
@@ -79,17 +68,6 @@ export function TournamentPaths() {
     return teamStats || null;
   }, [results, selectedTeamForPaths]);
 
-  // Get path stats for the selected team (for opponent info - legacy, round-level)
-  const pathStats = useMemo((): PathStatistics | null => {
-    if (!results || selectedTeamForPaths === null) return null;
-
-    const allPathStats = results.path_stats;
-    if (!allPathStats) return null;
-
-    const teamPathStats = allPathStats[String(selectedTeamForPaths)] as PathStatistics | undefined;
-    return teamPathStats || null;
-  }, [results, selectedTeamForPaths]);
-
   // Get slot-specific opponent stats for the selected team
   const slotOpponentStats = useMemo((): SlotOpponentStats | null => {
     if (!results || selectedTeamForPaths === null) return null;
@@ -100,34 +78,6 @@ export function TournamentPaths() {
     const teamStats = allSlotOpponentStats[String(selectedTeamForPaths)] as SlotOpponentStats | undefined;
     return teamStats || null;
   }, [results, selectedTeamForPaths]);
-
-  // Get highlighted slots (probability > 1%)
-  const highlightedSlots = useMemo(() => {
-    const highlighted = new Set<string>();
-    if (!bracketStats || !results) return highlighted;
-
-    for (const round of ROUNDS) {
-      if (round.key === 'final_match') {
-        const count = bracketStats.final_match as number;
-        const prob = count / results.total_simulations;
-        if (prob >= 0.01) {
-          highlighted.add(`${round.roundIndex}-0`);
-        }
-      } else {
-        const roundData = bracketStats[round.key] as Record<string, number>;
-        if (roundData) {
-          for (const [slotStr, count] of Object.entries(roundData)) {
-            const prob = count / results.total_simulations;
-            if (prob >= 0.01) {
-              highlighted.add(`${round.roundIndex}-${slotStr}`);
-            }
-          }
-        }
-      }
-    }
-
-    return highlighted;
-  }, [bracketStats, results]);
 
   // Compute optimal bracket when no team is selected
   const optimalBracket = useMemo((): OptimalBracketDisplay | null => {
@@ -171,140 +121,26 @@ export function TournamentPaths() {
     return highlights;
   }, [optimalBracket]);
 
-  // Get probability for a specific slot
-  const getSlotProbability = useCallback((
-    roundKey: keyof BracketSlotStats,
-    slotIndex: number
-  ): number => {
-    if (!bracketStats || !results) return 0;
-
-    if (roundKey === 'final_match') {
-      const count = bracketStats.final_match as number;
-      return count / results.total_simulations;
-    }
-
-    const roundData = bracketStats[roundKey] as Record<string, number>;
-    if (!roundData) return 0;
-
-    const count = roundData[String(slotIndex)] || 0;
-    return count / results.total_simulations;
-  }, [bracketStats, results]);
-
-  // Get venue for a specific slot by looking up the match in the schedule
   const getSlotVenue = useCallback((
     mappingKey: KnockoutRoundType,
     slotIndex: number
   ): Venue | undefined => {
     if (!schedule) return undefined;
-
-    // Get the match number for this round/slot
     const matchNum = getMatchForSlot(mappingKey, slotIndex);
     if (!matchNum) return undefined;
-
-    // Find the match in the schedule
     const match = schedule.matches.find(m => m.matchNumber === matchNum);
     if (!match) return undefined;
-
     return venueMap.get(match.venueId);
   }, [schedule, venueMap]);
-
-  // Get top opponents for a specific slot based on slot-specific stats
-  // Falls back to round-level stats if slot-specific data is unavailable
-  const getTopOpponents = useCallback((
-    roundKey: keyof BracketSlotStats,
-    slotIndex: number
-  ): { team: Team; probability: number }[] => {
-    if (!results) return [];
-
-    // Try slot-specific data first (new format)
-    if (slotOpponentStats) {
-      let opponentCounts: Record<string, number> | undefined;
-
-      if (roundKey === 'final_match') {
-        // Final has a single slot, use final_match directly
-        opponentCounts = slotOpponentStats.final_match;
-      } else {
-        // Get the slot-specific opponents for other rounds
-        const roundData = slotOpponentStats[roundKey] as Record<string, Record<string, number>> | undefined;
-        if (roundData) {
-          opponentCounts = roundData[String(slotIndex)];
-        }
-      }
-
-      if (opponentCounts && Object.keys(opponentCounts).length > 0) {
-        const sorted = Object.entries(opponentCounts)
-          .map(([teamIdStr, count]) => ({
-            teamId: parseInt(teamIdStr),
-            count: count as number,
-          }))
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 5);
-
-        return sorted
-          .map(({ teamId, count }) => {
-            const team = teamMap.get(teamId);
-            if (!team) return null;
-            return {
-              team,
-              probability: count / results.total_simulations,
-            };
-          })
-          .filter((item): item is { team: Team; probability: number } => item !== null);
-      }
-    }
-
-    // Fallback to round-level path stats (legacy behavior)
-    if (!pathStats) return [];
-
-    // Map bracket round key to path stats key
-    const pathRoundKey = Object.entries(PATH_ROUND_TO_BRACKET_ROUND)
-      .find(([, v]) => v === roundKey)?.[0] as keyof PathStatistics | undefined;
-
-    if (!pathRoundKey) return [];
-
-    const roundMatchups = pathStats[pathRoundKey];
-    if (!roundMatchups || typeof roundMatchups !== 'object' || !('opponents' in roundMatchups)) {
-      return [];
-    }
-
-    const opponents = (roundMatchups as { opponents: Record<string, number> }).opponents;
-    if (!opponents) return [];
-
-    // Sort by count and get top opponents
-    const sorted = Object.entries(opponents)
-      .map(([teamIdStr, count]) => ({
-        teamId: parseInt(teamIdStr),
-        count: count as number,
-      }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
-
-    return sorted
-      .map(({ teamId, count }) => {
-        const team = teamMap.get(teamId);
-        if (!team) return null;
-        return {
-          team,
-          probability: count / results.total_simulations,
-        };
-      })
-      .filter((item): item is { team: Team; probability: number } => item !== null);
-  }, [slotOpponentStats, pathStats, results, teamMap]);
 
   const handleTeamChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setSelectedTeamForPaths(value === '' ? null : parseInt(value));
-    setExpandedSlot(null);  // Reset expanded slot when team changes
   }, [setSelectedTeamForPaths]);
 
   const handleTeamClick = useCallback((teamId: number) => {
     setSelectedTeamForPaths(teamId);
-    setExpandedSlot(null);
   }, [setSelectedTeamForPaths]);
-
-  const handleToggleExpand = useCallback((slotKey: string) => {
-    setExpandedSlot((prev) => (prev === slotKey ? null : slotKey));
-  }, []);
 
   // Get selected team info for display
   const selectedTeam = selectedTeamForPaths !== null ? teamMap.get(selectedTeamForPaths) : null;
@@ -364,7 +200,7 @@ export function TournamentPaths() {
               <div>
                 <h3 className="text-xl font-bold">{selectedTeam.name}</h3>
                 <p className="text-blue-100 text-sm">
-                  Bracket position probabilities - hover for match info, click for opponents
+                  Possible tournament paths
                 </p>
               </div>
             </div>
@@ -555,120 +391,24 @@ export function TournamentPaths() {
         </div>
       )}
 
-      {/* Bracket visualization */}
-      {selectedTeamForPaths !== null && hasData && (
+      {/* Team path tree visualization */}
+      {selectedTeamForPaths !== null && hasData && selectedTeam && (
         <>
-          {/* Summary header */}
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-gray-500 text-center">
             Based on {formatNumber(results.total_simulations)} simulations
           </div>
 
-          {/* Bracket tree visualization */}
-          <div className="bg-white rounded-lg border border-gray-200 p-4 overflow-x-auto">
-            <div
-              className="relative"
-              style={{
-                width: bracketDimensions.width,
-                height: bracketDimensions.height,
-                minWidth: '900px',
-              }}
-            >
-              {/* Round headers */}
-              {ROUNDS.map((round, idx) => {
-                const roundPositions = slotPositions.filter(p => p.round === idx);
-                if (roundPositions.length === 0) return null;
-                const firstPos = roundPositions[0];
-
-                return (
-                  <div
-                    key={round.key}
-                    className="absolute text-center font-semibold text-gray-700 text-sm py-2 bg-gray-100 rounded-md"
-                    style={{
-                      left: firstPos.x,
-                      top: 0,
-                      width: firstPos.width,
-                    }}
-                  >
-                    {round.displayName}
-                  </div>
-                );
-              })}
-
-              {/* SVG Connectors */}
-              <BracketConnectors
-                positions={slotPositions}
-                width={bracketDimensions.width}
-                height={bracketDimensions.height}
-                highlightedSlots={highlightedSlots}
-              />
-
-              {/* Bracket slots */}
-              {slotPositions.map((pos) => {
-                const round = ROUNDS[pos.round];
-                if (!round) return null;
-
-                const slotKey = `${round.key}-${pos.slot}`;
-                const probability = getSlotProbability(round.key, pos.slot);
-                const venue = getSlotVenue(round.mappingKey, pos.slot);
-                const topOpponents = getTopOpponents(round.key, pos.slot);
-                const isExpanded = expandedSlot === slotKey;
-
-                return (
-                  <div
-                    key={slotKey}
-                    className="absolute"
-                    style={{
-                      left: pos.x,
-                      top: pos.y,
-                      width: pos.width,
-                      zIndex: isExpanded ? 20 : 10,
-                    }}
-                  >
-                    <BracketSlot
-                      round={round.key}
-                      slotIndex={pos.slot}
-                      probability={probability}
-                      totalSimulations={results.total_simulations}
-                      venue={venue}
-                      topOpponents={topOpponents}
-                      isExpanded={isExpanded}
-                      onToggleExpand={() => handleToggleExpand(slotKey)}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Legend */}
-          <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
-            <h4 className="text-sm font-semibold text-gray-700 mb-3">Probability Legend</h4>
-            <div className="flex flex-wrap gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded bg-green-500"></div>
-                <span className="text-sm text-gray-600">&gt;20%</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded bg-green-300"></div>
-                <span className="text-sm text-gray-600">10-20%</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded bg-yellow-300"></div>
-                <span className="text-sm text-gray-600">5-10%</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded bg-gray-200"></div>
-                <span className="text-sm text-gray-600">1-5%</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded bg-gray-100 border border-gray-200"></div>
-                <span className="text-sm text-gray-600">&lt;1%</span>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 mt-3">
-              Hover over R32 slots to see which group positions feed into each match. Click any slot to view top opponents.
-            </p>
-          </div>
+          <TeamPathTree
+            team={selectedTeam}
+            teamStats={results.team_stats[String(selectedTeamForPaths)]}
+            groups={groups}
+            bracketStats={bracketStats!}
+            slotOpponentStats={slotOpponentStats}
+            totalSimulations={results.total_simulations}
+            teamMap={teamMap}
+            venueMap={venueMap}
+            schedule={schedule}
+          />
         </>
       )}
     </div>
