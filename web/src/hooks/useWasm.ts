@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import init, { WcSimulator, calculateMatchProbability, getVersion } from '../../wasm-pkg';
-import type { TournamentData, Team, Group, AggregatedResults, MatchProbabilities, CompositeWeights, Strategy } from '../types';
+import type { TournamentData, Team, Group, AggregatedResults, MatchProbabilities, CompositeWeights, Strategy, RustFixedMatchEntry } from '../types';
 import { normalizeSimulationResult } from '../utils/normalizeSimulationResult';
 
 export interface WasmApi {
@@ -13,6 +13,7 @@ export interface WasmApi {
     iterations: number,
     compositeWeights?: CompositeWeights
   ) => AggregatedResults;
+  setFixedResults: (entries: RustFixedMatchEntry[]) => void;
   calculateMatchProbability: (
     teamAElo: number,
     teamBElo: number,
@@ -89,6 +90,13 @@ export function useWasm(): { status: WasmStatus; api: WasmApi | null; error: str
             }
 
             return normalizeSimulationResult(rawResult);
+          },
+          setFixedResults: (entries) => {
+            if (!entries || entries.length === 0) {
+              simulator.clearFixedResults();
+            } else {
+              simulator.setFixedResults(entries);
+            }
           },
           calculateMatchProbability: (teamAElo, teamBElo, isKnockout) => {
             return calculateMatchProbability(teamAElo, teamBElo, isKnockout) as MatchProbabilities;

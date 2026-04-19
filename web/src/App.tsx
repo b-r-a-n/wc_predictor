@@ -5,7 +5,8 @@ import { GroupStageView } from './components/groups';
 import { TournamentPaths } from './components/paths';
 import { VenuesView } from './components/venues';
 import { TeamDataEditor } from './components/editor';
-import { LoadingSpinner } from './components/common';
+import { FixturesView } from './components/fixtures';
+import { LoadingSpinner, BaselineBanner } from './components/common';
 import { useWasm } from './hooks/useWasm';
 import { useSimulatorStore } from './store/simulatorStore';
 
@@ -54,11 +55,15 @@ function App() {
 
   return (
     <Layout>
-      {activeTab === 'results' && <WinProbabilityTable />}
-      {activeTab === 'groups' && <GroupStageView />}
-      {activeTab === 'bracket' && <TournamentPaths />}
-      {activeTab === 'venues' && <VenuesView />}
-      {activeTab === 'editor' && <TeamDataEditor />}
+      <div className="space-y-4">
+        <BaselineBanner />
+        {activeTab === 'results' && <WinProbabilityTable />}
+        {activeTab === 'groups' && <GroupStageView />}
+        {activeTab === 'bracket' && <TournamentPaths />}
+        {activeTab === 'fixtures' && <FixturesView />}
+        {activeTab === 'venues' && <VenuesView />}
+        {activeTab === 'editor' && <TeamDataEditor />}
+      </div>
     </Layout>
   );
 }

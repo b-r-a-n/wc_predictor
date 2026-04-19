@@ -1,11 +1,39 @@
 import { create } from 'zustand';
-import type { Team, Group, AggregatedResults, Strategy, CompositeWeights, TabId, WasmStatus, TeamPreset, Venue, VenueData, MatchScheduleData } from '../types';
+import type { Team, Group, AggregatedResults, Strategy, CompositeWeights, TabId, WasmStatus, TeamPreset, Venue, VenueData, MatchScheduleData, BaselineSnapshot, FixedMatchResult, RustFixedMatchEntry } from '../types';
 import type { WasmApi } from '../hooks/useWasm';
 import { normalizeSimulationResult } from '../utils/normalizeSimulationResult';
+import { toRustFixedResults } from '../utils/fixedResults';
 
 // LocalStorage keys
 const STORAGE_KEY_CURRENT_EDITS = 'wc_predictor_current_edits';
 const STORAGE_KEY_PRESETS = 'wc_predictor_presets';
+const STORAGE_KEY_FIXED_RESULTS = 'wc_predictor_fixed_results';
+
+function persistFixedResults(results: Record<number, FixedMatchResult>): void {
+  try {
+    localStorage.setItem(STORAGE_KEY_FIXED_RESULTS, JSON.stringify(results));
+  } catch (error) {
+    console.error('Failed to persist fixed results:', error);
+  }
+}
+
+function loadPersistedFixedResults(): Record<number, FixedMatchResult> {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_FIXED_RESULTS);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as Record<string, FixedMatchResult>;
+    const out: Record<number, FixedMatchResult> = {};
+    for (const [key, value] of Object.entries(parsed)) {
+      const n = Number(key);
+      if (!Number.isFinite(n)) continue;
+      out[n] = value;
+    }
+    return out;
+  } catch (error) {
+    console.error('Failed to load persisted fixed results:', error);
+    return {};
+  }
+}
 
 interface SimulatorState {
   // WASM state
@@ -32,6 +60,9 @@ interface SimulatorState {
   // Simulation state
   isSimulating: boolean;
   results: AggregatedResults | null;
+  // Metadata about the pre-generated baseline currently displayed (if any).
+  // Cleared when the user runs their own simulation.
+  baselineInfo: Omit<BaselineSnapshot, 'results'> | null;
 
   // UI state
   activeTab: TabId;
@@ -42,6 +73,13 @@ interface SimulatorState {
 
   // Schedule state
   schedule: MatchScheduleData | null;
+
+  // User-locked group-stage match results, keyed by scheduled match number.
+  fixedResults: Record<number, FixedMatchResult>;
+  // Snapshot of fixedResults that was actually applied to the current
+  // displayed `results`. Null when the current results come from the baseline
+  // (which is generated with no locked matches).
+  lastSimulatedFixedResults: Record<number, FixedMatchResult> | null;
 
   // Actions
   setWasmStatus: (status: WasmStatus, error?: string | null) => void;
@@ -56,6 +94,12 @@ interface SimulatorState {
   setSelectedTeamForPaths: (teamId: number | null) => void;
   loadVenues: () => Promise<void>;
   loadSchedule: () => Promise<void>;
+  loadBaseline: () => Promise<void>;
+
+  // Fixed-result actions
+  setFixedResult: (matchNumber: number, homeScore: number, awayScore: number) => void;
+  clearFixedResult: (matchNumber: number) => void;
+  clearAllFixedResults: () => void;
 
   // Team editing actions
   updateTeam: (teamId: number, field: keyof Team, value: number) => void;
@@ -90,13 +134,14 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
   activePresetName: null,
 
   // Initial simulation settings
-  strategy: 'elo',
+  strategy: 'composite',
   iterations: 10000,
   compositeWeights: { elo: 0.4, market: 0.4, fifa: 0.1, form: 0.1 },
 
   // Initial simulation state
   isSimulating: false,
   results: null,
+  baselineInfo: null,
 
   // Initial UI state
   activeTab: 'results',
@@ -108,11 +153,16 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
   // Initial schedule state
   schedule: null,
 
+  // Initial fixed-results state (will be hydrated from LocalStorage)
+  fixedResults: {},
+  // Until we run, we assume results reflect "no locked matches" (baseline).
+  lastSimulatedFixedResults: null,
+
   // Actions
   setWasmStatus: (status, error = null) => set({ wasmStatus: status, wasmError: error }),
 
   setWasmApi: (api) => {
-    const { originalTeams, loadCurrentEditsFromStorage, loadPresetsFromStorage, loadVenues, loadSchedule } = get();
+    const { originalTeams, loadCurrentEditsFromStorage, loadPresetsFromStorage, loadVenues, loadSchedule, loadBaseline } = get();
     // Only set originalTeams if it's empty (first initialization)
     const newOriginalTeams = originalTeams.length === 0
       ? api.teams.map(t => ({ ...t }))
@@ -129,12 +179,16 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
     // Load persisted data from LocalStorage after WASM init
     loadPresetsFromStorage();
     loadCurrentEditsFromStorage();
+    set({ fixedResults: loadPersistedFixedResults() });
 
     // Load venue data for path visualization
     loadVenues();
 
     // Load match schedule data
     loadSchedule();
+
+    // Load pre-simulated baseline results (shown until the user runs their own).
+    loadBaseline();
   },
 
   setStrategy: (strategy) => set({ strategy }),
@@ -168,6 +222,60 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
     }
   },
 
+  setFixedResult: (matchNumber, homeScore, awayScore) => {
+    const { fixedResults } = get();
+    const next = {
+      ...fixedResults,
+      [matchNumber]: { matchNumber, homeScore, awayScore },
+    };
+    set({ fixedResults: next });
+    persistFixedResults(next);
+  },
+
+  clearFixedResult: (matchNumber) => {
+    const { fixedResults } = get();
+    if (!(matchNumber in fixedResults)) return;
+    const next = { ...fixedResults };
+    delete next[matchNumber];
+    set({ fixedResults: next });
+    persistFixedResults(next);
+  },
+
+  clearAllFixedResults: () => {
+    set({ fixedResults: {} });
+    persistFixedResults({});
+  },
+
+  loadBaseline: async () => {
+    try {
+      const { results: existing, teamsModified } = get();
+      // Don't overwrite user-run results or apply baseline after edits.
+      if (existing || teamsModified) return;
+      const response = await fetch(`${import.meta.env.BASE_URL}data/baseline_results.json`);
+      if (!response.ok) return;
+      const snapshot: BaselineSnapshot = await response.json();
+      const normalized = normalizeSimulationResult(snapshot.results);
+      // Apply baseline settings so the UI reflects how it was generated.
+      // Don't overwrite user-configurable simulation settings — the baseline
+      // metadata lives on baselineInfo, so re-runs use whatever is currently
+      // in the settings drawer.
+      set({
+        results: normalized,
+        lastSimulatedFixedResults: {},
+        baselineInfo: {
+          generated_at: snapshot.generated_at,
+          git_sha: snapshot.git_sha,
+          strategy: snapshot.strategy,
+          iterations: snapshot.iterations,
+          seed: snapshot.seed,
+          composite_weights: snapshot.composite_weights,
+        },
+      });
+    } catch (error) {
+      console.error('Failed to load baseline:', error);
+    }
+  },
+
   runSimulation: () => {
     const { wasmApi, teamsModified, strategy, iterations, compositeWeights, isSimulating, reinitializeSimulator } = get();
 
@@ -182,13 +290,26 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
           await reinitializeSimulator();
         }
 
-        const { wasmApi: currentApi } = get();
+        const { wasmApi: currentApi, fixedResults, schedule, groups } = get();
         if (!currentApi) {
           throw new Error('WASM API not available');
         }
 
+        // Push any user-locked matches into the simulator before running.
+        if (schedule && groups.length > 0) {
+          const entries = toRustFixedResults(fixedResults, schedule, groups);
+          currentApi.setFixedResults(entries);
+        } else {
+          currentApi.setFixedResults([]);
+        }
+
         const results = currentApi.runSimulation(strategy, iterations, compositeWeights);
-        set({ results, isSimulating: false });
+        set({
+          results,
+          isSimulating: false,
+          baselineInfo: null,
+          lastSimulatedFixedResults: { ...fixedResults },
+        });
       } catch (error) {
         console.error('Simulation error:', error);
         set({ isSimulating: false });
@@ -331,6 +452,13 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
           }
 
           return normalizeSimulationResult(rawResult);
+        },
+        setFixedResults: (entries: RustFixedMatchEntry[]) => {
+          if (!entries || entries.length === 0) {
+            simulator.clearFixedResults();
+          } else {
+            simulator.setFixedResults(entries);
+          }
         },
         calculateMatchProbability: wasmApi?.calculateMatchProbability || (() => ({ home_win: 0, draw: 0, away_win: 0 })),
       };

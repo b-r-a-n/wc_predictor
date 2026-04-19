@@ -114,7 +114,37 @@ export interface CompositeWeights {
 
 // UI state types
 export type WasmStatus = 'loading' | 'ready' | 'error';
-export type TabId = 'results' | 'groups' | 'bracket' | 'editor' | 'venues';
+export type TabId = 'results' | 'groups' | 'bracket' | 'editor' | 'venues' | 'fixtures';
+
+// User-locked match result (group stage only, for now)
+export interface FixedMatchResult {
+  matchNumber: number; // schedule match number
+  homeScore: number;
+  awayScore: number;
+}
+
+// Rust-side serialization format (matches FixedResults custom serde)
+export interface RustFixedMatchEntry {
+  fixture: {
+    type: 'GroupStage';
+    group_id: string; // single char, e.g. "A"
+    home_team: number;
+    away_team: number;
+  } | {
+    type: 'Knockout';
+    round: string;
+    slot: number;
+  };
+  spec: {
+    mode: 'ExactScore';
+    home_goals: number;
+    away_goals: number;
+    penalties?: [number, number];
+  } | {
+    mode: 'WinnerOnly';
+    winner: number;
+  };
+}
 
 // Knockout round types
 export type KnockoutRoundType =
@@ -256,6 +286,17 @@ export interface MostLikelySlotData {
   team: Team;
   count: number;
   probability: number;
+}
+
+// Pre-generated simulation baseline shipped with the app
+export interface BaselineSnapshot {
+  generated_at: string;
+  git_sha?: string;
+  strategy: Strategy;
+  iterations: number;
+  seed: number;
+  composite_weights: CompositeWeights;
+  results: AggregatedResults;
 }
 
 // Most likely bracket across all slots

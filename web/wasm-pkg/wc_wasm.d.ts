@@ -8,6 +8,10 @@ export class WcSimulator {
     free(): void;
     [Symbol.dispose](): void;
     /**
+     * Clear any fixed results previously set on this simulator.
+     */
+    clearFixedResults(): void;
+    /**
      * Get the group configuration.
      */
     getGroups(): any;
@@ -70,6 +74,18 @@ export class WcSimulator {
      * Run simulation using market value-based predictions.
      */
     runMarketValueSimulation(iterations: number, seed?: bigint | null): any;
+    /**
+     * Set fixed match results that will be honored by every subsequent simulation.
+     *
+     * Accepts an array matching the Rust `FixedResults` serialization format:
+     * ```json
+     * [
+     *   { "fixture": { "type": "GroupStage", "group_id": "A", "home_team": 1, "away_team": 2 },
+     *     "spec": { "mode": "ExactScore", "home_goals": 2, "away_goals": 1 } }
+     * ]
+     * ```
+     */
+    setFixedResults(value: any): void;
 }
 
 /**
@@ -143,6 +159,7 @@ export interface InitOutput {
     readonly getTopPathsForTeam: (a: any, b: number, c: number) => [number, number, number];
     readonly getVersion: () => [number, number];
     readonly simulateSingleTournament: (a: any, b: number, c: number, d: bigint) => [number, number, number];
+    readonly wcsimulator_clearFixedResults: (a: number) => void;
     readonly wcsimulator_getGroups: (a: number) => [number, number, number];
     readonly wcsimulator_getTeams: (a: number) => [number, number, number];
     readonly wcsimulator_new: (a: any) => [number, number, number];
@@ -153,6 +170,7 @@ export interface InitOutput {
     readonly wcsimulator_runFifaRankingSimulation: (a: number, b: number, c: number, d: bigint) => [number, number, number];
     readonly wcsimulator_runFormSimulation: (a: number, b: number, c: number, d: bigint) => [number, number, number];
     readonly wcsimulator_runMarketValueSimulation: (a: number, b: number, c: number, d: bigint) => [number, number, number];
+    readonly wcsimulator_setFixedResults: (a: number, b: any) => [number, number];
     readonly init: () => void;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

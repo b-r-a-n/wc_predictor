@@ -64,6 +64,26 @@ pub struct SimulateArgs {
     /// Show top N teams (default: 10)
     #[arg(long, default_value = "10")]
     pub top: usize,
+
+    /// Emit raw AggregatedResults JSON (matches wasm output). Requires --format json.
+    #[arg(long)]
+    pub raw: bool,
+
+    /// Composite ELO weight (used when --strategy composite)
+    #[arg(long, default_value = "0.4")]
+    pub elo_weight: f64,
+
+    /// Composite market-value weight
+    #[arg(long, default_value = "0.4")]
+    pub market_weight: f64,
+
+    /// Composite FIFA-ranking weight
+    #[arg(long, default_value = "0.1")]
+    pub fifa_weight: f64,
+
+    /// Composite form weight
+    #[arg(long, default_value = "0.1")]
+    pub form_weight: f64,
 }
 
 #[derive(ValueEnum, Clone, Default, Copy)]

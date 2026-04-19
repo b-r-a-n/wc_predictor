@@ -1,0 +1,50 @@
+name: Regenerate baseline simulation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/teams.json'
+      - 'crates/**'
+      - 'scripts/generate_baseline.sh'
+      - '.github/workflows/regenerate-baseline.yml'
+  workflow_dispatch:
+    inputs:
+      iterations:
+        description: 'Number of iterations to run'
+        required: false
+        default: '500000'
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Run baseline simulation
+        env:
+          ITERATIONS: ${{ github.event.inputs.iterations || '500000' }}
+        run: ./scripts/generate_baseline.sh
+
+      - name: Commit updated baseline
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- web/public/data/baseline_results.json; then
+            echo "Baseline unchanged — nothing to commit."
+            exit 0
+          fi
+          git add web/public/data/baseline_results.json
+          git commit -m "Regenerate baseline simulation ($ITERATIONS iterations)"
+          git push

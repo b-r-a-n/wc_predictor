@@ -4,7 +4,7 @@ use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 use rayon::prelude::*;
 
-use wc_core::{Tournament, TournamentResult};
+use wc_core::{FixedResults, Tournament, TournamentResult};
 use wc_strategies::PredictionStrategy;
 
 use crate::aggregator::AggregatedResults;
@@ -19,6 +19,8 @@ pub struct SimulationConfig {
     pub seed: Option<u64>,
     /// Number of parallel threads (None for auto-detect)
     pub parallelism: Option<usize>,
+    /// Fixed match results to apply to every simulation.
+    pub fixed_results: Option<FixedResults>,
 }
 
 impl Default for SimulationConfig {
@@ -27,6 +29,7 @@ impl Default for SimulationConfig {
             iterations: 10_000,
             seed: None,
             parallelism: None,
+            fixed_results: None,
         }
     }
 }
@@ -49,6 +52,12 @@ impl SimulationConfig {
     /// Set the number of parallel threads.
     pub fn with_parallelism(mut self, threads: usize) -> Self {
         self.parallelism = Some(threads);
+        self
+    }
+
+    /// Attach fixed match results that will be honored by every simulation.
+    pub fn with_fixed_results(mut self, fixed: FixedResults) -> Self {
+        self.fixed_results = Some(fixed);
         self
     }
 }
@@ -99,7 +108,10 @@ impl<'a> SimulationRunner<'a> {
                 let seed = base_seed.wrapping_add(i as u64);
                 let mut rng = ChaCha8Rng::seed_from_u64(seed);
 
-                let engine = SimulationEngine::new(self.tournament, self.strategy);
+                let mut engine = SimulationEngine::new(self.tournament, self.strategy);
+                if let Some(ref fixed) = self.config.fixed_results {
+                    engine = engine.with_fixed_results(fixed);
+                }
                 engine.simulate(&mut rng)
             })
             .collect();
@@ -120,7 +132,10 @@ impl<'a> SimulationRunner<'a> {
             let seed = base_seed.wrapping_add(i as u64);
             let mut rng = ChaCha8Rng::seed_from_u64(seed);
 
-            let engine = SimulationEngine::new(self.tournament, self.strategy);
+            let mut engine = SimulationEngine::new(self.tournament, self.strategy);
+            if let Some(ref fixed) = self.config.fixed_results {
+                engine = engine.with_fixed_results(fixed);
+            }
             results.push(engine.simulate(&mut rng));
 
             // Report progress periodically

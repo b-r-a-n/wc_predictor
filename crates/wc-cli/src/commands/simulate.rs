@@ -29,10 +29,10 @@ pub fn run_simulate(args: &SimulateArgs, tournament: &Tournament, format: Output
         StrategyChoice::Composite => {
             Box::new(
                 CompositeStrategy::new("Composite")
-                    .add_strategy(EloStrategy::default(), 0.35)
-                    .add_strategy(MarketValueStrategy::default(), 0.25)
-                    .add_strategy(FifaRankingStrategy::default(), 0.25)
-                    .add_strategy(FormStrategy::default(), 0.15),
+                    .add_strategy(EloStrategy::default(), args.elo_weight)
+                    .add_strategy(MarketValueStrategy::default(), args.market_weight)
+                    .add_strategy(FifaRankingStrategy::default(), args.fifa_weight)
+                    .add_strategy(FormStrategy::default(), args.form_weight),
             )
         }
     };
@@ -43,8 +43,14 @@ pub fn run_simulate(args: &SimulateArgs, tournament: &Tournament, format: Output
 
     // Output results
     if output.is_json() {
-        let json_output = SimulationJsonOutput::from_results(&results, tournament);
-        output.print_json(&json_output);
+        if args.raw {
+            // Emit the full AggregatedResults struct as JSON — matches the shape
+            // that wasm-bindgen produces so the web app can load it directly.
+            output.print_json(&results);
+        } else {
+            let json_output = SimulationJsonOutput::from_results(&results, tournament);
+            output.print_json(&json_output);
+        }
     } else {
         render_simulation_table(&results, args.top, tournament);
     }

@@ -1,0 +1,234 @@
+import { useMemo } from 'react';
+import { useSimulatorStore } from '../../store/simulatorStore';
+import { getFlagEmoji } from '../../utils/formatting';
+import { resolveGroupMatchTeams } from '../../utils/fixedResults';
+import { Button } from '../common';
+import type { Team, ScheduledMatch, FixedMatchResult } from '../../types';
+
+function fixedResultsEqual(
+  a: Record<number, FixedMatchResult>,
+  b: Record<number, FixedMatchResult>
+): boolean {
+  const aKeys = Object.keys(a);
+  const bKeys = Object.keys(b);
+  if (aKeys.length !== bKeys.length) return false;
+  for (const key of aKeys) {
+    const ai = a[Number(key)];
+    const bi = b[Number(key)];
+    if (!bi) return false;
+    if (ai.homeScore !== bi.homeScore || ai.awayScore !== bi.awayScore) return false;
+  }
+  return true;
+}
+
+interface GroupedMatch {
+  match: ScheduledMatch;
+  home: Team;
+  away: Team;
+}
+
+export function FixturesView() {
+  const {
+    schedule,
+    groups,
+    teams,
+    fixedResults,
+    lastSimulatedFixedResults,
+    setFixedResult,
+    clearFixedResult,
+    clearAllFixedResults,
+    runSimulation,
+    isSimulating,
+    wasmStatus,
+  } = useSimulatorStore();
+
+  const isDirty = useMemo(() => {
+    const baseline = lastSimulatedFixedResults ?? {};
+    return !fixedResultsEqual(fixedResults, baseline);
+  }, [fixedResults, lastSimulatedFixedResults]);
+
+  const canRun = wasmStatus === 'ready' && !isSimulating;
+
+  const teamMap = useMemo(() => {
+    const m = new Map<number, Team>();
+    teams.forEach((t) => m.set(t.id, t));
+    return m;
+  }, [teams]);
+
+  const groupedMatches = useMemo(() => {
+    const byGroup = new Map<string, GroupedMatch[]>();
+    if (!schedule) return byGroup;
+    for (const match of schedule.matches) {
+      if (match.round !== 'group_stage' || !match.groupId) continue;
+      const resolved = resolveGroupMatchTeams(match, groups);
+      if (!resolved) continue;
+      const home = teamMap.get(resolved.homeTeamId);
+      const away = teamMap.get(resolved.awayTeamId);
+      if (!home || !away) continue;
+      if (!byGroup.has(match.groupId)) byGroup.set(match.groupId, []);
+      byGroup.get(match.groupId)!.push({ match, home, away });
+    }
+    for (const list of byGroup.values()) {
+      list.sort((a, b) => a.match.matchNumber - b.match.matchNumber);
+    }
+    return byGroup;
+  }, [schedule, groups, teamMap]);
+
+  const lockedCount = Object.keys(fixedResults).length;
+
+  if (!schedule) {
+    return (
+      <div className="flex items-center justify-center h-64 text-gray-500">
+        Loading match schedule…
+      </div>
+    );
+  }
+
+  const groupIds = Array.from(groupedMatches.keys()).sort();
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">Lock Group-Stage Results</h2>
+          <p className="text-sm text-gray-500">
+            Enter a score to fix the outcome of a specific match. Locked matches are used as
+            given; everything else is simulated. Re-run the simulation to apply your changes.
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-gray-600">
+            {lockedCount === 0
+              ? 'No matches locked'
+              : `${lockedCount} match${lockedCount === 1 ? '' : 'es'} locked`}
+          </span>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={clearAllFixedResults}
+            disabled={lockedCount === 0}
+          >
+            Clear all
+          </Button>
+        </div>
+      </div>
+
+      {isDirty && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-md border border-amber-300 bg-amber-50 px-4 py-3">
+          <div className="flex items-center gap-2 text-sm text-amber-900">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span>
+              Results are out of date — locked matches have changed since the last simulation.
+            </span>
+          </div>
+          <Button
+            size="sm"
+            onClick={runSimulation}
+            disabled={!canRun}
+          >
+            {isSimulating ? 'Running…' : 'Re-run simulation'}
+          </Button>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {groupIds.map((groupId) => {
+          const matches = groupedMatches.get(groupId) ?? [];
+          return (
+            <div key={groupId} className="bg-white rounded-lg border border-gray-200 p-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-3">Group {groupId}</h3>
+              <div className="space-y-2">
+                {matches.map(({ match, home, away }) => {
+                  const fixed = fixedResults[match.matchNumber];
+                  const isLocked = !!fixed;
+                  return (
+                    <div
+                      key={match.matchNumber}
+                      className={`flex items-center gap-2 p-2 rounded border ${
+                        isLocked ? 'border-blue-300 bg-blue-50' : 'border-gray-200'
+                      }`}
+                    >
+                      <div className="flex-1 text-right text-sm font-medium truncate">
+                        <span className="mr-1">{getFlagEmoji(home.code)}</span>
+                        {home.name}
+                      </div>
+                      <ScoreInput
+                        value={fixed?.homeScore ?? null}
+                        onChange={(v) => {
+                          const awayV = fixed?.awayScore ?? 0;
+                          if (v == null) {
+                            clearFixedResult(match.matchNumber);
+                          } else {
+                            setFixedResult(match.matchNumber, v, awayV);
+                          }
+                        }}
+                      />
+                      <span className="text-gray-400 text-xs">vs</span>
+                      <ScoreInput
+                        value={fixed?.awayScore ?? null}
+                        onChange={(v) => {
+                          const homeV = fixed?.homeScore ?? 0;
+                          if (v == null) {
+                            clearFixedResult(match.matchNumber);
+                          } else {
+                            setFixedResult(match.matchNumber, homeV, v);
+                          }
+                        }}
+                      />
+                      <div className="flex-1 text-sm font-medium truncate">
+                        {away.name}
+                        <span className="ml-1">{getFlagEmoji(away.code)}</span>
+                      </div>
+                      <button
+                        onClick={() => clearFixedResult(match.matchNumber)}
+                        disabled={!isLocked}
+                        className="text-gray-400 hover:text-red-600 disabled:opacity-30 disabled:cursor-not-allowed text-sm px-1"
+                        title="Clear lock"
+                        aria-label="Clear locked result"
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+interface ScoreInputProps {
+  value: number | null;
+  onChange: (value: number | null) => void;
+}
+
+function ScoreInput({ value, onChange }: ScoreInputProps) {
+  return (
+    <input
+      type="number"
+      min={0}
+      max={20}
+      value={value ?? ''}
+      onChange={(e) => {
+        const raw = e.target.value;
+        if (raw === '') {
+          onChange(null);
+          return;
+        }
+        const n = parseInt(raw, 10);
+        if (!Number.isFinite(n) || n < 0) {
+          onChange(null);
+          return;
+        }
+        onChange(Math.min(n, 20));
+      }}
+      placeholder="—"
+      className="w-10 text-center border border-gray-300 rounded px-1 py-0.5 text-sm tabular-nums focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+    />
+  );
+}

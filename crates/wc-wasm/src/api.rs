@@ -4,7 +4,7 @@ use wasm_bindgen::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::{from_value, to_value};
 
-use wc_core::{TeamId, Tournament};
+use wc_core::{FixedResults, TeamId, Tournament};
 use wc_simulation::{AggregatedResults, SimulationConfig, SimulationRunner};
 use wc_strategies::{
     CompositeStrategy, EloStrategy, FifaRankingStrategy, FormStrategy, MarketValueStrategy,
@@ -15,6 +15,7 @@ use wc_strategies::{
 #[wasm_bindgen]
 pub struct WcSimulator {
     tournament: Tournament,
+    fixed_results: Option<FixedResults>,
 }
 
 #[wasm_bindgen]
@@ -41,7 +42,37 @@ impl WcSimulator {
             .validate()
             .map_err(|e| JsError::new(&format!("Invalid tournament: {}", e)))?;
 
-        Ok(Self { tournament })
+        Ok(Self { tournament, fixed_results: None })
+    }
+
+    /// Set fixed match results that will be honored by every subsequent simulation.
+    ///
+    /// Accepts an array matching the Rust `FixedResults` serialization format:
+    /// ```json
+    /// [
+    ///   { "fixture": { "type": "GroupStage", "group_id": "A", "home_team": 1, "away_team": 2 },
+    ///     "spec": { "mode": "ExactScore", "home_goals": 2, "away_goals": 1 } }
+    /// ]
+    /// ```
+    #[wasm_bindgen(js_name = setFixedResults)]
+    pub fn set_fixed_results(&mut self, value: JsValue) -> Result<(), JsError> {
+        if value.is_null() || value.is_undefined() {
+            self.fixed_results = None;
+            return Ok(());
+        }
+        let fixed: FixedResults = from_value(value)
+            .map_err(|e| JsError::new(&format!("Invalid fixed results: {}", e)))?;
+        fixed
+            .validate_dependencies()
+            .map_err(|e| JsError::new(&format!("Invalid fixed results: {}", e)))?;
+        self.fixed_results = Some(fixed);
+        Ok(())
+    }
+
+    /// Clear any fixed results previously set on this simulator.
+    #[wasm_bindgen(js_name = clearFixedResults)]
+    pub fn clear_fixed_results(&mut self) {
+        self.fixed_results = None;
     }
 
     /// Run simulation using ELO-based predictions.
@@ -132,6 +163,10 @@ impl WcSimulator {
 
         if let Some(s) = seed {
             config = config.with_seed(s);
+        }
+
+        if let Some(ref fixed) = self.fixed_results {
+            config = config.with_fixed_results(fixed.clone());
         }
 
         let runner = SimulationRunner::new(&self.tournament, strategy, config);

@@ -4,7 +4,11 @@ import { CompositeWeights } from './CompositeWeights';
 import { IterationSlider } from './IterationSlider';
 import { useSimulatorStore } from '../../store/simulatorStore';
 
-export function ControlPanel() {
+interface ControlPanelProps {
+  hideHeader?: boolean;
+}
+
+export function ControlPanel({ hideHeader = false }: ControlPanelProps) {
   const {
     strategy,
     setStrategy,
@@ -21,9 +25,11 @@ export function ControlPanel() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Simulation Settings</h2>
-      </div>
+      {!hideHeader && (
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Simulation Settings</h2>
+        </div>
+      )}
 
       <StrategySelector value={strategy} onChange={setStrategy} />
 

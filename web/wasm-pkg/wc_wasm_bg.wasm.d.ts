@@ -7,6 +7,7 @@ export const getTeamMatchupStats: (a: any, b: number) => [number, number, number
 export const getTopPathsForTeam: (a: any, b: number, c: number) => [number, number, number];
 export const getVersion: () => [number, number];
 export const simulateSingleTournament: (a: any, b: number, c: number, d: bigint) => [number, number, number];
+export const wcsimulator_clearFixedResults: (a: number) => void;
 export const wcsimulator_getGroups: (a: number) => [number, number, number];
 export const wcsimulator_getTeams: (a: number) => [number, number, number];
 export const wcsimulator_new: (a: any) => [number, number, number];
@@ -17,6 +18,7 @@ export const wcsimulator_runEloSimulation: (a: number, b: number, c: number, d: 
 export const wcsimulator_runFifaRankingSimulation: (a: number, b: number, c: number, d: bigint) => [number, number, number];
 export const wcsimulator_runFormSimulation: (a: number, b: number, c: number, d: bigint) => [number, number, number];
 export const wcsimulator_runMarketValueSimulation: (a: number, b: number, c: number, d: bigint) => [number, number, number];
+export const wcsimulator_setFixedResults: (a: number, b: any) => [number, number];
 export const init: () => void;
 export const __wbindgen_malloc: (a: number, b: number) => number;
 export const __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

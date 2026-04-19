@@ -1,0 +1,1 @@
+export { FixturesView } from './FixturesView';

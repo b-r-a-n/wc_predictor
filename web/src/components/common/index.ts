@@ -3,3 +3,4 @@ export { Card } from './Card';
 export { LoadingSpinner } from './LoadingSpinner';
 export { LoadingModal } from './LoadingModal';
 export { ProbabilityBar } from './ProbabilityBar';
+export { BaselineBanner } from './BaselineBanner';
