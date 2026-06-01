@@ -106,8 +106,12 @@ def get_elo_rating(
     if canonical in matched:
         return float(matched[canonical])
 
-    # Fall back to raw teams data (elo name -> rating)
+    # Fall back to raw teams data. The ELO scraper saves ratings keyed by
+    # canonical name (it remaps ELO-site names before writing), so prefer the
+    # canonical name and fall back to the raw ELO alias for older files.
     teams = elo_data.get("teams", {})
+    if canonical in teams:
+        return float(teams[canonical])
     if elo_name in teams:
         return float(teams[elo_name])
 

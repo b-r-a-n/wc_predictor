@@ -5,6 +5,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import cloudscraper
+
 from .base import BaseScraper
 
 
@@ -26,6 +28,15 @@ class SofascoreScraper(BaseScraper):
             team_ids: Optional dict mapping canonical team names to Sofascore IDs.
         """
         super().__init__(output_dir)
+        # Sofascore's API now blocks plain requests with 403. Use cloudscraper
+        # to bypass the bot protection (same approach as the Transfermarkt scraper).
+        self.session = cloudscraper.create_scraper(
+            browser={
+                "browser": "chrome",
+                "platform": "darwin",
+                "desktop": True,
+            }
+        )
         self.team_ids = team_ids or {}
         self._last_request_time = 0.0
 
@@ -102,8 +113,8 @@ class SofascoreScraper(BaseScraper):
         """
         url = f"{self.BASE_URL}/team/{sofascore_id}/events/last/0"
 
+        # Don't override the cloudscraper User-Agent; only add API-specific headers.
         headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
             "Accept": "application/json",
             "Referer": "https://www.sofascore.com/",
         }
