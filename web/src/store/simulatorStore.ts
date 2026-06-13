@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Team, Group, AggregatedResults, Strategy, CompositeWeights, TabId, WasmStatus, TeamPreset, Venue, VenueData, MatchScheduleData, BaselineSnapshot, FixedMatchResult, RustFixedMatchEntry } from '../types';
+import type { Team, Group, AggregatedResults, Strategy, CompositeWeights, TabId, WasmStatus, TeamPreset, Venue, VenueData, MatchScheduleData, BaselineSnapshot, FixedMatchResult, RustFixedMatchEntry, MatchResultsData } from '../types';
 import type { WasmApi } from '../hooks/useWasm';
 import { normalizeSimulationResult } from '../utils/normalizeSimulationResult';
 import { toRustFixedResults } from '../utils/fixedResults';
@@ -8,12 +8,46 @@ import { toRustFixedResults } from '../utils/fixedResults';
 const STORAGE_KEY_CURRENT_EDITS = 'wc_predictor_current_edits';
 const STORAGE_KEY_PRESETS = 'wc_predictor_presets';
 const STORAGE_KEY_FIXED_RESULTS = 'wc_predictor_fixed_results';
+const STORAGE_KEY_USE_ACTUAL_RESULTS = 'wc_predictor_use_actual_results';
+
+/**
+ * Combine real (scraped) results with the user's manual locks. Real results
+ * form the base layer when `useActualResults` is on; manual locks always win
+ * so the user can override an actual outcome with a hypothetical one.
+ */
+export function effectiveFixedResults(
+  useActualResults: boolean,
+  actualResults: Record<number, FixedMatchResult>,
+  fixedResults: Record<number, FixedMatchResult>
+): Record<number, FixedMatchResult> {
+  return useActualResults
+    ? { ...actualResults, ...fixedResults }
+    : { ...fixedResults };
+}
 
 function persistFixedResults(results: Record<number, FixedMatchResult>): void {
   try {
     localStorage.setItem(STORAGE_KEY_FIXED_RESULTS, JSON.stringify(results));
   } catch (error) {
     console.error('Failed to persist fixed results:', error);
+  }
+}
+
+function persistUseActualResults(value: boolean): void {
+  try {
+    localStorage.setItem(STORAGE_KEY_USE_ACTUAL_RESULTS, JSON.stringify(value));
+  } catch (error) {
+    console.error('Failed to persist real-results toggle:', error);
+  }
+}
+
+function loadPersistedUseActualResults(): boolean {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_USE_ACTUAL_RESULTS);
+    if (raw == null) return true; // default on: reflect reality once data exists
+    return JSON.parse(raw) === true;
+  } catch {
+    return true;
   }
 }
 
@@ -76,10 +110,18 @@ interface SimulatorState {
 
   // User-locked group-stage match results, keyed by scheduled match number.
   fixedResults: Record<number, FixedMatchResult>;
-  // Snapshot of fixedResults that was actually applied to the current
-  // displayed `results`. Null when the current results come from the baseline
-  // (which is generated with no locked matches).
+  // Snapshot of the *effective* fixed results (real + user) that was actually
+  // applied to the current displayed `results`. Null when the current results
+  // come from the baseline (which is generated with no locked matches).
   lastSimulatedFixedResults: Record<number, FixedMatchResult> | null;
+
+  // Real, already-played group-stage results loaded from results.json, keyed
+  // by scheduled match number. Empty until the results scraper has produced data.
+  actualResults: Record<number, FixedMatchResult>;
+  // Metadata about the loaded real results (for display).
+  actualResultsInfo: { generated_at: string | null; source?: string; count: number } | null;
+  // When true, real results are pinned as the base layer for simulations.
+  useActualResults: boolean;
 
   // Actions
   setWasmStatus: (status: WasmStatus, error?: string | null) => void;
@@ -95,11 +137,13 @@ interface SimulatorState {
   loadVenues: () => Promise<void>;
   loadSchedule: () => Promise<void>;
   loadBaseline: () => Promise<void>;
+  loadActualResults: () => Promise<void>;
 
   // Fixed-result actions
   setFixedResult: (matchNumber: number, homeScore: number, awayScore: number) => void;
   clearFixedResult: (matchNumber: number) => void;
   clearAllFixedResults: () => void;
+  setUseActualResults: (value: boolean) => void;
 
   // Team editing actions
   updateTeam: (teamId: number, field: keyof Team, value: number) => void;
@@ -158,11 +202,16 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
   // Until we run, we assume results reflect "no locked matches" (baseline).
   lastSimulatedFixedResults: null,
 
+  // Real results (hydrated from results.json after WASM init)
+  actualResults: {},
+  actualResultsInfo: null,
+  useActualResults: true,
+
   // Actions
   setWasmStatus: (status, error = null) => set({ wasmStatus: status, wasmError: error }),
 
   setWasmApi: (api) => {
-    const { originalTeams, loadCurrentEditsFromStorage, loadPresetsFromStorage, loadVenues, loadSchedule, loadBaseline } = get();
+    const { originalTeams, loadCurrentEditsFromStorage, loadPresetsFromStorage, loadVenues, loadSchedule, loadBaseline, loadActualResults } = get();
     // Only set originalTeams if it's empty (first initialization)
     const newOriginalTeams = originalTeams.length === 0
       ? api.teams.map(t => ({ ...t }))
@@ -179,13 +228,19 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
     // Load persisted data from LocalStorage after WASM init
     loadPresetsFromStorage();
     loadCurrentEditsFromStorage();
-    set({ fixedResults: loadPersistedFixedResults() });
+    set({
+      fixedResults: loadPersistedFixedResults(),
+      useActualResults: loadPersistedUseActualResults(),
+    });
 
     // Load venue data for path visualization
     loadVenues();
 
     // Load match schedule data
     loadSchedule();
+
+    // Load real (already-played) match results.
+    loadActualResults();
 
     // Load pre-simulated baseline results (shown until the user runs their own).
     loadBaseline();
@@ -276,6 +331,38 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
     }
   },
 
+  loadActualResults: async () => {
+    try {
+      const response = await fetch(`${import.meta.env.BASE_URL}data/results.json`);
+      if (!response.ok) return;
+      const data: MatchResultsData = await response.json();
+      const map: Record<number, FixedMatchResult> = {};
+      for (const m of data.matches ?? []) {
+        if (m.status !== 'completed') continue;
+        map[m.matchNumber] = {
+          matchNumber: m.matchNumber,
+          homeScore: m.homeScore,
+          awayScore: m.awayScore,
+        };
+      }
+      set({
+        actualResults: map,
+        actualResultsInfo: {
+          generated_at: data.generated_at ?? null,
+          source: data.source,
+          count: Object.keys(map).length,
+        },
+      });
+    } catch (error) {
+      console.error('Failed to load real results:', error);
+    }
+  },
+
+  setUseActualResults: (value) => {
+    set({ useActualResults: value });
+    persistUseActualResults(value);
+  },
+
   runSimulation: () => {
     const { wasmApi, teamsModified, strategy, iterations, compositeWeights, isSimulating, reinitializeSimulator } = get();
 
@@ -290,14 +377,17 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
           await reinitializeSimulator();
         }
 
-        const { wasmApi: currentApi, fixedResults, schedule, groups } = get();
+        const { wasmApi: currentApi, fixedResults, actualResults, useActualResults, schedule, groups } = get();
         if (!currentApi) {
           throw new Error('WASM API not available');
         }
 
-        // Push any user-locked matches into the simulator before running.
+        // Real results form the base layer; user locks override them.
+        const effective = effectiveFixedResults(useActualResults, actualResults, fixedResults);
+
+        // Push the effective fixed matches into the simulator before running.
         if (schedule && groups.length > 0) {
-          const entries = toRustFixedResults(fixedResults, schedule, groups);
+          const entries = toRustFixedResults(effective, schedule, groups);
           currentApi.setFixedResults(entries);
         } else {
           currentApi.setFixedResults([]);
@@ -308,7 +398,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
           results,
           isSimulating: false,
           baselineInfo: null,
-          lastSimulatedFixedResults: { ...fixedResults },
+          lastSimulatedFixedResults: effective,
         });
       } catch (error) {
         console.error('Simulation error:', error);

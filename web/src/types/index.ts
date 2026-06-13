@@ -123,6 +123,27 @@ export interface FixedMatchResult {
   awayScore: number;
 }
 
+// A real, already-played match result (group stage), produced by the results
+// scraper. Scores are in the schedule's home/away orientation, same as
+// FixedMatchResult, so they slot straight into the fixed-results path.
+export interface MatchResultEntry {
+  matchNumber: number;
+  groupId: string;
+  homeTeamId: number;
+  awayTeamId: number;
+  homeScore: number;
+  awayScore: number;
+  status: 'completed';
+  date: string;
+}
+
+// web/public/data/results.json structure (output of scrape_results).
+export interface MatchResultsData {
+  generated_at: string | null;
+  source?: string;
+  matches: MatchResultEntry[];
+}
+
 // Rust-side serialization format (matches FixedResults custom serde)
 export interface RustFixedMatchEntry {
   fixture: {

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useSimulatorStore } from '../../store/simulatorStore';
+import { useSimulatorStore, effectiveFixedResults } from '../../store/simulatorStore';
 import { getFlagEmoji } from '../../utils/formatting';
 import { resolveGroupMatchTeams } from '../../utils/fixedResults';
 import { Button } from '../common';
@@ -21,6 +21,12 @@ function fixedResultsEqual(
   return true;
 }
 
+function formatUpdated(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
 interface GroupedMatch {
   match: ScheduledMatch;
   home: Team;
@@ -33,6 +39,10 @@ export function FixturesView() {
     groups,
     teams,
     fixedResults,
+    actualResults,
+    actualResultsInfo,
+    useActualResults,
+    setUseActualResults,
     lastSimulatedFixedResults,
     setFixedResult,
     clearFixedResult,
@@ -42,10 +52,17 @@ export function FixturesView() {
     wasmStatus,
   } = useSimulatorStore();
 
+  const effective = useMemo(
+    () => effectiveFixedResults(useActualResults, actualResults, fixedResults),
+    [useActualResults, actualResults, fixedResults]
+  );
+
   const isDirty = useMemo(() => {
     const baseline = lastSimulatedFixedResults ?? {};
-    return !fixedResultsEqual(fixedResults, baseline);
-  }, [fixedResults, lastSimulatedFixedResults]);
+    return !fixedResultsEqual(effective, baseline);
+  }, [effective, lastSimulatedFixedResults]);
+
+  const actualCount = actualResultsInfo?.count ?? 0;
 
   const canRun = wasmStatus === 'ready' && !isSimulating;
 
@@ -90,17 +107,17 @@ export function FixturesView() {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Lock Group-Stage Results</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Group-Stage Results</h2>
           <p className="text-sm text-gray-500">
-            Enter a score to fix the outcome of a specific match. Locked matches are used as
-            given; everything else is simulated. Re-run the simulation to apply your changes.
+            Real results are pinned automatically; everything else is simulated. Enter a score to
+            override a match with a hypothetical result. Re-run the simulation to apply changes.
           </p>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-sm text-gray-600">
             {lockedCount === 0
-              ? 'No matches locked'
-              : `${lockedCount} match${lockedCount === 1 ? '' : 'es'} locked`}
+              ? 'No overrides'
+              : `${lockedCount} override${lockedCount === 1 ? '' : 's'}`}
           </span>
           <Button
             variant="secondary"
@@ -108,9 +125,31 @@ export function FixturesView() {
             onClick={clearAllFixedResults}
             disabled={lockedCount === 0}
           >
-            Clear all
+            Clear overrides
           </Button>
         </div>
+      </div>
+
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-md border border-gray-200 bg-gray-50 px-4 py-3">
+        <label className="flex items-center gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            checked={useActualResults}
+            onChange={(e) => setUseActualResults(e.target.checked)}
+          />
+          <span className="text-sm font-medium text-gray-900">
+            Start from real results
+          </span>
+        </label>
+        <span className="text-sm text-gray-500">
+          {actualCount === 0
+            ? 'No real results loaded yet'
+            : `${actualCount} match${actualCount === 1 ? '' : 'es'} played` +
+              (actualResultsInfo?.generated_at
+                ? ` · updated ${formatUpdated(actualResultsInfo.generated_at)}`
+                : '')}
+        </span>
       </div>
 
       {isDirty && (
@@ -141,13 +180,21 @@ export function FixturesView() {
               <h3 className="text-sm font-semibold text-gray-900 mb-3">Group {groupId}</h3>
               <div className="space-y-2">
                 {matches.map(({ match, home, away }) => {
-                  const fixed = fixedResults[match.matchNumber];
-                  const isLocked = !!fixed;
+                  const override = fixedResults[match.matchNumber];
+                  const actual = useActualResults ? actualResults[match.matchNumber] : undefined;
+                  // What the simulation will use: override beats real result.
+                  const current = override ?? actual;
+                  const isOverride = !!override;
+                  const isActual = !override && !!actual;
                   return (
                     <div
                       key={match.matchNumber}
                       className={`flex items-center gap-2 p-2 rounded border ${
-                        isLocked ? 'border-blue-300 bg-blue-50' : 'border-gray-200'
+                        isOverride
+                          ? 'border-blue-300 bg-blue-50'
+                          : isActual
+                          ? 'border-emerald-300 bg-emerald-50'
+                          : 'border-gray-200'
                       }`}
                     >
                       <div className="flex-1 text-right text-sm font-medium truncate">
@@ -155,9 +202,9 @@ export function FixturesView() {
                         {home.name}
                       </div>
                       <ScoreInput
-                        value={fixed?.homeScore ?? null}
+                        value={current?.homeScore ?? null}
                         onChange={(v) => {
-                          const awayV = fixed?.awayScore ?? 0;
+                          const awayV = current?.awayScore ?? 0;
                           if (v == null) {
                             clearFixedResult(match.matchNumber);
                           } else {
@@ -167,9 +214,9 @@ export function FixturesView() {
                       />
                       <span className="text-gray-400 text-xs">vs</span>
                       <ScoreInput
-                        value={fixed?.awayScore ?? null}
+                        value={current?.awayScore ?? null}
                         onChange={(v) => {
-                          const homeV = fixed?.homeScore ?? 0;
+                          const homeV = current?.homeScore ?? 0;
                           if (v == null) {
                             clearFixedResult(match.matchNumber);
                           } else {
@@ -181,12 +228,23 @@ export function FixturesView() {
                         {away.name}
                         <span className="ml-1">{getFlagEmoji(away.code)}</span>
                       </div>
+                      <span
+                        className={`text-[10px] font-semibold uppercase tracking-wide w-12 text-center ${
+                          isOverride
+                            ? 'text-blue-600'
+                            : isActual
+                            ? 'text-emerald-600'
+                            : 'text-transparent'
+                        }`}
+                      >
+                        {isOverride ? 'Edited' : isActual ? 'Played' : '—'}
+                      </span>
                       <button
                         onClick={() => clearFixedResult(match.matchNumber)}
-                        disabled={!isLocked}
+                        disabled={!isOverride}
                         className="text-gray-400 hover:text-red-600 disabled:opacity-30 disabled:cursor-not-allowed text-sm px-1"
-                        title="Clear lock"
-                        aria-label="Clear locked result"
+                        title={isActual ? 'Revert to real result' : 'Clear override'}
+                        aria-label="Clear override"
                       >
                         &times;
                       </button>

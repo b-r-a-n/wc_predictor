@@ -50,6 +50,13 @@ python -m scrapers.cli.scrape_elo -v
 python -m scrapers.cli.scrape_transfermarkt
 python -m scrapers.cli.scrape_fifa
 python -m scrapers.cli.scrape_sofascore
+
+# Completed match results (already-played group-stage games) from ESPN.
+# Re-run daily as more matches finish; output is a full snapshot every time.
+# Requires scrapers/output/schedule.json and scrapers/output/groups.json.
+python -m scrapers.cli.scrape_results -v
+cp scrapers/output/results.json web/public/data/results.json
+
 python -m scrapers.cli.merge_data \
   -m scrapers/config/team_mapping.json \
   -e scrapers/output/elo_ratings.json \
@@ -110,6 +117,8 @@ wc-wasm (WASM bindings)
 **WASM Map Conversion**: `serde-wasm-bindgen` returns JavaScript `Map` objects. The frontend converts these to plain objects for React state.
 
 **Lazy Reinitializer**: When teams are edited in the UI, a new `WcSimulator` instance is created only before the next simulation run, not on every edit.
+
+**Real Match Results**: `scrape_results` produces `web/public/data/results.json` (completed group-stage scores mapped to schedule `matchNumber`s). The store loads these into `actualResults` and, when the "Start from real results" toggle is on (`useActualResults`, default on), merges them as the base layer beneath the user's manual locks (`fixedResults`) — see `effectiveFixedResults` in `simulatorStore.ts`. Both flow through the existing `setFixedResults` fixture-locking path, so the simulator needs no changes. Only group-stage results are supported (knockout fixtures use positional placeholders the fixed-result path doesn't handle).
 
 ## Tournament Format (2026)
 
