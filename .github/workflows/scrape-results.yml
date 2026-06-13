@@ -1,0 +1,76 @@
+name: Scrape match results
+
+# Daily refresh of completed group-stage results. Runs on GitHub's
+# infrastructure, so no always-on local machine is needed. Commits the updated
+# results.json and, if it changed, kicks off the Pages deploy.
+on:
+  schedule:
+    # 09:00 UTC daily — after the previous day's late North American kickoffs
+    # have finished. Adjust if the tournament's match windows shift.
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+    inputs:
+      start:
+        description: 'First date to scrape (YYYY-MM-DD, optional)'
+        required: false
+      end:
+        description: 'Last date to scrape (YYYY-MM-DD, optional)'
+        required: false
+
+# Don't let two scrapes race on the same push.
+concurrency:
+  group: scrape-results
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: write   # needed for `gh workflow run` to dispatch deploy.yml
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        # Only what the results scraper needs (requests + the CLI's click/rich).
+        run: pip install requests click rich
+
+      - name: Scrape results
+        env:
+          START: ${{ github.event.inputs.start }}
+          END: ${{ github.event.inputs.end }}
+        run: |
+          ARGS="-o web/public/data"
+          [ -n "$START" ] && ARGS="$ARGS --start $START"
+          [ -n "$END" ] && ARGS="$ARGS --end $END"
+          PYTHONPATH=$PWD python -m scrapers.cli.scrape_results $ARGS
+
+      - name: Commit updated results
+        id: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- web/public/data/results.json; then
+            echo "Results unchanged — nothing to commit."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git add web/public/data/results.json
+          git commit -m "Update match results ($(date -u +%Y-%m-%d))"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger deploy
+        # Pushes made with GITHUB_TOKEN don't trigger other workflows, so the
+        # Pages deploy is dispatched explicitly. Only when results changed.
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run deploy.yml --ref main

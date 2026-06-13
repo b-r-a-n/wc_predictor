@@ -53,7 +53,10 @@ python -m scrapers.cli.scrape_sofascore
 
 # Completed match results (already-played group-stage games) from ESPN.
 # Re-run daily as more matches finish; output is a full snapshot every time.
-# Requires scrapers/output/schedule.json and scrapers/output/groups.json.
+# Defaults to the committed web/public/data/schedule.json and the group draw
+# in scrapers/config/team_mapping.json, so no other scraper output is required.
+# (The `.github/workflows/scrape-results.yml` cron runs this daily in CI and
+# commits the result — see Deployment.)
 python -m scrapers.cli.scrape_results -v
 cp scrapers/output/results.json web/public/data/results.json
 
@@ -130,3 +133,5 @@ wc-wasm (WASM bindings)
 ## Deployment
 
 GitHub Actions deploys to GitHub Pages on push to main. Base path is `/wc_predictor/`.
+
+`scrape-results.yml` runs daily (09:00 UTC) and on demand (`workflow_dispatch`), scraping completed group-stage results into `web/public/data/results.json`, committing changes, and dispatching `deploy.yml`. Because pushes made with `GITHUB_TOKEN` don't trigger other workflows, the deploy is kicked off explicitly via `gh workflow run`. No always-on machine is needed.

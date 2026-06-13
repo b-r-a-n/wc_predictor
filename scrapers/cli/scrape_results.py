@@ -8,13 +8,15 @@ import click
 from rich.console import Console
 from rich.table import Table
 
-from ..config.settings import OUTPUT_DIR
+from ..config.settings import OUTPUT_DIR, PROJECT_ROOT
 from ..sources.base import ScraperError
 from ..sources.results_scraper import ResultsScraper
 from ..utils.logging_config import setup_logging
 
 CONFIG_DIR = Path(__file__).parent.parent / "config"
 TEAM_MAPPING_FILE = CONFIG_DIR / "team_mapping.json"
+# Committed schedule shipped with the web app — always present, including in CI.
+DEFAULT_SCHEDULE = PROJECT_ROOT / "web" / "public" / "data" / "schedule.json"
 
 console = Console()
 
@@ -40,15 +42,15 @@ def _parse_date(ctx, param, value: str | None) -> date | None:
     "--schedule",
     "-s",
     type=click.Path(exists=True, path_type=Path),
-    default=OUTPUT_DIR / "schedule.json",
+    default=DEFAULT_SCHEDULE,
     help="Path to schedule.json (defines matchNumbers and placeholders).",
 )
 @click.option(
     "--groups",
     "-g",
     type=click.Path(exists=True, path_type=Path),
-    default=OUTPUT_DIR / "groups.json",
-    help="Path to groups.json (defines group composition / positions).",
+    default=None,
+    help="Path to groups.json. Defaults to the draw in team_mapping.json.",
 )
 @click.option(
     "--league",

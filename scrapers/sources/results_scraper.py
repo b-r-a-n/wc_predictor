@@ -59,15 +59,22 @@ class ResultsScraper(BaseScraper):
         self,
         output_dir: Path,
         schedule_path: Path,
-        groups_path: Path,
         team_mapping_path: Path,
+        groups_path: Path | None = None,
         league: str | None = None,
     ) -> None:
         super().__init__(output_dir)
         self.league = league or self.DEFAULT_LEAGUE
         self.schedule = self._load_json(schedule_path)
-        self.groups = self._load_json(groups_path).get("groups", {})
         self.team_mapping = self._load_json(team_mapping_path)
+        # Group composition is needed to resolve schedule placeholders ("A1")
+        # to team IDs. Fall back to the committed team_mapping.json, which
+        # carries the same draw, so a separate groups.json is optional (the
+        # generated one is gitignored and absent in CI).
+        if groups_path is not None:
+            self.groups = self._load_json(groups_path).get("groups", {})
+        else:
+            self.groups = self.team_mapping.get("groups", {})
         self._name_to_id = self._build_name_index()
         self._pair_to_match = self._build_pair_index()
 
