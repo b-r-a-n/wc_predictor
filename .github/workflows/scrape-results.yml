@@ -59,11 +59,17 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- web/public/data/results.json; then
-            echo "Results unchanged — nothing to commit."
+          # Compare only the match data, not the generated_at timestamp, so we
+          # don't commit/redeploy on days where nothing actually changed.
+          git show HEAD:web/public/data/results.json 2>/dev/null | jq -S '.matches // []' > old_matches.json 2>/dev/null || echo '[]' > old_matches.json
+          jq -S '.matches // []' web/public/data/results.json > new_matches.json
+          if diff -q old_matches.json new_matches.json >/dev/null 2>&1; then
+            echo "Match data unchanged — nothing to commit."
             echo "changed=false" >> "$GITHUB_OUTPUT"
+            rm -f old_matches.json new_matches.json
             exit 0
           fi
+          rm -f old_matches.json new_matches.json
           git add web/public/data/results.json
           git commit -m "Update match results ($(date -u +%Y-%m-%d))"
           git push
