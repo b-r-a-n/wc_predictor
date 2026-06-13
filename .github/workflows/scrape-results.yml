@@ -39,8 +39,10 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        # Only what the results scraper needs (requests + the CLI's click/rich).
-        run: pip install requests click rich
+        # The scrapers.cli package __init__ imports every CLI module, so the
+        # full requirements set (bs4, cloudscraper, ...) must be present even
+        # though the results scraper itself only needs requests/click/rich.
+        run: pip install -r scrapers/requirements.txt
 
       - name: Scrape results
         env:
