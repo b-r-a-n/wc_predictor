@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-19T10:31:12.011856+00:00",
+  "generated_at": "2026-06-19T22:19:07.611162+00:00",
   "source": "espn:fifa.world",
   "matches": [
     {
@@ -278,6 +278,16 @@
       "homeTeamId": 22,
       "awayTeamId": 35,
       "homeScore": 1,
+      "awayScore": 0,
+      "status": "completed",
+      "date": "2026-06-19"
+    },
+    {
+      "matchNumber": 29,
+      "groupId": "D",
+      "homeTeamId": 39,
+      "awayTeamId": 1,
+      "homeScore": 2,
       "awayScore": 0,
       "status": "completed",
       "date": "2026-06-19"
