@@ -41,17 +41,35 @@ jobs:
         run: pip install -r scrapers/requirements.txt
 
       - name: Scrape source data
-        # Each scraper writes to scrapers/output/. A hard failure here stops the
-        # job before any commit, which is the safe outcome. Silent degradation
-        # (fewer teams / default values) is caught by the guard step below.
-        # scrape_groups falls back to the committed team_mapping.json, so the
-        # gitignored scrapers/output/groups.json gets regenerated in CI.
+        # These three sources (plus the group draw) scrape fine from GitHub's
+        # runners. A hard failure here stops the job before any commit, which is
+        # the safe outcome. Silent degradation (fewer teams / default values) is
+        # caught by the guard step below. scrape_groups falls back to the
+        # committed team_mapping.json, so the gitignored groups.json is
+        # regenerated in CI.
         run: |
           PYTHONPATH=$PWD python -m scrapers.cli.scrape_groups -q
           PYTHONPATH=$PWD python -m scrapers.cli.scrape_elo
           PYTHONPATH=$PWD python -m scrapers.cli.scrape_transfermarkt
           PYTHONPATH=$PWD python -m scrapers.cli.scrape_fifa
-          PYTHONPATH=$PWD python -m scrapers.cli.scrape_sofascore
+
+      - name: Scrape Sofascore form (best-effort)
+        # Sofascore's API 403s datacenter IPs, so the form scrape usually fails
+        # in CI. We let it try but don't fail the job — the next step preserves
+        # last-known-good form when the scrape is missing or degraded. Refresh
+        # form by running scrape_sofascore locally (from a residential IP).
+        continue-on-error: true
+        run: PYTHONPATH=$PWD python -m scrapers.cli.scrape_sofascore
+
+      - name: Ensure form input
+        # Keep a usable sofascore_form.json: the fresh scrape if it covered
+        # enough teams, otherwise form reconstructed from the committed
+        # teams.json so merge doesn't collapse every team to a flat 1.5 default.
+        run: |
+          PYTHONPATH=$PWD python -m scrapers.ensure_form_input \
+            --form scrapers/output/sofascore_form.json \
+            --fallback web/public/data/teams.json \
+            --min-teams 45
 
       - name: Merge into teams.json
         run: |
