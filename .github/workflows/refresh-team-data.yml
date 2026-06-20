@@ -1,14 +1,15 @@
-name: Refresh team data
+name: Refresh team data (ELO)
 
-# Daily refresh of the strategy-input data (ELO ratings, Transfermarkt market
-# values, FIFA rankings, Sofascore form) that feeds the simulator's teams.json.
+# Daily refresh of ELO ratings — the most match-sensitive strategy input — into
+# teams.json. The other inputs (Transfermarkt market values, Sofascore form) come
+# from sites that 403 datacenter IPs, and FIFA's source is a small static top-20,
+# so those are left untouched here and refreshed by running the full scrape +
+# merge locally (see CLAUDE.md). Rather than re-run the full merge, this job
+# patches just each team's elo_rating in place via scrapers/apply_elo.py.
 #
-# Unlike the results scrape, this data is *merged* into teams.json, which drives
-# every simulation — so a degraded scrape would silently corrupt the model. The
-# job therefore only commits when the merge passes `validate` AND the extra
-# sanity guards in scrapers/check_data_guards.py (per-source team counts, no
-# zeroed inputs, no implausible aggregate swings). Otherwise it fails loudly and
-# commits nothing.
+# apply_elo self-guards (minimum matched teams, valid ELO range, no implausible
+# average swing) and validate enforces the schema, so a degraded scrape fails the
+# job and commits nothing.
 on:
   schedule:
     # 07:00 UTC daily — offset from the 09:00 results scrape so the two jobs
@@ -38,66 +39,29 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
+        # The scrapers.cli package __init__ imports every CLI module, so the
+        # full requirements set must be present even though we only run ELO.
         run: pip install -r scrapers/requirements.txt
 
-      - name: Scrape source data
-        # These three sources (plus the group draw) scrape fine from GitHub's
-        # runners. A hard failure here stops the job before any commit, which is
-        # the safe outcome. Silent degradation (fewer teams / default values) is
-        # caught by the guard step below. scrape_groups falls back to the
-        # committed team_mapping.json, so the gitignored groups.json is
-        # regenerated in CI.
-        run: |
-          PYTHONPATH=$PWD python -m scrapers.cli.scrape_groups -q
-          PYTHONPATH=$PWD python -m scrapers.cli.scrape_elo
-          PYTHONPATH=$PWD python -m scrapers.cli.scrape_transfermarkt
-          PYTHONPATH=$PWD python -m scrapers.cli.scrape_fifa
+      - name: Scrape ELO ratings
+        # international-football.net scrapes fine from GitHub's runners. A hard
+        # failure here stops the job before any commit (the safe outcome).
+        run: PYTHONPATH=$PWD python -m scrapers.cli.scrape_elo
 
-      - name: Scrape Sofascore form (best-effort)
-        # Sofascore's API 403s datacenter IPs, so the form scrape usually fails
-        # in CI. We let it try but don't fail the job — the next step preserves
-        # last-known-good form when the scrape is missing or degraded. Refresh
-        # form by running scrape_sofascore locally (from a residential IP).
-        continue-on-error: true
-        run: PYTHONPATH=$PWD python -m scrapers.cli.scrape_sofascore
-
-      - name: Ensure form input
-        # Keep a usable sofascore_form.json: the fresh scrape if it covered
-        # enough teams, otherwise form reconstructed from the committed
-        # teams.json so merge doesn't collapse every team to a flat 1.5 default.
+      - name: Apply ELO to teams.json
+        # Patches elo_rating in place, leaving all other fields untouched.
+        # Self-guards against a degraded scrape and exits non-zero on any doubt.
         run: |
-          PYTHONPATH=$PWD python -m scrapers.ensure_form_input \
-            --form scrapers/output/sofascore_form.json \
-            --fallback web/public/data/teams.json \
+          PYTHONPATH=$PWD python -m scrapers.apply_elo \
+            --teams data/teams.json \
+            --elo scrapers/output/elo_ratings.json \
             --min-teams 45
-
-      - name: Merge into teams.json
-        run: |
-          PYTHONPATH=$PWD python -m scrapers.cli.merge_data \
-            -m scrapers/config/team_mapping.json \
-            -e scrapers/output/elo_ratings.json \
-            -t scrapers/output/transfermarkt_values.json \
-            -f scrapers/output/fifa_rankings.json \
-            -s scrapers/output/sofascore_form.json \
-            -g scrapers/output/groups.json \
-            -o data/teams.json \
-            --allow-tbd-defaults --allow-missing-fifa
-
-      - name: Validate schema (hard gate)
-        run: PYTHONPATH=$PWD python -m scrapers.cli.validate data/teams.json --summary
-
-      - name: Sanity guards (degradation gate)
-        # Compares the fresh merge against the currently committed teams.json and
-        # checks raw scraper coverage; exits non-zero (failing the job) on any
-        # sign of a degraded scrape.
-        run: |
-          PYTHONPATH=$PWD python -m scrapers.check_data_guards \
-            --new data/teams.json \
-            --old web/public/data/teams.json \
-            --output-dir scrapers/output
 
       - name: Sync to web/public
         run: cp data/teams.json web/public/data/teams.json
+
+      - name: Validate schema (hard gate)
+        run: PYTHONPATH=$PWD python -m scrapers.cli.validate web/public/data/teams.json --summary
 
       - name: Commit updated team data
         id: commit
@@ -105,18 +69,18 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           if git diff --quiet -- data/teams.json web/public/data/teams.json; then
-            echo "Team data unchanged — nothing to commit."
+            echo "ELO unchanged — nothing to commit."
             echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git add data/teams.json web/public/data/teams.json
-          git commit -m "Update team data ($(date -u +%Y-%m-%d))"
+          git commit -m "Update ELO ratings ($(date -u +%Y-%m-%d))"
           git push
           echo "changed=true" >> "$GITHUB_OUTPUT"
 
       - name: Trigger deploy
         # Pushes made with GITHUB_TOKEN don't trigger other workflows, so the
-        # Pages deploy is dispatched explicitly. Only when team data changed.
+        # Pages deploy is dispatched explicitly. Only when ELO changed.
         if: steps.commit.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
