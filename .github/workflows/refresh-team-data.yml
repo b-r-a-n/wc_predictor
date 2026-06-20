@@ -1,0 +1,105 @@
+name: Refresh team data
+
+# Daily refresh of the strategy-input data (ELO ratings, Transfermarkt market
+# values, FIFA rankings, Sofascore form) that feeds the simulator's teams.json.
+#
+# Unlike the results scrape, this data is *merged* into teams.json, which drives
+# every simulation — so a degraded scrape would silently corrupt the model. The
+# job therefore only commits when the merge passes `validate` AND the extra
+# sanity guards in scrapers/check_data_guards.py (per-source team counts, no
+# zeroed inputs, no implausible aggregate swings). Otherwise it fails loudly and
+# commits nothing.
+on:
+  schedule:
+    # 07:00 UTC daily — offset from the 09:00 results scrape so the two jobs
+    # don't push/deploy at the same moment.
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+# Don't let two refreshes race on the same push.
+concurrency:
+  group: refresh-team-data
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: write   # needed for `gh workflow run` to dispatch deploy.yml
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r scrapers/requirements.txt
+
+      - name: Scrape source data
+        # Each scraper writes to scrapers/output/. A hard failure here stops the
+        # job before any commit, which is the safe outcome. Silent degradation
+        # (fewer teams / default values) is caught by the guard step below.
+        # scrape_groups falls back to the committed team_mapping.json, so the
+        # gitignored scrapers/output/groups.json gets regenerated in CI.
+        run: |
+          PYTHONPATH=$PWD python -m scrapers.cli.scrape_groups -q
+          PYTHONPATH=$PWD python -m scrapers.cli.scrape_elo
+          PYTHONPATH=$PWD python -m scrapers.cli.scrape_transfermarkt
+          PYTHONPATH=$PWD python -m scrapers.cli.scrape_fifa
+          PYTHONPATH=$PWD python -m scrapers.cli.scrape_sofascore
+
+      - name: Merge into teams.json
+        run: |
+          PYTHONPATH=$PWD python -m scrapers.cli.merge_data \
+            -m scrapers/config/team_mapping.json \
+            -e scrapers/output/elo_ratings.json \
+            -t scrapers/output/transfermarkt_values.json \
+            -f scrapers/output/fifa_rankings.json \
+            -s scrapers/output/sofascore_form.json \
+            -g scrapers/output/groups.json \
+            -o data/teams.json \
+            --allow-tbd-defaults --allow-missing-fifa
+
+      - name: Validate schema (hard gate)
+        run: PYTHONPATH=$PWD python -m scrapers.cli.validate data/teams.json --summary
+
+      - name: Sanity guards (degradation gate)
+        # Compares the fresh merge against the currently committed teams.json and
+        # checks raw scraper coverage; exits non-zero (failing the job) on any
+        # sign of a degraded scrape.
+        run: |
+          PYTHONPATH=$PWD python -m scrapers.check_data_guards \
+            --new data/teams.json \
+            --old web/public/data/teams.json \
+            --output-dir scrapers/output
+
+      - name: Sync to web/public
+        run: cp data/teams.json web/public/data/teams.json
+
+      - name: Commit updated team data
+        id: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- data/teams.json web/public/data/teams.json; then
+            echo "Team data unchanged — nothing to commit."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git add data/teams.json web/public/data/teams.json
+          git commit -m "Update team data ($(date -u +%Y-%m-%d))"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger deploy
+        # Pushes made with GITHUB_TOKEN don't trigger other workflows, so the
+        # Pages deploy is dispatched explicitly. Only when team data changed.
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run deploy.yml --ref main
