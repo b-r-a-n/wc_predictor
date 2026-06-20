@@ -1,14 +1,18 @@
 //! FIFA tiebreaker rules for group stage standings.
 //!
-//! According to FIFA regulations, teams are ranked by:
+//! For the 2026 World Cup, FIFA changed the order so that head-to-head results
+//! are applied *before* overall goal difference. Teams level on points are
+//! ranked by:
 //! 1. Points (3 for win, 1 for draw, 0 for loss)
-//! 2. Goal difference
-//! 3. Goals scored
-//! 4. Head-to-head points
-//! 5. Head-to-head goal difference
-//! 6. Head-to-head goals scored
+//! 2. Head-to-head points (in matches among the teams level on points)
+//! 3. Head-to-head goal difference (among the teams level on points)
+//! 4. Head-to-head goals scored (among the teams level on points)
+//! 5. Overall goal difference (all group matches)
+//! 6. Overall goals scored (all group matches)
 //! 7. Fair play points (yellow/red cards) - not simulated
 //! 8. Drawing of lots (random) - simulated as tiebreaker
+
+use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
@@ -102,67 +106,79 @@ pub fn calculate_standings(teams: &[TeamId], matches: &[MatchResult], group_id: 
     standings
 }
 
-/// Resolve standings with FIFA tiebreaker rules.
+/// Head-to-head record for a team, restricted to matches against the other
+/// teams it is level on points with.
+#[derive(Default, Clone, Copy)]
+struct HeadToHead {
+    points: i16,
+    goal_difference: i16,
+    goals_for: i16,
+}
+
+/// Compute each team's head-to-head record against the other teams it is level
+/// on points with (the FIFA "mini-table" among teams tied on points). Teams not
+/// tied with anyone get an all-zero record, which is harmless because the points
+/// criterion separates them first.
+fn head_to_head_records(
+    standings: &[GroupStanding],
+    matches: &[MatchResult],
+) -> HashMap<TeamId, HeadToHead> {
+    let points_by_team: HashMap<TeamId, u8> =
+        standings.iter().map(|s| (s.team_id, s.points)).collect();
+
+    let mut records: HashMap<TeamId, HeadToHead> = HashMap::new();
+    for s in standings {
+        let mut h2h = HeadToHead::default();
+        for m in matches {
+            let opponent = if m.home_team == s.team_id {
+                m.away_team
+            } else if m.away_team == s.team_id {
+                m.home_team
+            } else {
+                continue;
+            };
+            // Only matches against teams level on points count toward H2H.
+            if points_by_team.get(&opponent) != Some(&s.points) {
+                continue;
+            }
+            h2h.points += m.points_for(s.team_id) as i16;
+            h2h.goal_difference += m.goal_difference(s.team_id);
+            h2h.goals_for += m.goals_for(s.team_id) as i16;
+        }
+        records.insert(s.team_id, h2h);
+    }
+    records
+}
+
+/// Resolve standings with the 2026 FIFA tiebreaker rules.
 /// Returns standings sorted from first to last place.
 pub fn resolve_standings(
     mut standings: Vec<GroupStanding>,
     matches: &[MatchResult],
 ) -> Vec<GroupStanding> {
+    let h2h = head_to_head_records(&standings, matches);
+
     standings.sort_by(|a, b| {
+        let a_h2h = h2h[&a.team_id];
+        let b_h2h = h2h[&b.team_id];
         // 1. Points (descending)
         b.points
             .cmp(&a.points)
-            // 2. Goal difference (descending)
+            // 2. Head-to-head points among teams level on points (descending)
+            .then_with(|| b_h2h.points.cmp(&a_h2h.points))
+            // 3. Head-to-head goal difference (descending)
+            .then_with(|| b_h2h.goal_difference.cmp(&a_h2h.goal_difference))
+            // 4. Head-to-head goals scored (descending)
+            .then_with(|| b_h2h.goals_for.cmp(&a_h2h.goals_for))
+            // 5. Overall goal difference (descending)
             .then_with(|| b.goal_difference().cmp(&a.goal_difference()))
-            // 3. Goals scored (descending)
+            // 6. Overall goals scored (descending)
             .then_with(|| b.goals_for.cmp(&a.goals_for))
-            // 4-6. Head-to-head (if still tied)
-            .then_with(|| compare_head_to_head(a, b, matches))
             // 7. Team ID as final tiebreaker (simulates drawing of lots)
             .then_with(|| a.team_id.0.cmp(&b.team_id.0))
     });
 
     standings
-}
-
-/// Compare two teams head-to-head based on their direct encounter.
-fn compare_head_to_head(
-    team_a: &GroupStanding,
-    team_b: &GroupStanding,
-    matches: &[MatchResult],
-) -> std::cmp::Ordering {
-    // Find the head-to-head match
-    for m in matches {
-        let is_match =
-            (m.home_team == team_a.team_id && m.away_team == team_b.team_id)
-                || (m.home_team == team_b.team_id && m.away_team == team_a.team_id);
-
-        if is_match {
-            // Compare points from this match
-            let a_points = m.points_for(team_a.team_id);
-            let b_points = m.points_for(team_b.team_id);
-
-            if a_points != b_points {
-                return b_points.cmp(&a_points);
-            }
-
-            // Compare goal difference from this match
-            let a_gd = m.goal_difference(team_a.team_id);
-            let b_gd = m.goal_difference(team_b.team_id);
-
-            if a_gd != b_gd {
-                return b_gd.cmp(&a_gd);
-            }
-
-            // Compare goals scored in this match
-            let a_goals = m.goals_for(team_a.team_id);
-            let b_goals = m.goals_for(team_b.team_id);
-
-            return b_goals.cmp(&a_goals);
-        }
-    }
-
-    std::cmp::Ordering::Equal
 }
 
 /// Rank third-placed teams across all groups to determine the best 8.
@@ -261,5 +277,42 @@ mod tests {
 
         standings = resolve_standings(standings, &matches);
         assert_eq!(standings[0].team_id, TeamId(1)); // Team 1 won H2H
+    }
+
+    #[test]
+    fn test_head_to_head_beats_overall_goal_difference_2026() {
+        // 2026 rule: head-to-head is applied BEFORE overall goal difference.
+        // Team 1 has a far better overall goal difference, but Team 0 beat
+        // Team 1 head-to-head, so Team 0 must still finish ahead.
+        // (This is the Mexico-over-South-Korea case.)
+        let matches = vec![MatchResult::new(TeamId(0), TeamId(1), 1, 0)];
+
+        let standings = vec![
+            GroupStanding {
+                team_id: TeamId(0),
+                group_id: GroupId('A'),
+                points: 6,
+                goals_for: 3,
+                goals_against: 2, // GD +1
+                played: 3,
+                wins: 2,
+                draws: 0,
+                losses: 1,
+            },
+            GroupStanding {
+                team_id: TeamId(1),
+                group_id: GroupId('A'),
+                points: 6,
+                goals_for: 8,
+                goals_against: 2, // GD +6
+                played: 3,
+                wins: 2,
+                draws: 0,
+                losses: 1,
+            },
+        ];
+
+        let resolved = resolve_standings(standings, &matches);
+        assert_eq!(resolved[0].team_id, TeamId(0)); // H2H winner first despite worse GD
     }
 }
