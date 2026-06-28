@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-27T09:42:27.564988+00:00",
+  "generated_at": "2026-06-28T09:59:59.724507+00:00",
   "source": "espn:fifa.world",
   "matches": [
     {
@@ -661,6 +661,66 @@
       "awayScore": 5,
       "status": "completed",
       "date": "2026-06-27"
+    },
+    {
+      "matchNumber": 67,
+      "groupId": "L",
+      "homeTeamId": 27,
+      "awayTeamId": 13,
+      "homeScore": 0,
+      "awayScore": 2,
+      "status": "completed",
+      "date": "2026-06-27"
+    },
+    {
+      "matchNumber": 68,
+      "groupId": "L",
+      "homeTeamId": 9,
+      "awayTeamId": 16,
+      "homeScore": 2,
+      "awayScore": 1,
+      "status": "completed",
+      "date": "2026-06-27"
+    },
+    {
+      "matchNumber": 69,
+      "groupId": "K",
+      "homeTeamId": 46,
+      "awayTeamId": 41,
+      "homeScore": 3,
+      "awayScore": 1,
+      "status": "completed",
+      "date": "2026-06-27"
+    },
+    {
+      "matchNumber": 70,
+      "groupId": "K",
+      "homeTeamId": 8,
+      "awayTeamId": 29,
+      "homeScore": 0,
+      "awayScore": 0,
+      "status": "completed",
+      "date": "2026-06-27"
+    },
+    {
+      "matchNumber": 71,
+      "groupId": "J",
+      "homeTeamId": 21,
+      "awayTeamId": 0,
+      "homeScore": 1,
+      "awayScore": 3,
+      "status": "completed",
+      "date": "2026-06-28"
+    },
+    {
+      "matchNumber": 72,
+      "groupId": "J",
+      "homeTeamId": 3,
+      "awayTeamId": 2,
+      "homeScore": 3,
+      "awayScore": 3,
+      "status": "completed",
+      "date": "2026-06-28"
     }
   ]
 }
