@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { formatPercent, getFlagEmoji } from '../../utils/formatting';
 import { R32_SLOT_SOURCES, getSlotSourceLabel } from './slotMapping';
 import { getMatchForSlot } from '../../utils/matchMapping';
+import { QF_R16_SLOT_ORDER } from './bracketLayout';
 import type {
   Team,
   Group,
@@ -357,7 +358,11 @@ export function TeamPathTree({
 
     for (const { round, parent, label } of cascadeOrder) {
       for (const slot of reachablePerRound[round]) {
-        const parentSlots = [slot * 2, slot * 2 + 1];
+        // The QF crosses the halves of the R16 winners (FIFA 2026); every other
+        // round pairs adjacent slots.
+        const parentSlots = round === 'quarter_finals'
+          ? [QF_R16_SLOT_ORDER[slot * 2], QF_R16_SLOT_ORDER[slot * 2 + 1]]
+          : [slot * 2, slot * 2 + 1];
         const paths: string[][] = [];
         for (const ps of parentSlots) {
           const parentPaths = out[parent].get(ps);

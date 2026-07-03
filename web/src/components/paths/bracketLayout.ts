@@ -40,6 +40,38 @@ const DEFAULT_CONFIG: LayoutConfig = {
 // Round configuration
 const ROUND_SLOTS = [16, 8, 4, 2, 1];  // R32, R16, QF, SF, Final
 
+// R16 slots feeding each QF slot. The FIFA 2026 bracket crosses the two halves
+// of the R16 winners rather than pairing adjacent slots, so this must match the
+// engine (wc-core bracket::QF_R16_SLOT_ORDER).
+export const QF_R16_SLOT_ORDER = [0, 1, 4, 5, 2, 3, 6, 7];
+
+/**
+ * The two previous-round slots that feed a given (round, slot). Every round
+ * pairs adjacent slots except the quarter-finals (round index 2), which pull
+ * the crossed R16 slots.
+ */
+function feederSlots(round: number, slot: number): [number, number] {
+  if (round === 2) {
+    return [QF_R16_SLOT_ORDER[slot * 2], QF_R16_SLOT_ORDER[slot * 2 + 1]];
+  }
+  return [slot * 2, slot * 2 + 1];
+}
+
+/**
+ * Vertical display order of R32 slots that keeps the whole bracket planar: an
+ * in-order walk of the bracket tree from the final down to the R32 leaves.
+ * Cards keep their true slot index (for team/venue lookup); only their vertical
+ * placement follows this order.
+ */
+function r32DisplayOrder(): number[] {
+  const walk = (round: number, slot: number): number[] => {
+    if (round === 0) return [slot];
+    const [a, b] = feederSlots(round, slot);
+    return [...walk(round - 1, a), ...walk(round - 1, b)];
+  };
+  return walk(ROUND_SLOTS.length - 1, 0);
+}
+
 // Calculate all slot positions for the bracket
 export function calculateSlotPositions(config: Partial<LayoutConfig> = {}): SlotPosition[] {
   const cfg = { ...DEFAULT_CONFIG, ...config };
@@ -51,9 +83,11 @@ export function calculateSlotPositions(config: Partial<LayoutConfig> = {}): Slot
     const x = cfg.verticalPadding + round * (cfg.slotWidth + cfg.roundGap);
 
     if (round === 0) {
-      // R32: evenly spaced, offset by header height
+      // R32: evenly spaced in planar bracket order, offset by header height
+      const order = r32DisplayOrder();
       for (let slot = 0; slot < slotCount; slot++) {
-        const y = cfg.headerOffset + cfg.verticalPadding + slot * (cfg.slotHeight + cfg.baseSlotGap);
+        const row = order.indexOf(slot);
+        const y = cfg.headerOffset + cfg.verticalPadding + row * (cfg.slotHeight + cfg.baseSlotGap);
         positions.push({
           round,
           slot,
@@ -64,11 +98,9 @@ export function calculateSlotPositions(config: Partial<LayoutConfig> = {}): Slot
         });
       }
     } else {
-      // Later rounds: center between the two slots they connect
+      // Later rounds: center between the two slots they actually connect
       for (let slot = 0; slot < slotCount; slot++) {
-        // Find the two slots from the previous round that feed into this one
-        const prevSlot1 = slot * 2;
-        const prevSlot2 = slot * 2 + 1;
+        const [prevSlot1, prevSlot2] = feederSlots(round, slot);
         const prev1 = positions.find(p => p.round === round - 1 && p.slot === prevSlot1);
         const prev2 = positions.find(p => p.round === round - 1 && p.slot === prevSlot2);
 
@@ -132,9 +164,8 @@ export function generateAllConnectors(
     const roundSlots = positions.filter(p => p.round === round);
 
     for (const toSlot of roundSlots) {
-      // Two slots from previous round feed into this one
-      const fromSlot1 = toSlot.slot * 2;
-      const fromSlot2 = toSlot.slot * 2 + 1;
+      // Two slots from the previous round feed into this one
+      const [fromSlot1, fromSlot2] = feederSlots(round, toSlot.slot);
 
       const from1 = positions.find(p => p.round === round - 1 && p.slot === fromSlot1);
       const from2 = positions.find(p => p.round === round - 1 && p.slot === fromSlot2);

@@ -9,7 +9,7 @@ use std::collections::{HashMap, HashSet};
 
 use pathfinding::kuhn_munkres::kuhn_munkres;
 use pathfinding::matrix::Matrix;
-use wc_core::bracket::{SlotSource, R32_BRACKET};
+use wc_core::bracket::{SlotSource, QF_R16_SLOT_ORDER, R32_BRACKET};
 use wc_core::{Group, TeamId};
 
 use crate::path_tracker::{
@@ -336,13 +336,15 @@ fn propagate_winners(
         }
     }
 
-    // QF: slot i receives winner from R16 slots 2i and 2i+1
+    // QF: the FIFA 2026 bracket crosses the halves of the R16 winners, so a QF
+    // slot's feeders are the R16 slots given by QF_R16_SLOT_ORDER, not the
+    // adjacent slots. This must match how the engine feeds the quarter-finals.
     let mut qf: HashMap<u8, MostLikelyBracketSlot> = HashMap::new();
     let mut qf_feeders: HashMap<u8, Vec<TeamId>> = HashMap::new();
 
     for slot in 0..4u8 {
-        let feeder1 = slot * 2;
-        let feeder2 = slot * 2 + 1;
+        let feeder1 = QF_R16_SLOT_ORDER[(slot * 2) as usize] as u8;
+        let feeder2 = QF_R16_SLOT_ORDER[(slot * 2 + 1) as usize] as u8;
 
         let mut candidates: Vec<TeamId> = Vec::new();
         if let Some(data) = r16.get(&feeder1) {
