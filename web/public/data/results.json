@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-28T09:59:59.724507+00:00",
+  "generated_at": "2026-07-03T13:06:28.230684+00:00",
   "source": "espn:fifa.world",
   "matches": [
     {
@@ -721,6 +721,149 @@
       "awayScore": 3,
       "status": "completed",
       "date": "2026-06-28"
+    },
+    {
+      "matchNumber": 73,
+      "round": "round_of_32",
+      "homeTeamId": 34,
+      "awayTeamId": 6,
+      "homeScore": 0,
+      "awayScore": 1,
+      "winnerTeamId": 6,
+      "status": "completed",
+      "date": "2026-06-28"
+    },
+    {
+      "matchNumber": 74,
+      "round": "round_of_32",
+      "homeTeamId": 15,
+      "awayTeamId": 28,
+      "homeScore": 1,
+      "awayScore": 1,
+      "winnerTeamId": 28,
+      "status": "completed",
+      "date": "2026-06-29"
+    },
+    {
+      "matchNumber": 75,
+      "round": "round_of_32",
+      "homeTeamId": 24,
+      "awayTeamId": 23,
+      "homeScore": 1,
+      "awayScore": 1,
+      "winnerTeamId": 23,
+      "status": "completed",
+      "date": "2026-06-29"
+    },
+    {
+      "matchNumber": 76,
+      "round": "round_of_32",
+      "homeTeamId": 5,
+      "awayTeamId": 20,
+      "homeScore": 2,
+      "awayScore": 1,
+      "winnerTeamId": 5,
+      "status": "completed",
+      "date": "2026-06-29"
+    },
+    {
+      "matchNumber": 77,
+      "round": "round_of_32",
+      "homeTeamId": 14,
+      "awayTeamId": 43,
+      "homeScore": 3,
+      "awayScore": 0,
+      "winnerTeamId": 14,
+      "status": "completed",
+      "date": "2026-06-30"
+    },
+    {
+      "matchNumber": 78,
+      "round": "round_of_32",
+      "homeTeamId": 19,
+      "awayTeamId": 26,
+      "homeScore": 1,
+      "awayScore": 2,
+      "winnerTeamId": 26,
+      "status": "completed",
+      "date": "2026-06-30"
+    },
+    {
+      "matchNumber": 79,
+      "round": "round_of_32",
+      "homeTeamId": 22,
+      "awayTeamId": 11,
+      "homeScore": 2,
+      "awayScore": 0,
+      "winnerTeamId": 22,
+      "status": "completed",
+      "date": "2026-06-30"
+    },
+    {
+      "matchNumber": 80,
+      "round": "round_of_32",
+      "homeTeamId": 13,
+      "awayTeamId": 46,
+      "homeScore": 2,
+      "awayScore": 1,
+      "winnerTeamId": 13,
+      "status": "completed",
+      "date": "2026-07-01"
+    },
+    {
+      "matchNumber": 81,
+      "round": "round_of_32",
+      "homeTeamId": 39,
+      "awayTeamId": 42,
+      "homeScore": 2,
+      "awayScore": 0,
+      "winnerTeamId": 39,
+      "status": "completed",
+      "date": "2026-07-01"
+    },
+    {
+      "matchNumber": 82,
+      "round": "round_of_32",
+      "homeTeamId": 4,
+      "awayTeamId": 33,
+      "homeScore": 3,
+      "awayScore": 2,
+      "winnerTeamId": 4,
+      "status": "completed",
+      "date": "2026-07-01"
+    },
+    {
+      "matchNumber": 83,
+      "round": "round_of_32",
+      "homeTeamId": 29,
+      "awayTeamId": 9,
+      "homeScore": 2,
+      "awayScore": 1,
+      "winnerTeamId": 29,
+      "status": "completed",
+      "date": "2026-07-02"
+    },
+    {
+      "matchNumber": 84,
+      "round": "round_of_32",
+      "homeTeamId": 36,
+      "awayTeamId": 2,
+      "homeScore": 3,
+      "awayScore": 0,
+      "winnerTeamId": 36,
+      "status": "completed",
+      "date": "2026-07-02"
+    },
+    {
+      "matchNumber": 85,
+      "round": "round_of_32",
+      "homeTeamId": 37,
+      "awayTeamId": 3,
+      "homeScore": 2,
+      "awayScore": 0,
+      "winnerTeamId": 37,
+      "status": "completed",
+      "date": "2026-07-02"
     }
   ]
 }
