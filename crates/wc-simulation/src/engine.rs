@@ -178,9 +178,16 @@ impl<'a> SimulationEngine<'a> {
             self.simulate_knockout_round_with_slots(rng, &ro32_winners, KnockoutRound::RoundOf16);
         let ro16_winners: Vec<TeamId> = round_of_16.iter().filter_map(|m| m.winner()).collect();
 
-        // Quarter-finals (4 matches)
+        // Quarter-finals (4 matches). The FIFA 2026 QFs cross the two halves of
+        // the R16 winners, so reorder them (see bracket::QF_R16_SLOT_ORDER)
+        // before pairing. This also makes the semi-finals and final — built
+        // below by plain adjacent pairing — match the official bracket.
+        let qf_feed: Vec<TeamId> = bracket::QF_R16_SLOT_ORDER
+            .iter()
+            .map(|&i| ro16_winners[i])
+            .collect();
         let quarter_finals =
-            self.simulate_knockout_round_with_slots(rng, &ro16_winners, KnockoutRound::QuarterFinal);
+            self.simulate_knockout_round_with_slots(rng, &qf_feed, KnockoutRound::QuarterFinal);
         let qf_winners: Vec<TeamId> = quarter_finals.iter().filter_map(|m| m.winner()).collect();
 
         // Semi-finals (2 matches)
@@ -326,6 +333,55 @@ mod tests {
             for j in (i + 1)..4 {
                 assert_ne!(top4[i], top4[j]);
             }
+        }
+    }
+
+    #[test]
+    fn test_quarter_finals_match_fifa_bracket() {
+        // The quarter-finals must cross the halves of the R16 winners per the
+        // official FIFA 2026 bracket, not pair adjacent R16 slots. Pin every
+        // R32 and R16 slot to a home win so R16 winners are the home teams and
+        // each QF slot's two teams can be traced back to their R16 slots.
+        let tournament = create_test_tournament();
+        let strategy = EloStrategy::default();
+        let mut fixed = FixedResults::new();
+        for s in 0..16u8 {
+            fixed.insert(
+                MatchFixture::knockout(KnockoutRound::RoundOf32, s),
+                FixedResultSpec::exact_score(1, 0),
+            );
+        }
+        for s in 0..8u8 {
+            fixed.insert(
+                MatchFixture::knockout(KnockoutRound::RoundOf16, s),
+                FixedResultSpec::exact_score(1, 0),
+            );
+        }
+        let engine = SimulationEngine::new(&tournament, &strategy).with_fixed_results(&fixed);
+        let mut rng = ChaCha8Rng::seed_from_u64(7);
+        let result = engine.simulate(&mut rng);
+
+        // R16 winner (home team, since 1-0) -> its R16 slot index.
+        let mut slot_of_r16_winner = std::collections::HashMap::new();
+        for (slot, m) in result.knockout_bracket.round_of_16.iter().enumerate() {
+            slot_of_r16_winner.insert(m.winner().unwrap(), slot);
+        }
+
+        // QF slot -> the pair of R16 slots that feed it (FIFA 2026).
+        let expected = [[0usize, 1], [4, 5], [2, 3], [6, 7]];
+        for (qf_slot, m) in result.knockout_bracket.quarter_finals.iter().enumerate() {
+            let mut origins = [
+                slot_of_r16_winner[&m.home_team],
+                slot_of_r16_winner[&m.away_team],
+            ];
+            origins.sort_unstable();
+            let mut want = expected[qf_slot];
+            want.sort_unstable();
+            assert_eq!(
+                origins, want,
+                "QF slot {} should be fed by R16 slots {:?}, got {:?}",
+                qf_slot, want, origins
+            );
         }
     }
 

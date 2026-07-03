@@ -151,6 +151,25 @@ pub const R32_BRACKET: [R32Match; 16] = [
 /// Order: 1E, 1I, 1A, 1L, 1D, 1G, 1B, 1K
 pub const THIRD_PLACE_OPPONENTS: [char; 8] = ['E', 'I', 'A', 'L', 'D', 'G', 'B', 'K'];
 
+/// Order in which Round-of-16 winners feed the quarter-finals.
+///
+/// R16 results are produced in slot order 0..7, corresponding to FIFA match
+/// numbers 89..96. The official FIFA 2026 quarter-finals cross the two halves
+/// of the R16 winners rather than pairing adjacent slots:
+///
+/// ```text
+///   QF slot 0 (M97):  W89 vs W90  -> R16 slots (0, 1)
+///   QF slot 1 (M98):  W93 vs W94  -> R16 slots (4, 5)
+///   QF slot 2 (M99):  W91 vs W92  -> R16 slots (2, 3)
+///   QF slot 3 (M100): W95 vs W96  -> R16 slots (6, 7)
+/// ```
+///
+/// Reordering the R16 winners by this array before chunking into pairs makes
+/// the quarter-finals — and, in turn, the semi-finals and final produced by
+/// plain adjacent pairing — match the official bracket. Without it the engine
+/// would pair W97 vs W99 in a semi-final, which never happens in reality.
+pub const QF_R16_SLOT_ORDER: [usize; 8] = [0, 1, 4, 5, 2, 3, 6, 7];
+
 /// Pool of possible source groups for each third-place bracket slot.
 /// Index order: [1E, 1I, 1A, 1L, 1D, 1G, 1B, 1K]
 const THIRD_PLACE_POOLS: [[char; 5]; 8] = [

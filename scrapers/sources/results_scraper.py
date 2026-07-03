@@ -1,12 +1,15 @@
 """Completed match results scraper.
 
-Fetches finished World Cup 2026 group-stage scores from ESPN's public
-soccer scoreboard API and maps each result to a schedule ``matchNumber``
-so the web app can pin already-played matches as fixed results.
+Fetches finished World Cup 2026 scores from ESPN's public soccer scoreboard
+API and maps each result to a schedule ``matchNumber`` so the web app can pin
+already-played matches as fixed results.
 
-Only group-stage matches are emitted. Knockout fixtures use positional
-placeholders ("2A", "W74", ...) that the web app's fixed-result path does
-not yet support, so they are intentionally skipped.
+Group-stage matches are matched by the unordered pair of teams (the draw fixes
+who plays whom). Knockout matches can't be matched that way — the teams depend
+on earlier results — so each completed knockout event is matched to its
+scheduled ``matchNumber`` by (date, venue), which is unique across the bracket.
+Knockout entries record the winning team id; the web app pins them as
+winner-only fixed results (the exact score isn't needed downstream).
 """
 
 from datetime import date, datetime, timedelta, timezone
@@ -43,6 +46,15 @@ ESPN_NAME_OVERRIDES = {
     "curacao": "Curacao",
     "curaçao": "Curacao",
     "bosnia & herzegovina": "Bosnia and Herzegovina",
+    "bosnia-herzegovina": "Bosnia and Herzegovina",
+    "bosnia herzegovina": "Bosnia and Herzegovina",
+}
+
+# ESPN venue names that differ from our venues.json names. Keyed by the
+# normalized (lowercase, alphanumeric-only) ESPN venue name. City-based
+# matching handles most cases; this covers renamed/sponsor-named stadiums.
+VENUE_NAME_OVERRIDES = {
+    "estadiobanorte": "azteca",  # Estadio Azteca was renamed for 2026
 }
 
 
@@ -50,10 +62,11 @@ class ResultsScraper(BaseScraper):
     """Scraper for completed group-stage match results from ESPN."""
 
     DEFAULT_LEAGUE = "fifa.world"
-    # Group stage window for WC2026 (June 11-27). We pad by a day on each side
-    # because ESPN buckets late kickoffs into the following UTC date.
+    # Whole-tournament window for WC2026 (group stage June 11-27, final July 19).
+    # We pad by a day on each side because ESPN buckets late kickoffs into the
+    # following UTC date.
     DEFAULT_START = date(2026, 6, 10)
-    DEFAULT_END = date(2026, 6, 28)
+    DEFAULT_END = date(2026, 7, 20)
 
     def __init__(
         self,
@@ -61,6 +74,7 @@ class ResultsScraper(BaseScraper):
         schedule_path: Path,
         team_mapping_path: Path,
         groups_path: Path | None = None,
+        venues_path: Path | None = None,
         league: str | None = None,
     ) -> None:
         super().__init__(output_dir)
@@ -75,8 +89,18 @@ class ResultsScraper(BaseScraper):
             self.groups = self._load_json(groups_path).get("groups", {})
         else:
             self.groups = self.team_mapping.get("groups", {})
+        # Venues let us map completed knockout events to their scheduled
+        # matchNumber by (date, venue). Optional: without it, knockout matches
+        # on days with a single fixture still map unambiguously.
+        if venues_path is not None:
+            venues = self._load_json(venues_path)
+            self.venues = venues.get("venues", venues) if isinstance(venues, dict) else venues
+        else:
+            self.venues = []
         self._name_to_id = self._build_name_index()
         self._pair_to_match = self._build_pair_index()
+        self._venue_index = self._build_venue_index()
+        self._ko_by_venue, self._ko_fixtures = self._build_knockout_index()
 
     def get_output_filename(self) -> str:
         return "results.json"
@@ -172,6 +196,123 @@ class ResultsScraper(BaseScraper):
             }
         return pairs
 
+    @staticmethod
+    def _normalize(value: str) -> str:
+        """Lowercase and strip to alphanumerics for fuzzy name matching."""
+        return "".join(ch for ch in value.lower() if ch.isalnum())
+
+    def _build_venue_index(self) -> dict[str, str]:
+        """Map normalized venue names and cities to our venue ids.
+
+        ESPN venue naming drifts (sponsor renames, abbreviations), but each of
+        our venues is in a distinct city, so city is the most reliable key. We
+        index by stadium name and city so either can resolve a venue id.
+        """
+        index: dict[str, str] = {}
+        for venue in self.venues:
+            venue_id = venue.get("id")
+            if not venue_id:
+                continue
+            name = venue.get("name", "")
+            if name:
+                index[self._normalize(name)] = venue_id
+            city = venue.get("city", "")
+            if city:
+                index[self._normalize(city)] = venue_id
+                # Also index the city name without its state/province suffix
+                # ("East Rutherford, NJ" -> "East Rutherford").
+                index[self._normalize(city.split(",")[0])] = venue_id
+        # Explicit overrides win over derived keys.
+        index.update(VENUE_NAME_OVERRIDES)
+        return index
+
+    def _build_knockout_index(
+        self,
+    ) -> tuple[dict[str, list[tuple[date, dict[str, Any]]]], list[tuple[date, dict[str, Any]]]]:
+        """Index knockout fixtures by venue (and overall) with their dates.
+
+        ``by_venue`` maps each venueId to its knockout fixtures paired with the
+        scheduled date; ``all_fixtures`` is every knockout fixture. Matching
+        uses a date tolerance rather than an exact key because ESPN buckets late
+        kickoffs into the following UTC day, so a match's scoreboard date can be
+        one day after its scheduled date.
+        """
+        by_venue: dict[str, list[tuple[date, dict[str, Any]]]] = {}
+        all_fixtures: list[tuple[date, dict[str, Any]]] = []
+        for match in self.schedule.get("matches", []):
+            round_id = match.get("round")
+            if not round_id or round_id == "group_stage":
+                continue
+            match_date = match.get("date")
+            venue_id = match.get("venueId")
+            if not match_date:
+                continue
+            try:
+                date_obj = datetime.strptime(match_date, "%Y-%m-%d").date()
+            except ValueError:
+                continue
+            entry = {
+                "matchNumber": match.get("matchNumber"),
+                "round": round_id,
+                "venueId": venue_id,
+                "date": match_date,
+            }
+            all_fixtures.append((date_obj, entry))
+            if venue_id:
+                by_venue.setdefault(venue_id, []).append((date_obj, entry))
+        return by_venue, all_fixtures
+
+    def _resolve_venue_id(self, event: dict) -> str | None:
+        """Resolve an ESPN event's venue to one of our venue ids."""
+        competition = event.get("competitions", [{}])[0]
+        venue = competition.get("venue", {}) or {}
+        candidates = [venue.get("fullName", ""), venue.get("shortName", "")]
+        address = venue.get("address", {}) or {}
+        candidates.append(address.get("city", ""))
+        for candidate in candidates:
+            if not candidate:
+                continue
+            venue_id = self._venue_index.get(self._normalize(candidate))
+            if venue_id:
+                return venue_id
+        return None
+
+    # Max gap between an event's scoreboard date and its scheduled date. ESPN
+    # buckets late kickoffs into the following UTC day, so allow one day.
+    _DATE_TOLERANCE = timedelta(days=1)
+
+    def _scheduled_knockout(self, event_date: date, event: dict) -> dict[str, Any] | None:
+        """Find the schedule entry for a completed knockout event, if any.
+
+        Matches on venue (unique per bracket), picking the fixture at that venue
+        whose date is nearest the event's — within one day, to absorb ESPN's
+        next-day bucketing of late kickoffs.
+        """
+        venue_id = self._resolve_venue_id(event)
+        if venue_id is None:
+            return None
+        near = [
+            (abs(fixture_date - event_date), entry)
+            for fixture_date, entry in self._ko_by_venue.get(venue_id, [])
+            if abs(fixture_date - event_date) <= self._DATE_TOLERANCE
+        ]
+        near.sort(key=lambda item: item[0])
+        # Accept the nearest fixture as long as it's unambiguous.
+        if len(near) == 1 or (len(near) > 1 and near[0][0] != near[1][0]):
+            return near[0][1]
+        return None
+
+    def _in_knockout_window(self, event_date: date) -> bool:
+        """Whether a date falls within the knockout stage (± the tolerance)."""
+        if not self._ko_fixtures:
+            return False
+        dates = [fixture_date for fixture_date, _ in self._ko_fixtures]
+        return (
+            min(dates) - self._DATE_TOLERANCE
+            <= event_date
+            <= max(dates) + self._DATE_TOLERANCE
+        )
+
     # ------------------------------------------------------------------
     # Scraping
     # ------------------------------------------------------------------
@@ -227,6 +368,7 @@ class ResultsScraper(BaseScraper):
                 "team_id": team_id,
                 "name": team.get("displayName", ""),
                 "goals": goals,
+                "winner": bool(c.get("winner")),
             }
 
         home, away = sides.get("home"), sides.get("away")
@@ -237,12 +379,37 @@ class ResultsScraper(BaseScraper):
             self.logger.warning(f"Could not resolve team(s): {', '.join(unresolved)}")
             return None
 
+        match_date = (event.get("date", "") or "")[:10]
+        try:
+            event_date = datetime.strptime(match_date, "%Y-%m-%d").date()
+        except ValueError:
+            return None
+
+        # Knockout matches can't be matched by team pair (teams depend on
+        # earlier results), so try mapping by venue first. Checking knockout
+        # first also correctly handles a knockout rematch of a group pairing,
+        # which would otherwise collide with the group pair index.
+        knockout = self._scheduled_knockout(event_date, event)
+        if knockout is not None:
+            return self._knockout_entry(knockout, home, away)
+
         scheduled = self._pair_to_match.get(
             frozenset({home["team_id"], away["team_id"]})
         )
         if not scheduled:
-            # Not a group-stage fixture we track (e.g. knockout, or pairing
-            # that does not exist in the group draw).
+            # Neither a knockout fixture nor a group pairing we track. A
+            # completed, fully-resolved event inside the knockout window that
+            # lands here usually means an unrecognized venue name — surface it
+            # rather than dropping the result silently.
+            if self._in_knockout_window(event_date):
+                venue = (
+                    event.get("competitions", [{}])[0].get("venue", {}) or {}
+                ).get("fullName")
+                self.logger.warning(
+                    f"Completed knockout-window event not mapped to a fixture: "
+                    f"{home['name']} vs {away['name']} on {match_date} "
+                    f"(venue={venue!r})"
+                )
             return None
 
         # Orient the scraped score to the schedule's home/away ordering.
@@ -251,7 +418,6 @@ class ResultsScraper(BaseScraper):
         else:
             home_goals, away_goals = away["goals"], home["goals"]
 
-        match_date = (event.get("date", "") or "")[:10]
         return {
             "matchNumber": scheduled["matchNumber"],
             "groupId": scheduled["groupId"],
@@ -261,6 +427,41 @@ class ResultsScraper(BaseScraper):
             "awayScore": away_goals,
             "status": "completed",
             "date": match_date,
+        }
+
+    def _knockout_entry(self, scheduled: dict, home: dict, away: dict) -> dict | None:
+        """Build a knockout results entry, recording the winning team.
+
+        The web app pins knockout matches as winner-only fixed results, so the
+        winner is what matters. Prefer ESPN's ``winner`` flag (which accounts
+        for extra time and penalties); fall back to the higher score.
+        """
+        if home["winner"] and not away["winner"]:
+            winner_id = home["team_id"]
+        elif away["winner"] and not home["winner"]:
+            winner_id = away["team_id"]
+        elif home["goals"] != away["goals"]:
+            winner_id = home["team_id"] if home["goals"] > away["goals"] else away["team_id"]
+        else:
+            # Level score with no winner flag — likely undecided penalty data.
+            self.logger.warning(
+                f"Could not determine knockout winner for match "
+                f"{scheduled['matchNumber']} ({home['name']} vs {away['name']})"
+            )
+            return None
+
+        return {
+            "matchNumber": scheduled["matchNumber"],
+            "round": scheduled["round"],
+            "homeTeamId": home["team_id"],
+            "awayTeamId": away["team_id"],
+            "homeScore": home["goals"],
+            "awayScore": away["goals"],
+            "winnerTeamId": winner_id,
+            "status": "completed",
+            # Use the scheduled date, not ESPN's (which buckets late kickoffs
+            # into the next UTC day).
+            "date": scheduled["date"],
         }
 
     def scrape(
@@ -284,7 +485,12 @@ class ResultsScraper(BaseScraper):
                 results_by_match[entry["matchNumber"]] = entry
 
         matches = sorted(results_by_match.values(), key=lambda m: m["matchNumber"])
-        self.logger.info(f"Resolved {len(matches)} completed group-stage matches")
+        group_count = sum(1 for m in matches if "groupId" in m)
+        knockout_count = len(matches) - group_count
+        self.logger.info(
+            f"Resolved {len(matches)} completed matches "
+            f"({group_count} group, {knockout_count} knockout)"
+        )
 
         return {
             "generated_at": datetime.now(timezone.utc).isoformat(),

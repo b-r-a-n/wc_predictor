@@ -347,7 +347,8 @@ impl FixedResults {
     ///
     /// Knockout matches have dependencies on earlier rounds:
     /// - R16 slot N depends on R32 slots 2N and 2N+1
-    /// - QF slot N depends on R16 slots 2N and 2N+1
+    /// - QF slot N depends on the R16 slots given by `bracket::QF_R16_SLOT_ORDER`
+    ///   (the FIFA 2026 QFs cross the halves, so these are not simply 2N, 2N+1)
     /// - SF slot N depends on QF slots 2N and 2N+1
     /// - Final slot 0 depends on SF slots 0 and 1
     /// - Third place slot 0 depends on SF slots 0 and 1
@@ -386,10 +387,18 @@ fn get_knockout_dependencies(round: KnockoutRound, slot: u8) -> Vec<MatchFixture
             MatchFixture::knockout(KnockoutRound::RoundOf32, slot * 2 + 1),
         ],
 
-        // QF slot N depends on R16 slots 2N and 2N+1
+        // QF slot N depends on the two R16 slots that feed it. The FIFA 2026
+        // bracket crosses the halves, so use the canonical feed order rather
+        // than adjacent slots (see bracket::QF_R16_SLOT_ORDER).
         KnockoutRound::QuarterFinal => vec![
-            MatchFixture::knockout(KnockoutRound::RoundOf16, slot * 2),
-            MatchFixture::knockout(KnockoutRound::RoundOf16, slot * 2 + 1),
+            MatchFixture::knockout(
+                KnockoutRound::RoundOf16,
+                crate::bracket::QF_R16_SLOT_ORDER[(slot * 2) as usize] as u8,
+            ),
+            MatchFixture::knockout(
+                KnockoutRound::RoundOf16,
+                crate::bracket::QF_R16_SLOT_ORDER[(slot * 2 + 1) as usize] as u8,
+            ),
         ],
 
         // SF slot N depends on QF slots 2N and 2N+1
@@ -577,6 +586,31 @@ mod tests {
             .is_some());
     }
 
+    #[test]
+    fn test_deserializes_web_knockout_winner_only() {
+        // Contract with web/src/utils/fixedResults.ts: knockout results are
+        // pinned as winner-only fixtures keyed by (round, slot). The `round`
+        // string must match the KnockoutRound serde variant names.
+        let json = r#"[
+            {"fixture":{"type":"Knockout","round":"RoundOf32","slot":0},
+             "spec":{"mode":"WinnerOnly","winner":22}},
+            {"fixture":{"type":"Knockout","round":"QuarterFinal","slot":1},
+             "spec":{"mode":"WinnerOnly","winner":5}},
+            {"fixture":{"type":"Knockout","round":"Final","slot":0},
+             "spec":{"mode":"WinnerOnly","winner":9}}
+        ]"#;
+        let fixed: FixedResults = serde_json::from_str(json).expect("web JSON should parse");
+        assert_eq!(fixed.len(), 3);
+        match fixed.get_knockout_match(KnockoutRound::QuarterFinal, 1) {
+            Some(FixedResultSpec::WinnerOnly { winner }) => assert_eq!(*winner, TeamId(5)),
+            other => panic!("expected WinnerOnly for QF slot 1, got {:?}", other),
+        }
+        assert!(fixed
+            .get_knockout_match(KnockoutRound::RoundOf32, 0)
+            .is_some());
+        assert!(fixed.get_knockout_match(KnockoutRound::Final, 0).is_some());
+    }
+
     // Task 2.1: Tests for to_match_result
 
     #[test]
@@ -759,113 +793,60 @@ mod tests {
 
     #[test]
     fn test_complete_path_to_final() {
+        // Pin every knockout slot in every round. A fully-populated bracket
+        // satisfies all dependencies regardless of the exact feed wiring.
         let mut fixed = FixedResults::new();
+        let rounds = [
+            (KnockoutRound::RoundOf32, 16u8),
+            (KnockoutRound::RoundOf16, 8),
+            (KnockoutRound::QuarterFinal, 4),
+            (KnockoutRound::SemiFinal, 2),
+            (KnockoutRound::ThirdPlace, 1),
+            (KnockoutRound::Final, 1),
+        ];
+        for (round, count) in rounds {
+            for slot in 0..count {
+                fixed.insert(
+                    MatchFixture::knockout(round, slot),
+                    FixedResultSpec::winner_only(TeamId(slot)),
+                );
+            }
+        }
 
-        // Fix complete path: R32 → R16 → QF → SF → Final on one side
-        // R32 slots 0, 1 → R16 slot 0
-        fixed.insert(
-            MatchFixture::knockout(KnockoutRound::RoundOf32, 0),
-            FixedResultSpec::winner_only(TeamId(0)),
-        );
-        fixed.insert(
-            MatchFixture::knockout(KnockoutRound::RoundOf32, 1),
-            FixedResultSpec::winner_only(TeamId(1)),
-        );
-        fixed.insert(
-            MatchFixture::knockout(KnockoutRound::RoundOf16, 0),
-            FixedResultSpec::winner_only(TeamId(0)),
-        );
+        assert!(fixed.validate_dependencies().is_ok());
+    }
 
-        // R32 slots 2, 3 → R16 slot 1
-        fixed.insert(
-            MatchFixture::knockout(KnockoutRound::RoundOf32, 2),
-            FixedResultSpec::winner_only(TeamId(2)),
-        );
-        fixed.insert(
-            MatchFixture::knockout(KnockoutRound::RoundOf32, 3),
-            FixedResultSpec::winner_only(TeamId(3)),
-        );
-        fixed.insert(
-            MatchFixture::knockout(KnockoutRound::RoundOf16, 1),
-            FixedResultSpec::winner_only(TeamId(2)),
-        );
-
-        // QF slot 0 (from R16 slots 0 and 1)
-        fixed.insert(
-            MatchFixture::knockout(KnockoutRound::QuarterFinal, 0),
-            FixedResultSpec::winner_only(TeamId(0)),
-        );
-
-        // Same for the other side of the bracket (QF slot 1)
-        // R32 slots 4-7 → R16 slots 2-3 → QF slot 1
-        for i in 4..8 {
+    #[test]
+    fn test_qf_dependencies_follow_fifa_feed_order() {
+        // QF slot 1 must depend on R16 slots 4 and 5 (FIFA 2026 crosses the
+        // halves), not the adjacent slots 2 and 3. Satisfy R16 slots 2 and 3
+        // (and their R32 prerequisites) so that QF slot 1 is the only fixture
+        // with an unmet dependency.
+        let mut fixed = FixedResults::new();
+        for s in 4..8u8 {
             fixed.insert(
-                MatchFixture::knockout(KnockoutRound::RoundOf32, i),
-                FixedResultSpec::winner_only(TeamId(i)),
+                MatchFixture::knockout(KnockoutRound::RoundOf32, s),
+                FixedResultSpec::winner_only(TeamId(s)),
             );
         }
         fixed.insert(
             MatchFixture::knockout(KnockoutRound::RoundOf16, 2),
-            FixedResultSpec::winner_only(TeamId(4)),
+            FixedResultSpec::winner_only(TeamId(2)),
         );
         fixed.insert(
             MatchFixture::knockout(KnockoutRound::RoundOf16, 3),
-            FixedResultSpec::winner_only(TeamId(6)),
+            FixedResultSpec::winner_only(TeamId(3)),
         );
         fixed.insert(
             MatchFixture::knockout(KnockoutRound::QuarterFinal, 1),
-            FixedResultSpec::winner_only(TeamId(4)),
+            FixedResultSpec::winner_only(TeamId(2)),
         );
 
-        // SF slot 0 (from QF slots 0 and 1)
-        fixed.insert(
-            MatchFixture::knockout(KnockoutRound::SemiFinal, 0),
-            FixedResultSpec::winner_only(TeamId(0)),
-        );
-
-        // Now we need SF slot 1 for the final
-        // QF slots 2 and 3 → SF slot 1
-        for i in 8..16 {
-            fixed.insert(
-                MatchFixture::knockout(KnockoutRound::RoundOf32, i),
-                FixedResultSpec::winner_only(TeamId(i)),
-            );
+        let result = fixed.validate_dependencies();
+        assert!(result.is_err(), "QF slot 1 should not be satisfied by R16 slots 2 and 3");
+        if let Err(FixedResultsError::MissingDependency { missing, .. }) = result {
+            assert!(missing.contains(&MatchFixture::knockout(KnockoutRound::RoundOf16, 4)));
+            assert!(missing.contains(&MatchFixture::knockout(KnockoutRound::RoundOf16, 5)));
         }
-        fixed.insert(
-            MatchFixture::knockout(KnockoutRound::RoundOf16, 4),
-            FixedResultSpec::winner_only(TeamId(8)),
-        );
-        fixed.insert(
-            MatchFixture::knockout(KnockoutRound::RoundOf16, 5),
-            FixedResultSpec::winner_only(TeamId(10)),
-        );
-        fixed.insert(
-            MatchFixture::knockout(KnockoutRound::RoundOf16, 6),
-            FixedResultSpec::winner_only(TeamId(12)),
-        );
-        fixed.insert(
-            MatchFixture::knockout(KnockoutRound::RoundOf16, 7),
-            FixedResultSpec::winner_only(TeamId(14)),
-        );
-        fixed.insert(
-            MatchFixture::knockout(KnockoutRound::QuarterFinal, 2),
-            FixedResultSpec::winner_only(TeamId(8)),
-        );
-        fixed.insert(
-            MatchFixture::knockout(KnockoutRound::QuarterFinal, 3),
-            FixedResultSpec::winner_only(TeamId(12)),
-        );
-        fixed.insert(
-            MatchFixture::knockout(KnockoutRound::SemiFinal, 1),
-            FixedResultSpec::winner_only(TeamId(8)),
-        );
-
-        // Now we can fix the final
-        fixed.insert(
-            MatchFixture::knockout(KnockoutRound::Final, 0),
-            FixedResultSpec::winner_only(TeamId(0)),
-        );
-
-        assert!(fixed.validate_dependencies().is_ok());
     }
 }

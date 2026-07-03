@@ -116,23 +116,30 @@ export interface CompositeWeights {
 export type WasmStatus = 'loading' | 'ready' | 'error';
 export type TabId = 'results' | 'groups' | 'bracket' | 'editor' | 'venues' | 'fixtures';
 
-// User-locked match result (group stage only, for now)
+// User-locked or real match result. Group-stage matches are pinned by exact
+// score; knockout matches are pinned winner-only (the winning team advances
+// regardless of the bracket slot's home/away orientation), so knockout entries
+// carry `winnerTeamId`.
 export interface FixedMatchResult {
   matchNumber: number; // schedule match number
   homeScore: number;
   awayScore: number;
+  winnerTeamId?: number; // set for completed knockout matches
 }
 
-// A real, already-played match result (group stage), produced by the results
-// scraper. Scores are in the schedule's home/away orientation, same as
-// FixedMatchResult, so they slot straight into the fixed-results path.
+// A real, already-played match result, produced by the results scraper.
+// Group-stage scores are in the schedule's home/away orientation. Knockout
+// entries additionally carry `round` and `winnerTeamId` (and are not tied to a
+// group), since the winner is what the simulator pins.
 export interface MatchResultEntry {
   matchNumber: number;
-  groupId: string;
+  groupId?: string;
+  round?: KnockoutRoundType;
   homeTeamId: number;
   awayTeamId: number;
   homeScore: number;
   awayScore: number;
+  winnerTeamId?: number;
   status: 'completed';
   date: string;
 }

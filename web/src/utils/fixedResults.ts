@@ -5,6 +5,41 @@ import type {
   FixedMatchResult,
   RustFixedMatchEntry,
 } from '../types';
+import { getSlotForMatch } from './matchMapping';
+
+// Schedule round id -> the Rust `KnockoutRound` serde variant name.
+const RUST_KNOCKOUT_ROUND: Record<string, string> = {
+  round_of_32: 'RoundOf32',
+  round_of_16: 'RoundOf16',
+  quarter_finals: 'QuarterFinal',
+  semi_finals: 'SemiFinal',
+  third_place: 'ThirdPlace',
+  final: 'Final',
+};
+
+/**
+ * Convert a real knockout result into a Rust fixed-result entry.
+ *
+ * Knockout fixtures are keyed by (round, slot) and applied to whichever two
+ * teams the bracket places in that slot — so we pin them winner-only, which
+ * advances the real winner regardless of the slot's home/away orientation.
+ * Requires the winning team id (only completed knockout results carry it) and
+ * that every earlier match is also pinned, which holds because real results
+ * are a full snapshot. Returns null if the match can't be pinned.
+ */
+function toRustKnockoutResult(
+  match: ScheduledMatch,
+  result: FixedMatchResult
+): RustFixedMatchEntry | null {
+  if (result.winnerTeamId == null) return null;
+  const round = RUST_KNOCKOUT_ROUND[match.round];
+  const slot = getSlotForMatch(match.matchNumber);
+  if (round == null || slot == null) return null;
+  return {
+    fixture: { type: 'Knockout', round, slot },
+    spec: { mode: 'WinnerOnly', winner: result.winnerTeamId },
+  };
+}
 
 function groupPositionFromPlaceholder(placeholder?: string): number | null {
   if (!placeholder) return null;
@@ -63,6 +98,14 @@ export function toRustFixedResults(
   for (const result of Object.values(fixedResults)) {
     const match = schedule.matches.find((m) => m.matchNumber === result.matchNumber);
     if (!match) continue;
+
+    // Knockout matches are pinned winner-only via (round, slot).
+    if (match.round !== 'group_stage') {
+      const knockout = toRustKnockoutResult(match, result);
+      if (knockout) entries.push(knockout);
+      continue;
+    }
+
     const resolved = resolveGroupMatchTeams(match, groups);
     if (!resolved) continue;
 

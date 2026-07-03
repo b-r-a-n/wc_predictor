@@ -343,6 +343,8 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => ({
           matchNumber: m.matchNumber,
           homeScore: m.homeScore,
           awayScore: m.awayScore,
+          // Present for knockout matches; drives winner-only pinning.
+          ...(m.winnerTeamId != null ? { winnerTeamId: m.winnerTeamId } : {}),
         };
       }
       set({
