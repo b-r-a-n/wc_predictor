@@ -18,6 +18,7 @@ on:
 
 permissions:
   contents: write
+  actions: write   # needed for `gh workflow run` to dispatch deploy.yml
 
 jobs:
   regenerate:
@@ -38,13 +39,26 @@ jobs:
         run: ./scripts/generate_baseline.sh
 
       - name: Commit updated baseline
+        id: commit
+        env:
+          ITERATIONS: ${{ github.event.inputs.iterations || '500000' }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           if git diff --quiet -- web/public/data/baseline_results.json; then
             echo "Baseline unchanged — nothing to commit."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git add web/public/data/baseline_results.json
           git commit -m "Regenerate baseline simulation ($ITERATIONS iterations)"
           git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger deploy
+        # Pushes made with GITHUB_TOKEN don't trigger other workflows, so the
+        # Pages deploy is dispatched explicitly. Only when the baseline changed.
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run deploy.yml --ref main
