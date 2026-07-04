@@ -487,23 +487,20 @@ fn compute_joint_probability(
         log_sum += p_a.ln() + p_b.ln();
     }
 
-    // R16 probabilities
-    for data in r16.values() {
-        let p = data.probability.max(1e-10);
-        log_sum += p.ln();
-    }
-
-    // QF probabilities
-    for data in qf.values() {
-        let p = data.probability.max(1e-10);
-        log_sum += p.ln();
-    }
-
-    // SF probabilities
-    for data in sf.values() {
-        let p = data.probability.max(1e-10);
-        log_sum += p.ln();
-    }
+    // Later-round probabilities. Iterate slots in sorted order so the
+    // floating-point summation order is deterministic (HashMap iteration
+    // order is not), keeping the baseline reproducible across runs.
+    let sum_ln_by_slot = |map: &HashMap<u8, MostLikelyBracketSlot>| -> f64 {
+        let mut slots: Vec<u8> = map.keys().copied().collect();
+        slots.sort_unstable();
+        slots
+            .iter()
+            .map(|s| map[s].probability.max(1e-10).ln())
+            .sum()
+    };
+    log_sum += sum_ln_by_slot(r16);
+    log_sum += sum_ln_by_slot(qf);
+    log_sum += sum_ln_by_slot(sf);
 
     // Champion probability
     if let Some(data) = champion {

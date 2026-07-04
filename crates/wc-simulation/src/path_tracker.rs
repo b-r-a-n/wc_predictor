@@ -266,9 +266,10 @@ impl PathStatistics {
             return;
         }
 
-        // Collect entries and sort by count descending
+        // Collect entries and sort by count descending, breaking ties on the
+        // path key so pruning is deterministic (HashMap drain order is not).
         let mut entries: Vec<_> = self.complete_paths.drain().collect();
-        entries.sort_by(|a, b| b.1.cmp(&a.1));
+        entries.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
 
         // Keep only top entries
         self.complete_paths = entries.into_iter().take(max_entries).collect();
