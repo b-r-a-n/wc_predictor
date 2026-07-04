@@ -45,11 +45,20 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- web/public/data/baseline_results.json; then
-            echo "Baseline unchanged — nothing to commit."
+          # Compare everything except the volatile metadata (generated_at,
+          # git_sha), so we don't commit/redeploy when only the timestamp
+          # changed but the simulation results and config are identical.
+          git show HEAD:web/public/data/baseline_results.json 2>/dev/null \
+            | jq -S 'del(.generated_at, .git_sha)' > old_baseline.json 2>/dev/null \
+            || echo '{}' > old_baseline.json
+          jq -S 'del(.generated_at, .git_sha)' web/public/data/baseline_results.json > new_baseline.json
+          if diff -q old_baseline.json new_baseline.json >/dev/null 2>&1; then
+            echo "Baseline data unchanged — nothing to commit."
             echo "changed=false" >> "$GITHUB_OUTPUT"
+            rm -f old_baseline.json new_baseline.json
             exit 0
           fi
+          rm -f old_baseline.json new_baseline.json
           git add web/public/data/baseline_results.json
           git commit -m "Regenerate baseline simulation ($ITERATIONS iterations)"
           git push
