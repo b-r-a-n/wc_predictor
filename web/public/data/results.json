@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-06T12:38:47.928400+00:00",
+  "generated_at": "2026-07-07T11:39:30.486074+00:00",
   "source": "espn:fifa.world",
   "matches": [
     {
@@ -941,6 +941,28 @@
       "winnerTeamId": 13,
       "status": "completed",
       "date": "2026-07-05"
+    },
+    {
+      "matchNumber": 93,
+      "round": "round_of_16",
+      "homeTeamId": 29,
+      "awayTeamId": 36,
+      "homeScore": 0,
+      "awayScore": 1,
+      "winnerTeamId": 36,
+      "status": "completed",
+      "date": "2026-07-06"
+    },
+    {
+      "matchNumber": 94,
+      "round": "round_of_16",
+      "homeTeamId": 39,
+      "awayTeamId": 4,
+      "homeScore": 1,
+      "awayScore": 4,
+      "winnerTeamId": 4,
+      "status": "completed",
+      "date": "2026-07-06"
     }
   ]
 }
