@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-10T11:43:58.441931+00:00",
+  "generated_at": "2026-07-11T10:09:42.375998+00:00",
   "source": "espn:fifa.world",
   "matches": [
     {
@@ -996,6 +996,17 @@
       "winnerTeamId": 14,
       "status": "completed",
       "date": "2026-07-09"
+    },
+    {
+      "matchNumber": 98,
+      "round": "quarter_finals",
+      "homeTeamId": 36,
+      "awayTeamId": 4,
+      "homeScore": 2,
+      "awayScore": 1,
+      "winnerTeamId": 36,
+      "status": "completed",
+      "date": "2026-07-10"
     }
   ]
 }
