@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-15T10:42:57.018807+00:00",
+  "generated_at": "2026-07-16T10:50:38.475545+00:00",
   "source": "espn:fifa.world",
   "matches": [
     {
@@ -1040,6 +1040,17 @@
       "winnerTeamId": 36,
       "status": "completed",
       "date": "2026-07-14"
+    },
+    {
+      "matchNumber": 102,
+      "round": "semi_finals",
+      "homeTeamId": 13,
+      "awayTeamId": 0,
+      "homeScore": 1,
+      "awayScore": 2,
+      "winnerTeamId": 0,
+      "status": "completed",
+      "date": "2026-07-15"
     }
   ]
 }
