@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-16T10:50:38.475545+00:00",
+  "generated_at": "2026-07-19T10:20:08.315666+00:00",
   "source": "espn:fifa.world",
   "matches": [
     {
@@ -1051,6 +1051,17 @@
       "winnerTeamId": 0,
       "status": "completed",
       "date": "2026-07-15"
+    },
+    {
+      "matchNumber": 103,
+      "round": "third_place",
+      "homeTeamId": 14,
+      "awayTeamId": 13,
+      "homeScore": 4,
+      "awayScore": 6,
+      "winnerTeamId": 13,
+      "status": "completed",
+      "date": "2026-07-18"
     }
   ]
 }
